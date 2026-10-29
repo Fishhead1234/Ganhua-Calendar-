@@ -40,6 +40,7 @@ interface AdminConsoleModalProps {
   onOpenPaywall: () => void;
   onOpenIgModal: () => void;
   onResetApp: () => void;
+  onLogoutAdmin: () => void;
 }
 
 export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
@@ -59,6 +60,7 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
   onOpenPaywall,
   onOpenIgModal,
   onResetApp,
+  onLogoutAdmin,
 }) => {
   const [customDateStr, setCustomDateStr] = useState<string>(() => {
     const d = new Date();
@@ -388,16 +390,16 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
           </div>
         </div>
 
-        {/* Section 5: Modal & View Testers */}
+        {/* Section 5: Modal & View Testers & Logout */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#2D2D2D]/15">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={onOpenPaywall}
               className="px-3 py-2 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-xs font-sans font-bold text-[#2D2D2D] cursor-pointer flex items-center gap-1.5 shadow-sm"
             >
               <Crown className="w-3.5 h-3.5 text-amber-700" />
-              <span>預覽付費牆 (Paywall Modal)</span>
+              <span>預覽付費牆</span>
             </button>
 
             <button
@@ -406,7 +408,17 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
               className="px-3 py-2 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#EAE3D5] text-xs font-sans font-bold text-[#2D2D2D] cursor-pointer flex items-center gap-1.5 shadow-sm"
             >
               <Share2 className="w-3.5 h-3.5 text-[#2D2D2D]" />
-              <span>預覽 IG 限動導出 (Story Modal)</span>
+              <span>預覽 IG 限動</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onLogoutAdmin}
+              className="px-3 py-2 rounded-xl border border-[#C83E31] bg-[#C83E31] hover:bg-[#a93025] text-white text-xs font-sans font-bold cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title="登出管理員身分，恢復一般使用者鎖定狀態"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>🔒 鎖定並登出管理員</span>
             </button>
           </div>
 
@@ -417,7 +429,7 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
             title="清空瀏覽器快取並還原初始狀態"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>重設所有測試數據</span>
+            <span>重設數據</span>
           </button>
         </div>
       </div>

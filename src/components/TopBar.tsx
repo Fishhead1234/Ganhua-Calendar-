@@ -30,8 +30,10 @@ interface TopBarProps {
   onToggleFavoritesOnly: () => void;
   isPro: boolean;
   currentTier?: AppTier;
+  isAdminAuthed?: boolean;
   onOpenPaywall: () => void;
   onOpenAdminConsole?: () => void;
+  onRequestPasswordAuth?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -48,12 +50,30 @@ export const TopBar: React.FC<TopBarProps> = ({
   showFavoritesOnly,
   onToggleFavoritesOnly,
   isPro,
-  currentTier = 'admin',
+  currentTier = 'free',
+  isAdminAuthed = false,
   onOpenPaywall,
   onOpenAdminConsole,
+  onRequestPasswordAuth,
 }) => {
   const [now, setNow] = useState<Date>(() => new Date());
   const [editingOffHour, setEditingOffHour] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
+
+  const handleLogoClick = () => {
+    if (isAdminAuthed) {
+      onOpenAdminConsole?.();
+      return;
+    }
+    const next = logoClickCount + 1;
+    if (next >= 3) {
+      setLogoClickCount(0);
+      onRequestPasswordAuth?.();
+    } else {
+      setLogoClickCount(next);
+      setTimeout(() => setLogoClickCount(0), 1200);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -128,26 +148,44 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Row 1: Brand Title + Clock + Pro Badge + Survival Streak */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl border-2 border-[#2D2D2D] bg-[#FAF7F0] flex items-center justify-center shadow-[2px_2px_0px_#2D2D2D]">
+            <button
+              type="button"
+              onClick={handleLogoClick}
+              className="w-9 h-9 rounded-xl border-2 border-[#2D2D2D] bg-[#FAF7F0] flex items-center justify-center shadow-[2px_2px_0px_#2D2D2D] cursor-pointer hover:bg-[#EAE3D5] transition active:scale-95"
+              title={isAdminAuthed ? '點擊開啟管理員控制台' : '幹話日曆'}
+            >
               <span className="font-serif font-black text-base tracking-tighter text-[#2D2D2D]">
                 幹
               </span>
-            </div>
+            </button>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-serif font-black text-lg sm:text-xl tracking-wide text-[#2D2D2D]">
                   幹話日曆
                 </h1>
-                {currentTier === 'admin' ? (
-                  <button
-                    type="button"
-                    onClick={onOpenAdminConsole}
-                    className="text-[10px] font-sans font-black px-2 py-0.5 rounded-full border border-[#D4B483] bg-[#2D2D2D] text-[#D4B483] transition cursor-pointer flex items-center gap-1 shadow-sm hover:bg-[#1a1a1a]"
-                    title="點擊開啟管理員控制台 & 版本切換"
-                  >
-                    <Shield className="w-3 h-3 fill-current text-[#D4B483]" />
-                    <span>👑 管理員</span>
-                  </button>
+                {isAdminAuthed ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={onOpenAdminConsole}
+                      className="text-[10px] font-sans font-black px-2 py-0.5 rounded-full border border-[#D4B483] bg-[#2D2D2D] text-[#D4B483] transition cursor-pointer flex items-center gap-1 shadow-sm hover:bg-[#1a1a1a]"
+                      title="點擊開啟管理員控制台 & 版本切換"
+                    >
+                      <Shield className="w-3 h-3 fill-current text-[#D4B483]" />
+                      <span>{currentTier === 'admin' ? '👑 管理員' : currentTier === 'pro' ? 'PRO 視角' : '免費版視角'}</span>
+                    </button>
+
+                    {onOpenAdminConsole && (
+                      <button
+                        type="button"
+                        onClick={onOpenAdminConsole}
+                        className="p-1 rounded-full text-[#6E6A63] hover:text-[#2D2D2D] hover:bg-[#2D2D2D]/10 transition cursor-pointer"
+                        title="管理員設定 & 版本視角切換"
+                      >
+                        <Settings2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <button
                     type="button"
@@ -161,17 +199,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                   >
                     <Crown className="w-3 h-3 fill-current" />
                     <span>{isPro ? 'PRO 專業版' : '升級 PRO'}</span>
-                  </button>
-                )}
-
-                {onOpenAdminConsole && (
-                  <button
-                    type="button"
-                    onClick={onOpenAdminConsole}
-                    className="p-1 rounded-full text-[#6E6A63] hover:text-[#2D2D2D] hover:bg-[#2D2D2D]/10 transition cursor-pointer"
-                    title="管理員設定 & 版本視角切換"
-                  >
-                    <Settings2 className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>

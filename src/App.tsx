@@ -16,6 +16,7 @@ import { PaywallModal } from './components/PaywallModal';
 import { CalendarSyncBar } from './components/CalendarSyncBar';
 import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
 import { AdminConsoleModal } from './components/AdminConsoleModal';
+import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { FloatingVersionBar } from './components/FloatingVersionBar';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
@@ -78,7 +79,10 @@ export const App: React.FC = () => {
     tier,
     isPro,
     isAdmin,
+    isAdminAuthed,
     isLoading: isSubLoading,
+    loginAdmin,
+    logoutAdmin,
     setTier,
     purchase,
     restore,
@@ -91,6 +95,7 @@ export const App: React.FC = () => {
   const [isIgModalOpen, setIsIgModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
+  const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
 
@@ -105,16 +110,20 @@ export const App: React.FC = () => {
     return new URLSearchParams(window.location.search).get('embed') === '1';
   }, []);
 
-  // Keyboard shortcut: Shift+A or Shift+D to open Admin Console
+  // Keyboard shortcut: Shift+A or Shift+D to open Admin Console (or Password Modal if locked)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.shiftKey && (e.key === 'A' || e.key === 'a' || e.key === 'D' || e.key === 'd')) {
-        setIsAdminConsoleOpen((prev) => !prev);
+        if (isAdminAuthed) {
+          setIsAdminConsoleOpen((prev) => !prev);
+        } else {
+          setIsAdminPasswordModalOpen(true);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isAdminAuthed]);
 
   useEffect(() => {
     try {
@@ -288,8 +297,10 @@ export const App: React.FC = () => {
         onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
         isPro={isPro}
         currentTier={tier}
+        isAdminAuthed={isAdminAuthed}
         onOpenPaywall={() => setIsPaywallOpen(true)}
         onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
+        onRequestPasswordAuth={() => setIsAdminPasswordModalOpen(true)}
       />
 
       {/* Toast Alert */}
@@ -442,11 +453,17 @@ export const App: React.FC = () => {
       {/* Floating Version Quick-Switcher */}
       <FloatingVersionBar
         currentTier={tier}
+        isAdminAuthed={isAdminAuthed}
         onChangeTier={(newTier) => {
-          setTier(newTier);
-          showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+          const success = setTier(newTier);
+          if (success) {
+            showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+          } else {
+            setIsAdminPasswordModalOpen(true);
+          }
         }}
         onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
+        onRequestPasswordAuth={() => setIsAdminPasswordModalOpen(true)}
       />
 
       {/* Admin Console & Time Machine Modal */}
@@ -455,8 +472,12 @@ export const App: React.FC = () => {
         onClose={() => setIsAdminConsoleOpen(false)}
         currentTier={tier}
         onChangeTier={(newTier) => {
-          setTier(newTier);
-          showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+          const success = setTier(newTier);
+          if (success) {
+            showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+          } else {
+            setIsAdminPasswordModalOpen(true);
+          }
         }}
         dateOffset={persisted.dateOffset}
         onSetDateOffset={(offset) => {
@@ -493,6 +514,22 @@ export const App: React.FC = () => {
             localStorage.clear();
             window.location.reload();
           }
+        }}
+        onLogoutAdmin={() => {
+          logoutAdmin();
+          setIsAdminConsoleOpen(false);
+          showToast('🔒 已安全登出並鎖定管理員權限');
+        }}
+      />
+
+      {/* Admin Password Verification Modal */}
+      <AdminPasswordModal
+        isOpen={isAdminPasswordModalOpen}
+        onClose={() => setIsAdminPasswordModalOpen(false)}
+        onVerify={(pwd) => loginAdmin(pwd)}
+        onSuccess={() => {
+          showToast('🎉 管理員驗證成功！已解鎖最高權限');
+          setIsAdminConsoleOpen(true);
         }}
       />
     </div>

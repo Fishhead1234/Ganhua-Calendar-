@@ -34,26 +34,43 @@ export const SUBSCRIPTION_PLANS: PlanDetails[] = [
 
 const LOCAL_STORAGE_PRO_KEY = 'ganhua_pro_subscription_v1';
 const LOCAL_STORAGE_TIER_KEY = 'ganhua_app_tier_v2';
+const LOCAL_STORAGE_ADMIN_AUTH_KEY = 'ganhua_admin_authenticated_v2';
 
-type SubscriptionListener = (isPro: boolean, tier: AppTier, isAdmin: boolean) => void;
+const MASTER_PASSWORDS = ['ganhua2026', '8888'];
+
+type SubscriptionListener = (
+  isPro: boolean,
+  tier: AppTier,
+  isAdmin: boolean,
+  isAdminAuthed: boolean
+) => void;
 
 class PurchaseService {
-  private tier: AppTier = 'admin';
+  private tier: AppTier = 'free';
+  private isAdminAuthed: boolean = false;
   private listeners: Set<SubscriptionListener> = new Set();
 
   constructor() {
     if (typeof window !== 'undefined') {
       try {
-        const storedTier = localStorage.getItem(LOCAL_STORAGE_TIER_KEY) as AppTier | null;
-        if (storedTier && (storedTier === 'free' || storedTier === 'pro' || storedTier === 'admin')) {
-          this.tier = storedTier;
+        const authed = localStorage.getItem(LOCAL_STORAGE_ADMIN_AUTH_KEY) === 'true';
+        this.isAdminAuthed = authed;
+
+        if (authed) {
+          const storedTier = localStorage.getItem(LOCAL_STORAGE_TIER_KEY) as AppTier | null;
+          if (storedTier && (storedTier === 'free' || storedTier === 'pro' || storedTier === 'admin')) {
+            this.tier = storedTier;
+          } else {
+            this.tier = 'admin';
+          }
         } else {
-          // Default to 'admin' so the owner has full admin rights and features unlocked
-          this.tier = 'admin';
-          localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'admin');
+          // Unauthenticated standard user: default to Free unless legitimate pro is recorded
+          const isProUser = localStorage.getItem(LOCAL_STORAGE_PRO_KEY) === 'true';
+          this.tier = isProUser ? 'pro' : 'free';
         }
       } catch {
-        this.tier = 'admin';
+        this.tier = 'free';
+        this.isAdminAuthed = false;
       }
     }
   }
@@ -70,22 +87,65 @@ class PurchaseService {
     return this.tier === 'admin';
   }
 
+  public isAdminAuthenticated(): boolean {
+    return this.isAdminAuthed;
+  }
+
+  public verifyAdminPassword(inputPassword: string): boolean {
+    const cleaned = (inputPassword || '').trim();
+    const envPwd =
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_ADMIN_PASSWORD) || '';
+    const valid = [...MASTER_PASSWORDS, envPwd].filter(Boolean);
+
+    if (valid.includes(cleaned)) {
+      this.isAdminAuthed = true;
+      this.tier = 'admin';
+      try {
+        localStorage.setItem(LOCAL_STORAGE_ADMIN_AUTH_KEY, 'true');
+        localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'admin');
+        localStorage.setItem(LOCAL_STORAGE_PRO_KEY, 'true');
+      } catch {
+        // ignore
+      }
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
+  public logoutAdmin(): void {
+    this.isAdminAuthed = false;
+    this.tier = 'free';
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_ADMIN_AUTH_KEY);
+      localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'free');
+      localStorage.setItem(LOCAL_STORAGE_PRO_KEY, 'false');
+    } catch {
+      // ignore
+    }
+    this.notify();
+  }
+
   public subscribe(callback: SubscriptionListener): () => void {
     this.listeners.add(callback);
-    callback(this.isPro(), this.tier, this.isAdmin());
+    callback(this.isPro(), this.tier, this.isAdmin(), this.isAdminAuthed);
     return () => this.listeners.delete(callback);
   }
 
   private notify() {
     const pro = this.isPro();
     const admin = this.isAdmin();
-    this.listeners.forEach((cb) => cb(pro, this.tier, admin));
+    const authed = this.isAdminAuthed;
+    this.listeners.forEach((cb) => cb(pro, this.tier, admin, authed));
   }
 
   /**
-   * Set user tier directly (Free, Pro, Admin)
+   * Set user tier directly (Free, Pro, Admin) - Requires Admin auth to change to Admin or Pro
    */
-  public setTier(tier: AppTier): void {
+  public setTier(tier: AppTier): boolean {
+    if ((tier === 'admin' || tier === 'pro') && !this.isAdminAuthed) {
+      return false;
+    }
     this.tier = tier;
     try {
       localStorage.setItem(LOCAL_STORAGE_TIER_KEY, tier);
@@ -94,6 +154,7 @@ class PurchaseService {
       // ignore
     }
     this.notify();
+    return true;
   }
 
   /**

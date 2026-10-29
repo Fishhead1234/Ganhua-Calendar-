@@ -1,19 +1,39 @@
 import React, { useState } from 'react';
-import { Shield, Crown, User, Settings2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Shield, Crown, User, Settings2, ChevronUp, ChevronDown, Lock } from 'lucide-react';
 import { AppTier } from '../services/purchaseService';
 
 interface FloatingVersionBarProps {
   currentTier: AppTier;
+  isAdminAuthed: boolean;
   onChangeTier: (tier: AppTier) => void;
   onOpenAdminConsole: () => void;
+  onRequestPasswordAuth: () => void;
 }
 
 export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
   currentTier,
+  isAdminAuthed,
   onChangeTier,
   onOpenAdminConsole,
+  onRequestPasswordAuth,
 }) => {
   const [collapsed, setCollapsed] = useState(false);
+
+  // If not authenticated as Admin, only show a subtle discrete keyhole entrance
+  if (!isAdminAuthed) {
+    return (
+      <div className="fixed bottom-3 left-3 z-40 select-none">
+        <button
+          type="button"
+          onClick={onRequestPasswordAuth}
+          className="p-2 rounded-full bg-[#2D2D2D]/40 hover:bg-[#2D2D2D] text-[#D4B483] border border-[#2D2D2D]/20 hover:border-[#D4B483]/50 transition cursor-pointer opacity-25 hover:opacity-100 shadow-sm"
+          title="內部管理員通道"
+        >
+          <Lock className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-3 left-3 sm:left-4 z-40 select-none">
@@ -106,3 +126,5 @@ export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
     </div>
   );
 };
+
+
