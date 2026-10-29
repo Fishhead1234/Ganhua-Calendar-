@@ -9,8 +9,11 @@ import {
   Heart,
   Crown,
   Lock,
+  Shield,
+  Settings2,
 } from 'lucide-react';
 import { CharacterType, CHARACTER_META } from '../types/calendar';
+import { AppTier } from '../services/purchaseService';
 
 interface TopBarProps {
   selectedTheme: CharacterType | 'all';
@@ -26,7 +29,9 @@ interface TopBarProps {
   showFavoritesOnly: boolean;
   onToggleFavoritesOnly: () => void;
   isPro: boolean;
+  currentTier?: AppTier;
   onOpenPaywall: () => void;
+  onOpenAdminConsole?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -43,7 +48,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   showFavoritesOnly,
   onToggleFavoritesOnly,
   isPro,
+  currentTier = 'admin',
   onOpenPaywall,
+  onOpenAdminConsole,
 }) => {
   const [now, setNow] = useState<Date>(() => new Date());
   const [editingOffHour, setEditingOffHour] = useState(false);
@@ -131,19 +138,42 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <h1 className="font-serif font-black text-lg sm:text-xl tracking-wide text-[#2D2D2D]">
                   幹話日曆
                 </h1>
-                <button
-                  type="button"
-                  onClick={onOpenPaywall}
-                  className={`text-[10px] font-sans font-black px-2 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 ${
-                    isPro
-                      ? 'bg-[#D4B483] text-[#2D2D2D] border-[#2D2D2D]'
-                      : 'bg-[#C83E31]/10 text-[#C83E31] border-[#C83E31]/30 hover:bg-[#C83E31]/20'
-                  }`}
-                  title="點擊查看 Pro 會員特權與終身方案"
-                >
-                  <Crown className="w-3 h-3 fill-current" />
-                  <span>{isPro ? 'PRO 專業版' : '升級 PRO'}</span>
-                </button>
+                {currentTier === 'admin' ? (
+                  <button
+                    type="button"
+                    onClick={onOpenAdminConsole}
+                    className="text-[10px] font-sans font-black px-2 py-0.5 rounded-full border border-[#D4B483] bg-[#2D2D2D] text-[#D4B483] transition cursor-pointer flex items-center gap-1 shadow-sm hover:bg-[#1a1a1a]"
+                    title="點擊開啟管理員控制台 & 版本切換"
+                  >
+                    <Shield className="w-3 h-3 fill-current text-[#D4B483]" />
+                    <span>👑 管理員</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onOpenPaywall}
+                    className={`text-[10px] font-sans font-black px-2 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 ${
+                      isPro
+                        ? 'bg-[#D4B483] text-[#2D2D2D] border-[#2D2D2D]'
+                        : 'bg-[#C83E31]/10 text-[#C83E31] border-[#C83E31]/30 hover:bg-[#C83E31]/20'
+                    }`}
+                    title="點擊查看 Pro 會員特權與終身方案"
+                  >
+                    <Crown className="w-3 h-3 fill-current" />
+                    <span>{isPro ? 'PRO 專業版' : '升級 PRO'}</span>
+                  </button>
+                )}
+
+                {onOpenAdminConsole && (
+                  <button
+                    type="button"
+                    onClick={onOpenAdminConsole}
+                    className="p-1 rounded-full text-[#6E6A63] hover:text-[#2D2D2D] hover:bg-[#2D2D2D]/10 transition cursor-pointer"
+                    title="管理員設定 & 版本視角切換"
+                  >
+                    <Settings2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
               <p className="text-[11px] font-sans text-[#6E6A63] hidden sm:block">
                 每日一頁社畜生存指南・撕掉今天的厭世

@@ -15,9 +15,12 @@ import { IgStoryModal } from './components/IgStoryModal';
 import { PaywallModal } from './components/PaywallModal';
 import { CalendarSyncBar } from './components/CalendarSyncBar';
 import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
+import { AdminConsoleModal } from './components/AdminConsoleModal';
+import { FloatingVersionBar } from './components/FloatingVersionBar';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
 import { useTodayQuote } from './hooks/useTodayQuote';
+import { AppTier } from './services/purchaseService';
 import {
   CalendarMeeting,
   CalendarRoastResult,
@@ -71,13 +74,24 @@ function loadPersistedState(): PersistedState {
 
 export const App: React.FC = () => {
   const allQuotes = quotesData as CalendarQuote[];
-  const { isPro, isLoading: isSubLoading, purchase, restore, toggleMockPro } = useSubscription();
+  const {
+    tier,
+    isPro,
+    isAdmin,
+    isLoading: isSubLoading,
+    setTier,
+    purchase,
+    restore,
+    toggleMockPro,
+  } = useSubscription();
 
   const [persisted, setPersisted] = useState<PersistedState>(() => loadPersistedState());
   const [viewMode, setViewMode] = useState<'single' | 'trio'>('single');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isIgModalOpen, setIsIgModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
+  const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
 
   // Calendar Roast State
@@ -89,6 +103,17 @@ export const App: React.FC = () => {
   const isEmbedMode = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return new URLSearchParams(window.location.search).get('embed') === '1';
+  }, []);
+
+  // Keyboard shortcut: Shift+A or Shift+D to open Admin Console
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.shiftKey && (e.key === 'A' || e.key === 'a' || e.key === 'D' || e.key === 'd')) {
+        setIsAdminConsoleOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -106,10 +131,10 @@ export const App: React.FC = () => {
 
   // Enforce Free Tier Character Gating: if free, force 'cat'
   useEffect(() => {
-    if (!isPro && persisted.selectedTheme !== 'cat') {
+    if (!isPro && !isAdmin && persisted.selectedTheme !== 'cat') {
       setPersisted((prev) => ({ ...prev, selectedTheme: 'cat' }));
     }
-  }, [isPro, persisted.selectedTheme]);
+  }, [isPro, isAdmin, persisted.selectedTheme]);
 
   // Integrated useTodayQuote hook with quotes365.json dataset
   const {
@@ -122,6 +147,8 @@ export const App: React.FC = () => {
   } = useTodayQuote({
     dateOffset: persisted.dateOffset,
     isPro,
+    isAdmin,
+    allowFutureDates,
     calendarConnected: persisted.calendarConnected,
     roastResult: persisted.calendarConnected ? roastResult : null,
     selectedThemeFilter: persisted.selectedTheme,
@@ -130,7 +157,7 @@ export const App: React.FC = () => {
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
     if (!canGoPrev) {
-      if (!isPro) {
+      if (!isPro && !isAdmin) {
         setIsPaywallOpen(true);
       } else {
         showToast('已翻閱至最久遠的生存存檔紀錄。');
@@ -157,7 +184,11 @@ export const App: React.FC = () => {
   };
 
   const handleBlockedTomorrow = () => {
-    showToast('🔒 明天的事明天再煩惱，先活過今天。');
+    if (isAdmin) {
+      showToast('🔒 明天的事明天再煩惱；您亦可至管理員控制台開啟「解除未來鎖定」提前預覽。');
+    } else {
+      showToast('🔒 明天的事明天再煩惱，先活過今天。');
+    }
   };
 
   // Stamp Survived
@@ -234,7 +265,7 @@ export const App: React.FC = () => {
       <TopBar
         selectedTheme={persisted.selectedTheme}
         onSelectTheme={(theme) => {
-          if (!isPro && (theme === 'capybara' || theme === 'ghost' || theme === 'all')) {
+          if (!isPro && !isAdmin && (theme === 'capybara' || theme === 'ghost' || theme === 'all')) {
             setIsPaywallOpen(true);
             return;
           }
@@ -256,7 +287,9 @@ export const App: React.FC = () => {
         showFavoritesOnly={showFavoritesOnly}
         onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
         isPro={isPro}
+        currentTier={tier}
         onOpenPaywall={() => setIsPaywallOpen(true)}
+        onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
       />
 
       {/* Toast Alert */}
@@ -295,7 +328,7 @@ export const App: React.FC = () => {
             onSelectCard={(quoteId) => {
               const clicked = allQuotes.find((q) => q.id === quoteId);
               if (clicked) {
-                if (!isPro && (clicked.character === 'capybara' || clicked.character === 'ghost')) {
+                if (!isPro && !isAdmin && (clicked.character === 'capybara' || clicked.character === 'ghost')) {
                   setIsPaywallOpen(true);
                   return;
                 }
@@ -404,6 +437,63 @@ export const App: React.FC = () => {
         isLoading={isSubLoading}
         isPro={isPro}
         onToggleMockPro={toggleMockPro}
+      />
+
+      {/* Floating Version Quick-Switcher */}
+      <FloatingVersionBar
+        currentTier={tier}
+        onChangeTier={(newTier) => {
+          setTier(newTier);
+          showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+        }}
+        onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
+      />
+
+      {/* Admin Console & Time Machine Modal */}
+      <AdminConsoleModal
+        isOpen={isAdminConsoleOpen}
+        onClose={() => setIsAdminConsoleOpen(false)}
+        currentTier={tier}
+        onChangeTier={(newTier) => {
+          setTier(newTier);
+          showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+        }}
+        dateOffset={persisted.dateOffset}
+        onSetDateOffset={(offset) => {
+          setPersisted((prev) => ({ ...prev, dateOffset: offset }));
+          showToast(offset === 0 ? '已回到今日！' : `已跳轉至 ${offset > 0 ? `未來 +${offset} 天` : `${offset} 天前`}！`);
+        }}
+        allowFutureDates={allowFutureDates}
+        onToggleAllowFutureDates={(allow) => {
+          setAllowFutureDates(allow);
+          showToast(allow ? '🔓 已解鎖未來日期撕頁！' : '🔒 已恢復常規鎖定規則');
+        }}
+        streakCount={persisted.streakCount}
+        onSetStreakCount={(count) => {
+          setPersisted((prev) => ({ ...prev, streakCount: count }));
+          showToast(`連續生還天數已設為 ${count} 天`);
+        }}
+        isTodaySurvived={persisted.survivedDates.includes(currentQuote.date)}
+        onToggleTodaySurvived={handleStampSurvived}
+        onSelectMeetingPreset={(meetings) => {
+          setActiveMeetings(meetings);
+          setPersisted((prev) => ({ ...prev, calendarConnected: true }));
+          showToast('已切換會議行程，已為今日即時開酸！');
+        }}
+        onOpenPaywall={() => {
+          setIsAdminConsoleOpen(false);
+          setIsPaywallOpen(true);
+        }}
+        onOpenIgModal={() => {
+          setIsAdminConsoleOpen(false);
+          setIsIgModalOpen(true);
+        }}
+        onResetApp={() => {
+          if (window.confirm('確定要清空所有測試紀錄並重設為初始狀態嗎？')) {
+            localStorage.clear();
+            window.location.reload();
+          }
+        }}
       />
     </div>
   );

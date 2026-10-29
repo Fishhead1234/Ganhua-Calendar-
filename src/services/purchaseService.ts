@@ -1,6 +1,7 @@
 // RevenueCat / In-App Purchase Service for Web, Capacitor & Native Mobile
 
 export type SubscriptionPlan = 'annual' | 'lifetime';
+export type AppTier = 'free' | 'pro' | 'admin';
 
 export interface PlanDetails {
   id: SubscriptionPlan;
@@ -32,47 +33,80 @@ export const SUBSCRIPTION_PLANS: PlanDetails[] = [
 ];
 
 const LOCAL_STORAGE_PRO_KEY = 'ganhua_pro_subscription_v1';
+const LOCAL_STORAGE_TIER_KEY = 'ganhua_app_tier_v2';
+
+type SubscriptionListener = (isPro: boolean, tier: AppTier, isAdmin: boolean) => void;
 
 class PurchaseService {
-  private isProCached: boolean = false;
-  private listeners: Set<(isPro: boolean) => void> = new Set();
+  private tier: AppTier = 'admin';
+  private listeners: Set<SubscriptionListener> = new Set();
 
   constructor() {
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem(LOCAL_STORAGE_PRO_KEY);
-        this.isProCached = stored === 'true';
+        const storedTier = localStorage.getItem(LOCAL_STORAGE_TIER_KEY) as AppTier | null;
+        if (storedTier && (storedTier === 'free' || storedTier === 'pro' || storedTier === 'admin')) {
+          this.tier = storedTier;
+        } else {
+          // Default to 'admin' so the owner has full admin rights and features unlocked
+          this.tier = 'admin';
+          localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'admin');
+        }
       } catch {
-        this.isProCached = false;
+        this.tier = 'admin';
       }
     }
   }
 
-  public isPro(): boolean {
-    return this.isProCached;
+  public getTier(): AppTier {
+    return this.tier;
   }
 
-  public subscribe(callback: (isPro: boolean) => void): () => void {
+  public isPro(): boolean {
+    return this.tier === 'pro' || this.tier === 'admin';
+  }
+
+  public isAdmin(): boolean {
+    return this.tier === 'admin';
+  }
+
+  public subscribe(callback: SubscriptionListener): () => void {
     this.listeners.add(callback);
-    callback(this.isProCached);
+    callback(this.isPro(), this.tier, this.isAdmin());
     return () => this.listeners.delete(callback);
   }
 
   private notify() {
-    this.listeners.forEach((cb) => cb(this.isProCached));
+    const pro = this.isPro();
+    const admin = this.isAdmin();
+    this.listeners.forEach((cb) => cb(pro, this.tier, admin));
   }
 
   /**
-   * Set Pro status (supports mock testing toggle in Web, or real receipt validation)
+   * Set user tier directly (Free, Pro, Admin)
    */
-  public setProStatus(isPro: boolean): void {
-    this.isProCached = isPro;
+  public setTier(tier: AppTier): void {
+    this.tier = tier;
     try {
-      localStorage.setItem(LOCAL_STORAGE_PRO_KEY, String(isPro));
+      localStorage.setItem(LOCAL_STORAGE_TIER_KEY, tier);
+      localStorage.setItem(LOCAL_STORAGE_PRO_KEY, String(tier === 'pro' || tier === 'admin'));
     } catch {
       // ignore
     }
     this.notify();
+  }
+
+  /**
+   * Set Pro status (legacy compatibility helper)
+   */
+  public setProStatus(isPro: boolean): void {
+    if (isPro) {
+      if (this.tier !== 'admin') {
+        this.setTier('pro');
+      }
+    } else {
+      this.setTier('free');
+    }
   }
 
   /**
@@ -96,7 +130,7 @@ class PurchaseService {
         if (pkg) {
           const res = await purchases.purchasePackage({ aPackage: pkg });
           if (res.customerInfo?.entitlements?.active?.pro) {
-            this.setProStatus(true);
+            this.setTier('pro');
             return { success: true, message: '🎉 購買成功！已解鎖社畜終極逃生包！' };
           }
         }
@@ -109,7 +143,9 @@ class PurchaseService {
 
     // Default Web simulation / testing mode
     await new Promise((r) => setTimeout(r, 600));
-    this.setProStatus(true);
+    if (this.tier !== 'admin') {
+      this.setTier('pro');
+    }
     return {
       success: true,
       message: `🎉 成功解鎖「${planId === 'annual' ? '年度生還計畫' : '終身擺爛通行證'}」！`,
@@ -129,8 +165,8 @@ class PurchaseService {
       try {
         const { customerInfo } = await (window as any).Purchases.restorePurchases();
         const hasPro = Boolean(customerInfo?.entitlements?.active?.pro);
-        this.setProStatus(hasPro);
         if (hasPro) {
+          if (this.tier !== 'admin') this.setTier('pro');
           return { success: true, message: '✓ 已成功恢復您的 Pro 專業版權益！' };
         }
         return { success: false, message: '查無過往購買紀錄。' };
@@ -141,14 +177,14 @@ class PurchaseService {
 
     // Web simulation
     await new Promise((r) => setTimeout(r, 450));
-    const stored = localStorage.getItem(LOCAL_STORAGE_PRO_KEY) === 'true';
-    this.setProStatus(stored);
-    if (stored) {
+    const isPro = this.isPro();
+    if (isPro) {
       return { success: true, message: '✓ 已成功恢復您的 Pro 權益！' };
     }
-    return { success: false, message: '目前無已儲存的購買紀錄，可使用下方測試開關切換體驗。' };
+    return { success: false, message: '目前無已儲存的購買紀錄，可使用控制台切換體驗。' };
   }
 }
 
 export const purchaseService = new PurchaseService();
+
 

@@ -88,6 +88,8 @@ export function formatQuoteFrom365(
 interface UseTodayQuoteOptions {
   dateOffset: number; // 0 = today, -1 = yesterday, -2 = 2 days ago ...
   isPro: boolean;
+  isAdmin?: boolean;
+  allowFutureDates?: boolean;
   calendarConnected: boolean;
   roastResult: CalendarRoastResult | null;
   selectedThemeFilter?: CharacterType | 'all';
@@ -96,6 +98,8 @@ interface UseTodayQuoteOptions {
 export function useTodayQuote({
   dateOffset,
   isPro,
+  isAdmin = false,
+  allowFutureDates = false,
   calendarConnected,
   roastResult,
   selectedThemeFilter = 'all',
@@ -104,6 +108,7 @@ export function useTodayQuote({
   nextQuotePreview: CalendarQuote;
   isToday: boolean;
   isPastDate: boolean;
+  isFutureDate: boolean;
   canGoNext: boolean;
   canGoPrev: boolean;
 } {
@@ -181,17 +186,19 @@ export function useTodayQuote({
 
   const isToday = dateOffset === 0;
   const isPastDate = dateOffset < 0;
-  const canGoNext = dateOffset < 0; // Strictly backward navigation: cannot peek forward past today!
+  const isFutureDate = dateOffset > 0;
+  const canGoNext = allowFutureDates ? true : dateOffset < 0;
 
-  // Free Tier: past 7 days archive. Pro Tier: unlimited (365 days)
-  const maxHistory = isPro ? 365 : 7;
-  const canGoPrev = Math.abs(dateOffset) < maxHistory;
+  // Free Tier: past 7 days archive. Pro Tier or Admin: unlimited (365 days)
+  const maxHistory = isPro || isAdmin ? 365 : 7;
+  const canGoPrev = dateOffset > 0 ? true : Math.abs(dateOffset) < maxHistory;
 
   return {
     currentQuote: baseQuote,
     nextQuotePreview,
     isToday,
     isPastDate,
+    isFutureDate,
     canGoNext,
     canGoPrev,
   };

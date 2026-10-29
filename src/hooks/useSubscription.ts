@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
-import { purchaseService, SubscriptionPlan } from '../services/purchaseService';
+import { purchaseService, SubscriptionPlan, AppTier } from '../services/purchaseService';
 
 export function useSubscription() {
+  const [tier, setTierState] = useState<AppTier>(() => purchaseService.getTier());
   const [isPro, setIsPro] = useState<boolean>(() => purchaseService.isPro());
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => purchaseService.isAdmin());
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = purchaseService.subscribe((status) => {
-      setIsPro(status);
+    const unsubscribe = purchaseService.subscribe((proVal, tierVal, adminVal) => {
+      setIsPro(proVal);
+      setTierState(tierVal);
+      setIsAdmin(adminVal);
     });
     return unsubscribe;
   }, []);
+
+  const setTier = (newTier: AppTier) => {
+    purchaseService.setTier(newTier);
+  };
 
   const purchase = async (plan: SubscriptionPlan) => {
     setIsLoading(true);
@@ -31,15 +39,25 @@ export function useSubscription() {
   };
 
   const toggleMockPro = () => {
-    purchaseService.setProStatus(!isPro);
+    if (tier === 'free') {
+      purchaseService.setTier('pro');
+    } else if (tier === 'pro') {
+      purchaseService.setTier('admin');
+    } else {
+      purchaseService.setTier('free');
+    }
   };
 
   return {
+    tier,
     isPro,
+    isAdmin,
     isLoading,
+    setTier,
     purchase,
     restore,
     toggleMockPro,
   };
 }
+
 
