@@ -93,6 +93,7 @@ interface UseTodayQuoteOptions {
   calendarConnected: boolean;
   roastResult: CalendarRoastResult | null;
   selectedThemeFilter?: CharacterType | 'all';
+  birthday?: { month: number; day: number } | null;
 }
 
 export function useTodayQuote({
@@ -103,12 +104,14 @@ export function useTodayQuote({
   calendarConnected,
   roastResult,
   selectedThemeFilter = 'all',
+  birthday = null,
 }: UseTodayQuoteOptions): {
   currentQuote: CalendarQuote;
   nextQuotePreview: CalendarQuote;
   isToday: boolean;
   isPastDate: boolean;
   isFutureDate: boolean;
+  isBirthday: boolean;
   canGoNext: boolean;
   canGoPrev: boolean;
 } {
@@ -125,8 +128,30 @@ export function useTodayQuote({
   const targetMonth = targetDate.getMonth() + 1; // 1-12
   const targetDay = targetDate.getDate(); // 1-31
 
+  const isBirthday = useMemo(() => {
+    return Boolean(birthday && birthday.month === targetMonth && birthday.day === targetDay);
+  }, [birthday, targetMonth, targetDay]);
+
   // 2. Look up target date directly from quotes365.json
   const baseQuote: CalendarQuote = useMemo(() => {
+    // 2.1 Birthday Special Roast Override
+    if (birthday && birthday.month === targetMonth && birthday.day === targetDay) {
+      return {
+        id: `bday-${targetMonth}-${targetDay}`,
+        date: `${targetDate.getFullYear()}-${String(targetMonth).padStart(2, '0')}-${String(targetDay).padStart(2, '0')}`,
+        month: targetMonth,
+        day: targetDay,
+        quote: '祝你生日快樂，又平安老了一歲。今天允許自己不回訊息、不裝積極、吃整顆蛋糕！',
+        subtext: '🎂 壽星避難日生效中：全世界工作全部靠邊站！今日願望只有三個：老闆休假、存款翻倍、所有會議全取消。',
+        character: selectedThemeFilter === 'all' ? 'cat' : selectedThemeFilter,
+        category: 'workplace',
+        lunarDate: '🎂 壽星避難日・今日特權最大',
+        yi: '吃整顆草莓蛋糕・準時下班人間蒸發・放空耍廢',
+        ji: '在生日這天看公司群組・回覆同事工作訊息・答應加班開會',
+        illustrationSvg: `${selectedThemeFilter === 'all' ? 'cat' : selectedThemeFilter}_svg`,
+      };
+    }
+
     // Look up directly by month and day
     let match = quotesList.find(
       (q) => q.month === targetMonth && q.day === targetDay
@@ -171,6 +196,7 @@ export function useTodayQuote({
     isPro,
     calendarConnected,
     roastResult,
+    birthday,
   ]);
 
   // Next quote preview (for under-sheet peeling preview)
@@ -199,6 +225,7 @@ export function useTodayQuote({
     isToday,
     isPastDate,
     isFutureDate,
+    isBirthday,
     canGoNext,
     canGoPrev,
   };

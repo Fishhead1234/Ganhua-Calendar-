@@ -16,6 +16,7 @@ import {
   Flame,
   Stamp,
   Share2,
+  Cake,
 } from 'lucide-react';
 import { AppTier } from '../services/purchaseService';
 import {
@@ -41,6 +42,7 @@ interface AdminConsoleModalProps {
   onOpenIgModal: () => void;
   onResetApp: () => void;
   onLogoutAdmin: () => void;
+  onOpenBirthdayModal?: () => void;
 }
 
 export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
@@ -61,6 +63,7 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
   onOpenIgModal,
   onResetApp,
   onLogoutAdmin,
+  onOpenBirthdayModal,
 }) => {
   const [customDateStr, setCustomDateStr] = useState<string>(() => {
     const d = new Date();
@@ -410,6 +413,17 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
               <Share2 className="w-3.5 h-3.5 text-[#2D2D2D]" />
               <span>預覽 IG 限動</span>
             </button>
+
+            {onOpenBirthdayModal && (
+              <button
+                type="button"
+                onClick={onOpenBirthdayModal}
+                className="px-3 py-2 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#C83E31]/10 text-xs font-sans font-bold text-[#C83E31] cursor-pointer flex items-center gap-1.5 shadow-sm"
+              >
+                <Cake className="w-3.5 h-3.5" />
+                <span>壽星避難日設定</span>
+              </button>
+            )}
 
             <button
               type="button"

@@ -17,7 +17,9 @@ import { CalendarSyncBar } from './components/CalendarSyncBar';
 import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
 import { AdminConsoleModal } from './components/AdminConsoleModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
+import { BirthdayModal } from './components/BirthdayModal';
 import { FloatingVersionBar } from './components/FloatingVersionBar';
+import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
 import { useTodayQuote } from './hooks/useTodayQuote';
@@ -40,6 +42,7 @@ interface PersistedState {
   offWorkHour: number;
   artStyle: 'original' | 'svg';
   calendarConnected: boolean;
+  birthday?: { month: number; day: number } | null;
 }
 
 function loadPersistedState(): PersistedState {
@@ -56,6 +59,12 @@ function loadPersistedState(): PersistedState {
         offWorkHour: typeof parsed.offWorkHour === 'number' ? parsed.offWorkHour : 18,
         artStyle: parsed.artStyle === 'svg' ? 'svg' : 'original',
         calendarConnected: Boolean(parsed.calendarConnected),
+        birthday:
+          parsed.birthday &&
+          typeof parsed.birthday.month === 'number' &&
+          typeof parsed.birthday.day === 'number'
+            ? parsed.birthday
+            : null,
       };
     }
   } catch {
@@ -70,6 +79,7 @@ function loadPersistedState(): PersistedState {
     offWorkHour: 18,
     artStyle: 'original',
     calendarConnected: false,
+    birthday: null,
   };
 }
 
@@ -96,6 +106,7 @@ export const App: React.FC = () => {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
   const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
+  const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
   const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
 
@@ -151,6 +162,7 @@ export const App: React.FC = () => {
     nextQuotePreview,
     isToday,
     isPastDate,
+    isBirthday,
     canGoNext,
     canGoPrev,
   } = useTodayQuote({
@@ -161,7 +173,31 @@ export const App: React.FC = () => {
     calendarConnected: persisted.calendarConnected,
     roastResult: persisted.calendarConnected ? roastResult : null,
     selectedThemeFilter: persisted.selectedTheme,
+    birthday: persisted.birthday || null,
   });
+
+  // Confetti celebration if today is user's birthday
+  useEffect(() => {
+    if (isBirthday && isToday) {
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 85,
+          origin: { y: 0.6 },
+          colors: ['#C83E31', '#D4B483', '#FAF7F0', '#E58C8A'],
+        });
+      } catch {
+        // ignore
+      }
+    }
+  }, [isBirthday, isToday]);
+
+  // Sync to native Android widget whenever quote updates
+  useEffect(() => {
+    if (currentQuote) {
+      syncNativeWidgetData(currentQuote);
+    }
+  }, [currentQuote]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
@@ -298,9 +334,11 @@ export const App: React.FC = () => {
         isPro={isPro}
         currentTier={tier}
         isAdminAuthed={isAdminAuthed}
+        birthday={persisted.birthday || null}
         onOpenPaywall={() => setIsPaywallOpen(true)}
         onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
         onRequestPasswordAuth={() => setIsAdminPasswordModalOpen(true)}
+        onOpenBirthdayModal={() => setIsBirthdayModalOpen(true)}
       />
 
       {/* Toast Alert */}
@@ -509,6 +547,10 @@ export const App: React.FC = () => {
           setIsAdminConsoleOpen(false);
           setIsIgModalOpen(true);
         }}
+        onOpenBirthdayModal={() => {
+          setIsAdminConsoleOpen(false);
+          setIsBirthdayModalOpen(true);
+        }}
         onResetApp={() => {
           if (window.confirm('確定要清空所有測試紀錄並重設為初始狀態嗎？')) {
             localStorage.clear();
@@ -530,6 +572,29 @@ export const App: React.FC = () => {
         onSuccess={() => {
           showToast('🎉 管理員驗證成功！已解鎖最高權限');
           setIsAdminConsoleOpen(true);
+        }}
+      />
+
+      {/* Birthday Settings Modal */}
+      <BirthdayModal
+        isOpen={isBirthdayModalOpen}
+        onClose={() => setIsBirthdayModalOpen(false)}
+        birthday={persisted.birthday || null}
+        onSaveBirthday={(bday) => {
+          setPersisted((prev) => ({ ...prev, birthday: bday }));
+          if (bday) {
+            showToast(`🎂 已成功設定生日為 ${bday.month} 月 ${bday.day} 日！`);
+          } else {
+            showToast('已清除生日紀錄');
+          }
+        }}
+        onPreviewBirthdayQuote={(m, d) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const target = new Date(today.getFullYear(), m - 1, d);
+          const diff = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          setPersisted((prev) => ({ ...prev, dateOffset: diff }));
+          showToast(`🎂 已跳轉至生日 (${m}/${d}) 預覽專屬特權卡片！`);
         }}
       />
     </div>

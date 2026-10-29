@@ -68,7 +68,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
               桌面小工具預覽器 (Widget Preview Drawer)
             </span>
             <span className="hidden sm:inline-block text-[11px] font-sans px-2 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] font-bold">
-              iOS 鎖定畫面 • 主畫面 2×4 • Notion 嵌入
+              Android 原生桌面小工具 • iOS • Notion 嵌入
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs font-sans font-bold text-[#6E6A63]">
@@ -79,6 +79,17 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
 
         {isOpen && (
           <div className="p-5 space-y-5">
+            {/* Android Native Widget Support Note */}
+            <div className="p-3 rounded-2xl bg-[#EAE3D5]/40 border border-[#2D2D2D]/20 text-xs font-sans text-[#2D2D2D] flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>
+                  <strong>Android 實體桌面小工具已實裝：</strong>
+                  安裝 APK 後，在 Android 手機桌面長按空白處 &gt; 點選「微件/小工具」&gt; 選擇「幹話日曆」即可釘選至手機主畫面！
+                </span>
+              </div>
+            </div>
+
             {/* 3 Widget Format Switcher Tabs */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
@@ -91,7 +102,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                 }`}
               >
                 <Lock className="w-3.5 h-3.5" />
-                <span>a) iOS 鎖定畫面 Widget</span>
+                <span>a) 鎖定畫面精簡 Widget</span>
               </button>
 
               <button
@@ -104,7 +115,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                 }`}
               >
                 <LayoutTemplate className="w-3.5 h-3.5" />
-                <span>b) 主畫面中型 Widget (2×4)</span>
+                <span>b) Android / iOS 主畫面 (4×2)</span>
               </button>
 
               <button

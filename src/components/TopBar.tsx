@@ -11,6 +11,7 @@ import {
   Lock,
   Shield,
   Settings2,
+  Cake,
 } from 'lucide-react';
 import { CharacterType, CHARACTER_META } from '../types/calendar';
 import { AppTier } from '../services/purchaseService';
@@ -31,9 +32,11 @@ interface TopBarProps {
   isPro: boolean;
   currentTier?: AppTier;
   isAdminAuthed?: boolean;
+  birthday?: { month: number; day: number } | null;
   onOpenPaywall: () => void;
   onOpenAdminConsole?: () => void;
   onRequestPasswordAuth?: () => void;
+  onOpenBirthdayModal?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -52,9 +55,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   isPro,
   currentTier = 'free',
   isAdminAuthed = false,
+  birthday = null,
   onOpenPaywall,
   onOpenAdminConsole,
   onRequestPasswordAuth,
+  onOpenBirthdayModal,
 }) => {
   const [now, setNow] = useState<Date>(() => new Date());
   const [editingOffHour, setEditingOffHour] = useState(false);
@@ -253,8 +258,29 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </div>
 
-          {/* Right: Survival Streak Pill + View Switcher */}
+          {/* Right: Birthday Pill + Survival Streak Pill + View Switcher */}
           <div className="flex items-center gap-2">
+            {onOpenBirthdayModal && (
+              <button
+                type="button"
+                onClick={onOpenBirthdayModal}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl border text-xs font-sans font-bold transition cursor-pointer ${
+                  birthday
+                    ? 'bg-[#C83E31]/10 text-[#C83E31] border-[#C83E31]/30 hover:bg-[#C83E31]/20'
+                    : 'bg-[#FAF7F0] text-[#6E6A63] border-[#2D2D2D]/20 hover:border-[#2D2D2D]'
+                }`}
+                title="設定您的生日，解鎖當天壽星避難特權卡片"
+              >
+                <Cake className="w-3.5 h-3.5 text-[#C83E31]" />
+                <span className="hidden sm:inline">
+                  {birthday ? `壽星 ${birthday.month}/${birthday.day}` : '設定生日'}
+                </span>
+                <span className="sm:hidden">
+                  {birthday ? `${birthday.month}/${birthday.day}` : '生日'}
+                </span>
+              </button>
+            )}
+
             <div
               title="累積平安下班打卡天數"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border border-[#C83E31]/40 bg-[#C83E31]/10 text-[#C83E31] text-xs font-sans font-bold"
