@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    background-color: #F9F6F0;
+    color: #2D2D2D;
+    font-family: 'Noto Serif TC', 'Songti TC', Georgia, serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+}
+
+/* Subtle Taiwanese aesthetic paper grain texture */
+.paper-texture {
+  background-color: #FAF7F0;
+  background-image: 
+    radial-gradient(rgba(45, 45, 45, 0.03) 1px, transparent 0),
+    radial-gradient(rgba(139, 119, 95, 0.025) 1px, transparent 0);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Warm wooden desk surface inspired by reference photo */
+.wood-desk-bg {
+  background-color: #BA8C5E;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      rgba(92, 58, 28, 0.04) 0px,
+      rgba(92, 58, 28, 0.04) 2px,
+      transparent 2px,
+      transparent 9px
+    ),
+    linear-gradient(180deg, #C6986A 0%, #B38354 50%, #A67647 100%);
+}
+
+/* Perforated tear line */
+.perforated-line {
+  background-image: linear-gradient(to right, #2D2D2D 45%, rgba(255, 255, 255, 0) 0%);
+  background-position: bottom;
+  background-size: 10px 1.5px;
+  background-repeat: repeat-x;
+}
+
+/* Realistic paper tear animation */
+@keyframes tearOffPage {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  28% {
+    transform: translateY(18px) rotate(-2.5deg) scale(1.01);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(420px) rotate(11deg) scale(0.94);
+    opacity: 0;
+  }
+}
+
+.animate-tear-off {
+  animation: tearOffPage 0.58s cubic-bezier(0.32, 0.04, 0.6, 0.98) forwards;
+  transform-origin: top right;
+}
+
+/* Stamp slam animation */
+@keyframes stampSlam {
+  0% {
+    transform: scale(2.4) rotate(-18deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(0.92) rotate(-11deg);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(1.04) rotate(-13deg);
+  }
+  100% {
+    transform: scale(1) rotate(-12deg);
+    opacity: 0.92;
+  }
+}
+
+.animate-stamp {
+  animation: stampSlam 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards;
+}
+

@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/characterillustration.tsx","./src/components/deskcalendarcard.tsx","./src/components/igstorymodal.tsx","./src/components/topbar.tsx","./src/components/triodeskshowcase.tsx","./src/components/widgetpreviewdrawer.tsx","./src/types/calendar.ts","./src/utils/soundeffects.ts"],"version":"5.9.3"}

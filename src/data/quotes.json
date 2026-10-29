@@ -1,0 +1,147 @@
+[
+  {
+    "id": "q-01",
+    "date": "2026-10-29",
+    "quote": "每天都想辭職，但每天都準時上班。",
+    "subtext": "全勤獎不是因為我熱愛工作，是因為我熱愛新台幣。",
+    "character": "cat",
+    "category": "workplace",
+    "lunarDate": "農曆 九月廿十",
+    "yi": "喝特大杯冰美式・準時打卡下班",
+    "ji": "打開銀行帳戶餘額・看離職信草稿",
+    "illustrationSvg": "cat_americano"
+  },
+  {
+    "id": "q-02",
+    "date": "2026-10-30",
+    "quote": "今天也是一塊沒用的爛泥。",
+    "subtext": "只要我躺得夠平，壓力就壓不到我身上。",
+    "character": "capybara",
+    "category": "laziness",
+    "lunarDate": "農曆 九月廿一",
+    "yi": "趴在辦公桌放空・假裝在思考架構",
+    "ji": "主動舉手發言・答應「順便幫忙」",
+    "illustrationSvg": "capybara_melt"
+  },
+  {
+    "id": "q-03",
+    "date": "2026-10-31",
+    "quote": "我的靈魂已經下班了。",
+    "subtext": "留在座位上的只是一具會敲鍵盤與喝珍奶的空殼。",
+    "character": "ghost",
+    "category": "social_battery",
+    "lunarDate": "農曆 九月廿二",
+    "yi": "點全糖黑糖珍奶・開啟勿擾模式",
+    "ji": "下班前五分鐘被拉進臨時會議",
+    "illustrationSvg": "ghost_boba"
+  },
+  {
+    "id": "q-04",
+    "date": "2026-11-01",
+    "quote": "只要我夠努力，老闆很快就能換新車了。",
+    "subtext": "老闆畫的大餅太大，我胃不好真的吃不下。",
+    "character": "cat",
+    "category": "workplace",
+    "lunarDate": "農曆 九月廿三",
+    "yi": "帶薪上廁所十五分鐘・準時關機",
+    "ji": "相信「共體時艱」與「明年調薪」",
+    "illustrationSvg": "cat_tie"
+  },
+  {
+    "id": "q-05",
+    "date": "2026-11-02",
+    "quote": "萬事起頭難，中間難，結尾更難。",
+    "subtext": "既然怎麼做都難，不如先趴著休息一下。",
+    "character": "capybara",
+    "category": "laziness",
+    "lunarDate": "農曆 九月廿四",
+    "yi": "把今天的事留給明天的自己",
+    "ji": "在週五下午部署任何程式碼",
+    "illustrationSvg": "capybara_laptop"
+  },
+  {
+    "id": "q-06",
+    "date": "2026-11-03",
+    "quote": "能用貼圖敷衍的事，就絕對不要打字。",
+    "subtext": "「收到 👌」已經耗盡了我今日 95% 的社交能量。",
+    "character": "ghost",
+    "category": "social_battery",
+    "lunarDate": "農曆 九月廿五",
+    "yi": "戴抗噪耳機裝忙・已讀只回貼圖",
+    "ji": "參加任何需要破冰遊戲的聚餐",
+    "illustrationSvg": "ghost_keyboard"
+  },
+  {
+    "id": "q-07",
+    "date": "2026-11-04",
+    "quote": "開會就像通靈，大家都在等一個不會出現的結論。",
+    "subtext": "這場會唯一確定的事，就是下週還要再開一次。",
+    "character": "cat",
+    "category": "workplace",
+    "lunarDate": "農曆 九月廿六",
+    "yi": "關麥克風偷嘆氣・眼神放空點頭",
+    "ji": "問「請問還有其他問題嗎？」",
+    "illustrationSvg": "cat_americano"
+  },
+  {
+    "id": "q-08",
+    "date": "2026-11-05",
+    "quote": "不是在摸魚，是在幫公司的椅子測試人體工學。",
+    "subtext": "領多少錢做多少事，剩下的都是做功德。",
+    "character": "capybara",
+    "category": "laziness",
+    "lunarDate": "農曆 九月廿七",
+    "yi": "逛網購加入購物車・午休睡好睡滿",
+    "ji": "超前部署下個月的工作進度",
+    "illustrationSvg": "capybara_melt"
+  },
+  {
+    "id": "q-09",
+    "date": "2026-11-06",
+    "quote": "社交電量剩 1%，請勿拍打、餵食或標註我。",
+    "subtext": "看到訊息沒回不是在忙，是我正在假裝沒看到。",
+    "character": "ghost",
+    "category": "social_battery",
+    "lunarDate": "農曆 九月廿八",
+    "yi": "下班直接人間蒸發・躲進被窩追劇",
+    "ji": "接聽沒有事先傳訊息預告的電話",
+    "illustrationSvg": "ghost_boba"
+  },
+  {
+    "id": "q-10",
+    "date": "2026-11-07",
+    "quote": "薪水就像月經，一個月來一次，一週左右就沒了。",
+    "subtext": "月底吃土的時候，連土都覺得比上個月貴。",
+    "character": "cat",
+    "category": "workplace",
+    "lunarDate": "農曆 九月廿九",
+    "yi": "搜刮辦公室免費零食・喝公司茶包",
+    "ji": "下班路過百貨公司週年慶",
+    "illustrationSvg": "cat_tie"
+  },
+  {
+    "id": "q-11",
+    "date": "2026-11-08",
+    "quote": "可以為了工作犧牲睡眠，但不能為了上班放棄賴床。",
+    "subtext": "鬧鐘響了五次，代表我跟床之間有深厚的羈絆。",
+    "character": "capybara",
+    "category": "laziness",
+    "lunarDate": "農曆 十月初一",
+    "yi": "再睡五分鐘・搭電梯剛好壓線打卡",
+    "ji": "設超過十個鬧鐘卻全部按掉",
+    "illustrationSvg": "capybara_laptop"
+  },
+  {
+    "id": "q-12",
+    "date": "2026-11-09",
+    "quote": "已讀不回是我的溫柔，已讀亂回是我的禮貌。",
+    "subtext": "下班後的訊息，一律視為明天的宇宙電波。",
+    "character": "ghost",
+    "category": "social_battery",
+    "lunarDate": "農曆 十月初二",
+    "yi": "準時登出工作群組・靈魂徹底離線",
+    "ji": "睡前滑手機不小心點開公司群組",
+    "illustrationSvg": "ghost_keyboard"
+  }
+]
+
