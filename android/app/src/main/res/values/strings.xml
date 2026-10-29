@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">幹話日曆</string>
+    <string name="title_activity_main">幹話日曆</string>
+    <string name="package_name">com.ganhuacalendar.app</string>
+    <string name="custom_url_scheme">com.ganhuacalendar.app</string>
+</resources>
