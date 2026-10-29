@@ -208,3 +208,4 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
     </div>
   );
 };
+

@@ -132,3 +132,4 @@ export function analyzeCalendarEvents(events: CalendarMeeting[]): CalendarRoastR
     ji: '在群組問「今天大家好像很閒」',
   };
 }
+

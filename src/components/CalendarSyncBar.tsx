@@ -126,3 +126,4 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
     </div>
   );
 };
+

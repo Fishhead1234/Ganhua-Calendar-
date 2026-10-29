@@ -1,10 +1,26 @@
 export type CharacterType = 'cat' | 'capybara' | 'ghost';
 
-export type QuoteCategory = 'workplace' | 'laziness' | 'social_battery';
+export type QuoteCategory = 'workplace' | 'laziness' | 'social_battery' | 'money' | 'seasonal' | 'layflat';
+
+export interface RawStaticQuote365 {
+  dayOfYear: number;
+  dateKey: string;
+  month: number;
+  day: number;
+  quote: string;
+  subtext: string;
+  character: CharacterType;
+  theme: string;
+  lunarDate?: string;
+  yi?: string;
+  ji?: string;
+}
 
 export interface CalendarQuote {
   id: string;
-  date: string;
+  date: string; // YYYY-MM-DD
+  month: number;
+  day: number;
   quote: string;
   subtext: string;
   character: CharacterType;
@@ -54,4 +70,3 @@ export const CHARACTER_META: Record<CharacterType, CharacterMeta> = {
     bgTint: '#F1F2F4',
   },
 };
-

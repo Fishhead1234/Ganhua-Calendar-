@@ -3,13 +3,11 @@ import confetti from 'canvas-confetti';
 import {
   Stamp,
   Share2,
-  Shuffle,
   Sparkles,
-  Lock,
   Calendar as CalendarIcon,
 } from 'lucide-react';
 import quotesData from './data/quotes.json';
-import { CalendarQuote, CharacterType, CHARACTER_META } from './types/calendar';
+import { CalendarQuote, CharacterType } from './types/calendar';
 import { TopBar } from './components/TopBar';
 import { DeskCalendar } from './components/DeskCalendar';
 import { TrioDeskShowcase } from './components/TrioDeskShowcase';
@@ -19,6 +17,7 @@ import { CalendarSyncBar } from './components/CalendarSyncBar';
 import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
+import { useTodayQuote } from './hooks/useTodayQuote';
 import {
   CalendarMeeting,
   CalendarRoastResult,
@@ -26,11 +25,11 @@ import {
   analyzeCalendarEvents,
 } from './services/calendarRoastService';
 
-const STORAGE_KEY = 'ganhua_calendar_state_v2';
+const STORAGE_KEY = 'ganhua_calendar_state_v3';
 
 interface PersistedState {
   selectedTheme: CharacterType | 'all';
-  currentDateIndex: number; // 0 = today, -1 = yesterday, -2 = 2 days ago ...
+  dateOffset: number; // 0 = today, -1 = yesterday, -2 = 2 days ago ...
   favoritedIds: string[];
   survivedDates: string[];
   streakCount: number;
@@ -46,8 +45,8 @@ function loadPersistedState(): PersistedState {
       const parsed = JSON.parse(raw);
       return {
         selectedTheme: parsed.selectedTheme || 'cat',
-        currentDateIndex: typeof parsed.currentDateIndex === 'number' ? parsed.currentDateIndex : 0,
-        favoritedIds: Array.isArray(parsed.favoritedIds) ? parsed.favoritedIds : ['q-01'],
+        dateOffset: typeof parsed.dateOffset === 'number' ? parsed.dateOffset : 0,
+        favoritedIds: Array.isArray(parsed.favoritedIds) ? parsed.favoritedIds : ['q365-01-01'],
         survivedDates: Array.isArray(parsed.survivedDates) ? parsed.survivedDates : [],
         streakCount: typeof parsed.streakCount === 'number' ? parsed.streakCount : 3,
         offWorkHour: typeof parsed.offWorkHour === 'number' ? parsed.offWorkHour : 18,
@@ -60,8 +59,8 @@ function loadPersistedState(): PersistedState {
   }
   return {
     selectedTheme: 'cat',
-    currentDateIndex: 0,
-    favoritedIds: ['q-01'],
+    dateOffset: 0,
+    favoritedIds: ['q365-01-01'],
     survivedDates: [],
     streakCount: 3,
     offWorkHour: 18,
@@ -112,61 +111,21 @@ export const App: React.FC = () => {
     }
   }, [isPro, persisted.selectedTheme]);
 
-  // Today base quote
-  const characterQuotes = useMemo(() => {
-    return allQuotes.filter((q) => {
-      if (persisted.selectedTheme !== 'all' && q.character !== persisted.selectedTheme) {
-        return false;
-      }
-      if (showFavoritesOnly && !persisted.favoritedIds.includes(q.id)) {
-        return false;
-      }
-      return true;
-    });
-  }, [allQuotes, persisted.selectedTheme, showFavoritesOnly, persisted.favoritedIds]);
-
-  const pool = characterQuotes.length > 0 ? characterQuotes : allQuotes;
-
-  // Map currentDateIndex (0 = today, -1 = yesterday, -2 = 2 days ago...)
-  // Max backward history limit: 7 days for Free Tier, unlimited (30+) for Pro Tier
-  const maxHistoryDays = isPro ? 30 : 7;
-  const clampedOffset = Math.max(-maxHistoryDays, Math.min(0, persisted.currentDateIndex));
-
-  // Determine current active quote
-  const currentQuote: CalendarQuote = useMemo(() => {
-    // If today (offset === 0) and calendar roast is connected & Pro, dynamically swap today's quote!
-    if (clampedOffset === 0 && persisted.calendarConnected && isPro) {
-      const base = pool[0] || allQuotes[0];
-      return {
-        ...base,
-        quote: roastResult.roastQuote,
-        subtext: roastResult.roastSubtext,
-        yi: roastResult.yi,
-        ji: roastResult.ji,
-      };
-    }
-
-    // Historical date indexing
-    const baseIndex = Math.abs(clampedOffset) % pool.length;
-    const item = pool[baseIndex] || allQuotes[0];
-
-    // Compute synthetic date string matching offset
-    const dt = new Date();
-    dt.setDate(dt.getDate() + clampedOffset);
-    const dateStr = dt.toISOString().split('T')[0];
-
-    return {
-      ...item,
-      date: dateStr,
-    };
-  }, [pool, allQuotes, clampedOffset, persisted.calendarConnected, isPro, roastResult]);
-
-  const nextQuotePreview = pool[(Math.abs(clampedOffset + 1)) % pool.length] || allQuotes[0];
-
-  const isToday = clampedOffset === 0;
-  const isPastDate = clampedOffset < 0;
-  const canGoNext = clampedOffset < 0; // Strictly backward navigation: cannot peek forward past today!
-  const canGoPrev = Math.abs(clampedOffset) < maxHistoryDays;
+  // Integrated useTodayQuote hook with quotes365.json dataset
+  const {
+    currentQuote,
+    nextQuotePreview,
+    isToday,
+    isPastDate,
+    canGoNext,
+    canGoPrev,
+  } = useTodayQuote({
+    dateOffset: persisted.dateOffset,
+    isPro,
+    calendarConnected: persisted.calendarConnected,
+    roastResult: persisted.calendarConnected ? roastResult : null,
+    selectedThemeFilter: persisted.selectedTheme,
+  });
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
@@ -181,7 +140,7 @@ export const App: React.FC = () => {
     playPaperTearSound();
     setPersisted((prev) => ({
       ...prev,
-      currentDateIndex: prev.currentDateIndex - 1,
+      dateOffset: prev.dateOffset - 1,
     }));
   };
 
@@ -190,7 +149,7 @@ export const App: React.FC = () => {
       playPaperTearSound();
       setPersisted((prev) => ({
         ...prev,
-        currentDateIndex: prev.currentDateIndex + 1,
+        dateOffset: prev.dateOffset + 1,
       }));
     } else {
       handleBlockedTomorrow();
@@ -343,7 +302,7 @@ export const App: React.FC = () => {
                 setPersisted((prev) => ({
                   ...prev,
                   selectedTheme: clicked.character,
-                  currentDateIndex: 0,
+                  dateOffset: 0,
                 }));
               }
               setViewMode('single');
@@ -398,9 +357,8 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              if (clampedOffset < 0) {
-                // If in past archive, return to today
-                setPersisted((prev) => ({ ...prev, currentDateIndex: 0 }));
+              if (persisted.dateOffset < 0) {
+                setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
                 showToast('已返回今日日曆！');
               } else {
                 handleBlockedTomorrow();
