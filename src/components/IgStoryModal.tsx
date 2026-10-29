@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Download, Copy, Check, Share2, Sparkles } from 'lucide-react';
+import { X, Download, Copy, Check, Share2, Sparkles, Lock } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
-import { CharacterIllustration, REFERENCE_CROP_MAP } from './CharacterIllustration';
+import { REFERENCE_CROP_MAP } from './CharacterIllustration';
 import { parseQuoteDateDisplay } from './DeskCalendarCard';
 
 interface IgStoryModalProps {
@@ -11,9 +11,11 @@ interface IgStoryModalProps {
   isSurvivedToday: boolean;
   streakCount: number;
   artStyle: 'original' | 'svg';
+  isPro: boolean;
+  onOpenPaywall: () => void;
 }
 
-type StoryBgStyle = 'cream' | 'wood' | 'charcoal';
+type StoryBgStyle = 'wood' | 'cream' | 'charcoal';
 
 export const IgStoryModal: React.FC<IgStoryModalProps> = ({
   isOpen,
@@ -22,6 +24,8 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
   isSurvivedToday,
   streakCount,
   artStyle,
+  isPro,
+  onOpenPaywall,
 }) => {
   const [bgStyle, setBgStyle] = useState<StoryBgStyle>('wood');
   const [isExporting, setIsExporting] = useState(false);
@@ -48,7 +52,6 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Subtle wood grain lines
       ctx.strokeStyle = 'rgba(72, 42, 16, 0.06)';
       ctx.lineWidth = 3;
       for (let x = 0; x < 1080; x += 14) {
@@ -132,7 +135,7 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
     ctx.font = 'bold 25px "Noto Sans TC", sans-serif';
     ctx.fillText(charMeta.nameZh, cardX + cardW - 80, cardY + 265);
 
-    // 6. Character Illustration from /characters/reference-trio.jpg
+    // 6. Character Illustration
     try {
       const refImg = await loadImage('/characters/reference-trio.jpg');
       const crop = REFERENCE_CROP_MAP[quote.character];
@@ -140,22 +143,12 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       const destH = 515;
       const destX = 540 - destW / 2;
       const destY = cardY + 340;
-      ctx.drawImage(
-        refImg,
-        crop.sx,
-        crop.sy,
-        crop.sw,
-        crop.sh,
-        destX,
-        destY,
-        destW,
-        destH
-      );
+      ctx.drawImage(refImg, crop.sx, crop.sy, crop.sw, crop.sh, destX, destY, destW, destH);
     } catch {
-      // Fallback text if image load fails
+      // ignore
     }
 
-    // 7. Quote Text (Wrapped nicely)
+    // 7. Quote Text
     ctx.fillStyle = '#2D2D2D';
     ctx.font = '900 50px "Noto Serif TC", Georgia, serif';
     ctx.textAlign = 'center';
@@ -183,7 +176,7 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
     ctx.fillStyle = '#C83E31';
     ctx.fillText(`【忌】${quote.ji}`, cardX + 105, almY + 98);
 
-    // 9. Red Stamp if survived
+    // 9. Red Stamp
     if (isSurvivedToday) {
       ctx.save();
       ctx.translate(cardX + cardW - 175, cardY + 820);
@@ -201,19 +194,22 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       ctx.restore();
     }
 
-    // 10. Card Watermark & Bottom Footer
+    // 10. Card Watermark & Bottom Footer (Gated by Pro)
     ctx.textAlign = 'center';
     ctx.fillStyle = '#6E6A63';
     ctx.font = 'bold 34px "Noto Serif TC", serif';
     ctx.fillText('幹 話 日 曆', 540, cardY + cardH - 55);
 
+    // If Free Tier, render promotional watermark at the bottom
+    if (!isPro) {
+      ctx.fillStyle = bgStyle === 'charcoal' ? '#D4B483' : '#8C6239';
+      ctx.font = 'bold 26px "Noto Sans TC", sans-serif';
+      ctx.fillText('✦ 幹話日曆 Ganhua Calendar • 免費版浮水印 ✦', 540, 1720);
+    }
+
     ctx.fillStyle = bgStyle === 'charcoal' ? '#F9F6F0' : '#2D2D2D';
     ctx.font = 'bold 28px "Noto Sans TC", sans-serif';
-    ctx.fillText(
-      `🔥 連續平安下班 ${streakCount} 天 • #幹話日曆 #${charMeta.nameZh}`,
-      540,
-      1760
-    );
+    ctx.fillText(`🔥 連續平安下班 ${streakCount} 天 • #${charMeta.nameZh}`, 540, 1770);
 
     return canvas;
   };
@@ -224,7 +220,7 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       const canvas = await renderStoryCanvas();
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
-      link.download = `幹話日曆_${quote.date}_${quote.character}.png`;
+      link.download = `幹話日曆_${quote.date}_${quote.character}${isPro ? '_Pro' : ''}.png`;
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
@@ -241,13 +237,10 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob }),
-          ]);
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
           setCopiedImg(true);
           setTimeout(() => setCopiedImg(false), 2500);
         } catch {
-          // If clipboard image API restricted, fallback to download
           handleDownloadStoryPng();
         }
       }, 'image/png');
@@ -259,27 +252,48 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="w-full max-w-md rounded-3xl bg-[#F9F6F0] border-2 border-[#2D2D2D] shadow-2xl overflow-hidden my-auto">
-        {/* Modal Header */}
+        {/* Header */}
         <div className="px-5 py-3.5 bg-[#2D2D2D] text-[#F9F6F0] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Share2 className="w-4 h-4 text-[#D4B483]" />
             <span className="font-serif font-bold text-sm tracking-wider">
-              分享到 IG 限時動態 (9:16 預覽)
+              分享到 IG 限時動態 (9:16)
             </span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-white/10 cursor-pointer"
+            className="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="p-4 sm:p-5 space-y-4">
-          {/* Background Theme Picker */}
+          {/* Pro Status Banner */}
+          {!isPro ? (
+            <div className="rounded-xl bg-amber-500/10 border border-amber-600/30 p-2.5 flex items-center justify-between text-xs font-sans">
+              <span className="text-amber-900 font-bold">
+                ⚠️ 目前為免費版：導出含有浮水印
+              </span>
+              <button
+                type="button"
+                onClick={onOpenPaywall}
+                className="px-2 py-0.5 rounded-lg bg-[#2D2D2D] text-white text-[11px] font-bold cursor-pointer"
+              >
+                升級去浮水印
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-emerald-500/10 border border-emerald-600/30 p-2 text-xs font-sans text-emerald-800 font-bold flex items-center gap-1.5">
+              <Check className="w-4 h-4" />
+              <span>已解鎖 PRO 專業版：高清無浮水印導出</span>
+            </div>
+          )}
+
+          {/* Background Style */}
           <div className="flex items-center justify-between gap-2 text-xs font-sans">
-            <span className="font-bold text-[#6E6A63]">限動背景風格：</span>
+            <span className="font-bold text-[#6E6A63]">限動背景：</span>
             <div className="flex items-center gap-1.5">
               {[
                 { id: 'wood', label: '🪵 木桌質感' },
@@ -302,7 +316,7 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
             </div>
           </div>
 
-          {/* 9:16 Vertical IG Story Preview Box */}
+          {/* 9:16 Preview Box */}
           <div
             className={`mx-auto w-[270px] aspect-[9/16] rounded-3xl p-4 flex flex-col items-center justify-between shadow-inner border border-[#2D2D2D]/25 relative overflow-hidden ${
               bgStyle === 'wood'
@@ -320,7 +334,6 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
               ✦ 每日社畜生存日曆 ✦
             </div>
 
-            {/* Inner Calendar Card */}
             <div className="w-full flex-1 my-2 rounded-2xl paper-texture border-2 border-[#2D2D2D] p-3.5 flex flex-col justify-between shadow-lg relative">
               <div className="text-center">
                 <div className="font-serif font-black text-base tracking-[0.2em] text-[#2D2D2D]">
@@ -338,40 +351,50 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
               </div>
 
               <div className="my-auto scale-90">
-                <CharacterIllustration
-                  character={quote.character}
-                  artStyle={artStyle}
-                  className="!h-36"
+                <div
+                  className="w-full h-32 bg-no-repeat mix-blend-multiply"
+                  style={{
+                    backgroundImage: 'url(/characters/reference-trio.jpg)',
+                    backgroundPosition: REFERENCE_CROP_MAP[quote.character].bgPos,
+                    backgroundSize: REFERENCE_CROP_MAP[quote.character].bgSize,
+                  }}
                 />
               </div>
 
               {isSurvivedToday && (
                 <div className="absolute right-2.5 bottom-16 -rotate-12 border-2 border-[#C83E31] bg-[#FAF7F0]/90 text-[#C83E31] rounded-full w-14 h-14 flex flex-col items-center justify-center text-[9px] font-serif font-black leading-tight shadow-sm">
                   <span>今日已</span>
-                  <span>平安下班</span>
+                  <span>已生還</span>
                 </div>
               )}
 
-              <div className="text-center space-y-1.5">
+              <div className="text-center space-y-1">
                 <p className="font-serif font-black text-sm leading-snug text-[#2D2D2D]">
                   {quote.quote}
                 </p>
-                <div className="text-[10px] font-serif font-bold tracking-[0.2em] text-[#6E6A63]/80 pt-1">
+                <div className="text-[10px] font-serif font-bold tracking-[0.2em] text-[#6E6A63]/80 pt-0.5">
                   幹話日曆
                 </div>
               </div>
             </div>
 
-            <div
-              className={`text-[10px] font-sans font-bold ${
-                bgStyle === 'charcoal' ? 'text-[#F9F6F0]/90' : 'text-[#2D2D2D]'
-              }`}
-            >
-              🔥 連續平安下班 {streakCount} 天 • #{charMeta.nameZh}
+            <div className="text-center space-y-0.5">
+              {!isPro && (
+                <div className="text-[9px] font-sans font-bold text-amber-900 bg-amber-400/20 px-2 py-0.5 rounded-full">
+                  幹話日曆 • 免費版浮水印
+                </div>
+              )}
+              <div
+                className={`text-[10px] font-sans font-bold ${
+                  bgStyle === 'charcoal' ? 'text-[#F9F6F0]/90' : 'text-[#2D2D2D]'
+                }`}
+              >
+                🔥 連續生還 {streakCount} 天 • #{charMeta.nameZh}
+              </div>
             </div>
           </div>
 
-          {/* Export Action Buttons */}
+          {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
@@ -392,12 +415,12 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
               {copiedImg ? (
                 <>
                   <Check className="w-4 h-4 text-emerald-700" />
-                  <span className="text-emerald-700">已複製圖片！</span>
+                  <span className="text-emerald-700">已複製！</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-4 h-4" />
-                  <span>複製圖片貼上限動</span>
+                  <span>複製貼上限動</span>
                 </>
               )}
             </button>
@@ -408,7 +431,6 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
   );
 };
 
-// Canvas helpers
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -443,4 +465,3 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.src = src;
   });
 }
-
