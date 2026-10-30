@@ -7,7 +7,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.RemoteViews;
+import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -60,14 +63,31 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.tv_widget_offwork, offworkStr);
             views.setTextViewText(R.id.tv_widget_streak, streakStr);
 
-            // Set character avatar illustration
-            int avatarRes = R.drawable.widget_char_cat;
-            if ("capybara".equals(characterKey)) {
-                avatarRes = R.drawable.widget_char_capybara;
-            } else if ("ghost".equals(characterKey)) {
-                avatarRes = R.drawable.widget_char_ghost;
+            // Load exact scene illustration if custom avatar is available
+            boolean loadedCustom = false;
+            File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
+            if (avatarFile.exists() && avatarFile.length() > 0) {
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                    if (bitmap != null) {
+                        views.setImageViewBitmap(R.id.iv_widget_avatar, bitmap);
+                        loadedCustom = true;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
-            views.setImageViewResource(R.id.iv_widget_avatar, avatarRes);
+
+            // Fallback to default character icon if custom avatar is not yet generated
+            if (!loadedCustom) {
+                int avatarRes = R.drawable.widget_char_cat;
+                if ("capybara".equals(characterKey)) {
+                    avatarRes = R.drawable.widget_char_capybara;
+                } else if ("ghost".equals(characterKey)) {
+                    avatarRes = R.drawable.widget_char_ghost;
+                }
+                views.setImageViewResource(R.id.iv_widget_avatar, avatarRes);
+            }
 
             // Tap widget to launch app
             Intent intent = new Intent(context, MainActivity.class);
