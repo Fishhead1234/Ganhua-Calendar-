@@ -14,6 +14,7 @@ import { TrioDeskShowcase } from './components/TrioDeskShowcase';
 import { IgStoryModal } from './components/IgStoryModal';
 import { PaywallModal } from './components/PaywallModal';
 import { CalendarSyncBar } from './components/CalendarSyncBar';
+import { CalendarSyncModal } from './components/CalendarSyncModal';
 import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
 import { AdminConsoleModal } from './components/AdminConsoleModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
@@ -137,6 +138,7 @@ export const App: React.FC = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isIgModalOpen, setIsIgModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isCalendarSyncModalOpen, setIsCalendarSyncModalOpen] = useState(false);
   const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
   const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
@@ -144,7 +146,15 @@ export const App: React.FC = () => {
   const [toastText, setToastText] = useState<string | null>(null);
 
   // Calendar Roast State
-  const [activeMeetings, setActiveMeetings] = useState<CalendarMeeting[]>(() => MOCK_CALENDAR_PRESETS[0].events);
+  const [activeMeetings, setActiveMeetings] = useState<CalendarMeeting[]>(() => {
+    try {
+      const saved = localStorage.getItem('ganhua_calendar_meetings');
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return MOCK_CALENDAR_PRESETS[0].events;
+  });
   const roastResult: CalendarRoastResult = useMemo(() => {
     return analyzeCalendarEvents(activeMeetings);
   }, [activeMeetings]);
@@ -397,17 +407,10 @@ export const App: React.FC = () => {
         {/* A. Calendar Sync Module (Roast Engine) */}
         {viewMode === 'single' && (
           <CalendarSyncBar
-            isPro={isPro}
+            isPro={isPro || isAdmin}
             isConnected={persisted.calendarConnected}
             roastResult={persisted.calendarConnected ? roastResult : null}
-            onConnectCalendar={() => {
-              setPersisted((prev) => ({ ...prev, calendarConnected: true }));
-              showToast('📅 已連接行事曆！已為您即時掃描並開啟毒舌模式');
-            }}
-            onSelectPreset={(events) => {
-              setActiveMeetings(events);
-              showToast('已切換會議行程，已為今日即時開酸！');
-            }}
+            onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
             onOpenPaywall={() => setIsPaywallOpen(true)}
           />
         )}
@@ -529,6 +532,30 @@ export const App: React.FC = () => {
         isLoading={isSubLoading}
         isPro={isPro}
         onToggleMockPro={toggleMockPro}
+      />
+
+      {/* Calendar Sync & Roast Settings Modal */}
+      <CalendarSyncModal
+        isOpen={isCalendarSyncModalOpen}
+        onClose={() => setIsCalendarSyncModalOpen(false)}
+        isConnected={persisted.calendarConnected}
+        activeMeetings={activeMeetings}
+        onUpdateMeetings={(meetings) => {
+          setActiveMeetings(meetings);
+          try {
+            localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(meetings));
+          } catch {
+            // ignore
+          }
+        }}
+        onToggleConnected={(connected) => {
+          setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
+        }}
+        isPro={isPro || isAdmin}
+        onOpenPaywall={() => {
+          setIsCalendarSyncModalOpen(false);
+          setIsPaywallOpen(true);
+        }}
       />
 
       {/* Floating Version Quick-Switcher */}

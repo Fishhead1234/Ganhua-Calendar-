@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
-import { Calendar, Sparkles, ChevronDown, Check, Lock } from 'lucide-react';
-import {
-  MOCK_CALENDAR_PRESETS,
-  CalendarMeeting,
-  CalendarRoastResult,
-} from '../services/calendarRoastService';
+import React from 'react';
+import { Calendar, Settings2, Lock } from 'lucide-react';
+import { CalendarRoastResult } from '../services/calendarRoastService';
 
 interface CalendarSyncBarProps {
   isPro: boolean;
   isConnected: boolean;
   roastResult: CalendarRoastResult | null;
-  onConnectCalendar: () => void;
-  onSelectPreset: (meetings: CalendarMeeting[]) => void;
+  onOpenSyncModal: () => void;
   onOpenPaywall: () => void;
 }
 
@@ -19,38 +14,28 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
   isPro,
   isConnected,
   roastResult,
-  onConnectCalendar,
-  onSelectPreset,
+  onOpenSyncModal,
   onOpenPaywall,
 }) => {
-  const [showPresets, setShowPresets] = useState(false);
-
-  const handleClickMain = () => {
+  const handleClick = () => {
     if (!isPro) {
       onOpenPaywall();
       return;
     }
-    if (!isConnected) {
-      onConnectCalendar();
-    } else {
-      setShowPresets(!showPresets);
-    }
+    onOpenSyncModal();
   };
 
   return (
     <div className="w-full max-w-[390px] mx-auto relative select-none">
       <div
-        className={`rounded-2xl border-2 transition-all p-2.5 flex items-center justify-between shadow-sm ${
+        className={`rounded-2xl border-2 transition-all p-2.5 flex items-center justify-between shadow-sm cursor-pointer ${
           isConnected
             ? 'bg-[#FAF7F0] border-[#2D2D2D]'
             : 'bg-[#F3EFE6] border-[#2D2D2D]/30 hover:border-[#2D2D2D]'
         }`}
+        onClick={handleClick}
       >
-        <button
-          type="button"
-          onClick={handleClickMain}
-          className="flex-1 flex items-center gap-2 text-left cursor-pointer min-w-0"
-        >
+        <div className="flex-1 flex items-center gap-2.5 text-left min-w-0">
           <div
             className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 border ${
               isConnected
@@ -77,53 +62,28 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
             </div>
             <p className="text-[10px] font-sans text-[#6E6A63] truncate">
               {isConnected
-                ? '已即時掃描會議時段・點擊更換測試行程'
-                : '智能辨識會議數量與週五末班會，自動生成精準毒舌'}
+                ? '已即時掃描會議・點擊管理 iCal 訂閱或切換情境'
+                : '支援 Google / Outlook / Apple 訂閱網址，即時精準開酸'}
             </p>
           </div>
-        </button>
+        </div>
 
-        {isPro && isConnected && (
+        {isPro && (
           <button
             type="button"
-            onClick={() => setShowPresets(!showPresets)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenSyncModal();
+            }}
             className="p-1.5 rounded-xl hover:bg-[#2D2D2D]/10 text-[#2D2D2D] cursor-pointer shrink-0 ml-1"
-            title="切換模擬行事曆會議情境"
+            title="開啟行事曆設定"
           >
-            <ChevronDown className={`w-4 h-4 transition-transform ${showPresets ? 'rotate-180' : ''}`} />
+            <Settings2 className="w-4 h-4 text-[#6E6A63] hover:text-[#2D2D2D]" />
           </button>
         )}
       </div>
-
-      {/* Preset Meeting Loaders Dropdown (For Testing & Immediate Live Demonstration) */}
-      {showPresets && isPro && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-20 rounded-2xl bg-[#FAF7F0] border-2 border-[#2D2D2D] shadow-xl p-2.5 space-y-1.5 animate-in fade-in">
-          <div className="flex items-center justify-between px-1 pb-1 border-b border-[#2D2D2D]/15 text-[11px] font-sans font-bold text-[#6E6A63]">
-            <span>切換測試會議情境 (即時開酸)</span>
-            <span className="text-[10px]">Client-side</span>
-          </div>
-
-          {MOCK_CALENDAR_PRESETS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => {
-                onSelectPreset(p.events);
-                setShowPresets(false);
-              }}
-              className="w-full text-left p-2 rounded-xl hover:bg-[#F3EFE6] transition cursor-pointer flex flex-col"
-            >
-              <span className="font-serif font-bold text-xs text-[#2D2D2D]">
-                {p.label}
-              </span>
-              <span className="text-[10px] font-sans text-[#6E6A63] mt-0.5">
-                {p.description}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
+
 

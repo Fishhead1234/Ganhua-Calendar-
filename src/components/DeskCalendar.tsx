@@ -76,6 +76,11 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
     if ((e.target as HTMLElement).closest('button')) return;
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -83,23 +88,30 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
     const deltaX = e.clientX - dragStartX.current;
     const deltaY = e.clientY - dragStartY.current;
 
-    setDragOffsetX(Math.max(-160, Math.min(160, deltaX)));
+    setDragOffsetX(Math.max(-180, Math.min(180, deltaX)));
     if (deltaY > 0) {
-      setDragOffsetY(Math.min(deltaY, 150));
+      setDragOffsetY(Math.min(deltaY, 160));
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    try {
+      if ((e.currentTarget as HTMLElement).hasPointerCapture?.(e.pointerId)) {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
     if (dragStartX.current === null || dragStartY.current === null) return;
     const finalX = dragOffsetX;
     const finalY = dragOffsetY;
 
-    // Swipe Left (<-) OR Pull Down (v) to Tear off and advance to next day!
-    if (finalX < -50 || finalY > 50) {
-      triggerTearAnimation(finalX < -50 ? 'left' : 'down');
+    // Threshold: only trigger if clearly swiped or pulled (> 65px)
+    if (finalX < -65 || finalY > 65) {
+      triggerTearAnimation(finalX < -65 ? 'left' : 'down');
     }
     // Swipe Right (->) to Flip back to previous day!
-    else if (finalX > 50) {
+    else if (finalX > 65) {
       if (canGoPrev) {
         onPrevDay();
       }
@@ -193,10 +205,6 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
       {/* Main Active Desk Calendar Card */}
       <div
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
         style={
           (Math.abs(dragOffsetX) > 0 || dragOffsetY > 0) && !isTearing
             ? {
@@ -205,54 +213,70 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
               }
             : undefined
         }
-        className={`relative rounded-[26px] paper-texture border-2 border-[#2D2D2D] shadow-[0_14px_32px_rgba(45,45,45,0.12),0_4px_0_#2D2D2D] overflow-hidden transition-transform duration-200 cursor-grab active:cursor-grabbing touch-none select-none ${
+        className={`relative rounded-[26px] paper-texture border-2 border-[#2D2D2D] shadow-[0_14px_32px_rgba(45,45,45,0.12),0_4px_0_#2D2D2D] overflow-hidden transition-transform duration-200 select-none ${
           isTearing ? (tearDirection === 'left' ? '-translate-x-full rotate-[-12deg] opacity-0 duration-500' : 'animate-tear-off pointer-events-none') : ''
         }`}
       >
-        {/* Top Calendar Stand Binding Block & Brass Rivets */}
-        <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner inline-block" />
-            <span className="text-[11px] font-sans tracking-[0.2em] text-[#F9F6F0]/80 uppercase">
-              GAN-HUA DESK CALENDAR
-            </span>
+        {/* Top Tearing Handle: Only pressing & dragging from the top edge to the dotted line initiates tearing */}
+        <div
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className="touch-none cursor-grab active:cursor-grabbing select-none border-b border-[#2D2D2D]/15"
+          title="按住頂部撕頁區（木架至虛線處）可向左滑動或向下撕下日曆"
+        >
+          {/* Top Calendar Stand Binding Block & Brass Rivets */}
+          <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-2.5 flex items-center justify-between pointer-events-none">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner inline-block" />
+              <span className="text-[11px] font-sans tracking-[0.2em] text-[#F9F6F0]/80 uppercase">
+                GAN-HUA DESK CALENDAR
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-sans text-[#D4B483] font-semibold">
+                {charMeta.nameZh}
+              </span>
+              <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner inline-block" />
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-sans text-[#D4B483] font-semibold">
-              {charMeta.nameZh}
-            </span>
-            <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner inline-block" />
+
+          {/* Perforated Tear Line + Interactive Action */}
+          <div className="relative px-5 py-2 bg-[#F3EFE6] perforated-line flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63] pointer-events-none">
+              <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
+              <span>{isPastDate ? '已存檔・按住頂部翻閱歷史' : '✂️ 撕頁區・按住頂部向左滑或下拉'}</span>
+            </div>
+            {canGoNext ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerTearAnimation('left');
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] text-[11px] font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm relative z-10"
+              >
+                <span>撕下一頁</span>
+                <span>↘</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBlockedTomorrow();
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D]/15 text-[#2D2D2D] text-[11px] font-sans font-bold hover:bg-[#2D2D2D]/25 transition cursor-pointer relative z-10"
+              >
+                <span>明天待續</span>
+                <Lock className="w-3 h-3" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Perforated Tear Line + Interactive Action */}
-        <div className="relative px-5 py-2 bg-[#F3EFE6] perforated-line flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63]">
-            <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
-            <span>{isPastDate ? '已存檔・可左右滑動翻閱歷史' : '每日一頁・往左滑或向下拉撕下此頁'}</span>
-          </div>
-          {canGoNext ? (
-            <button
-              type="button"
-              onClick={() => triggerTearAnimation('left')}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] text-[11px] font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm"
-            >
-              <span>撕下一頁</span>
-              <span>↘</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onBlockedTomorrow}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D]/15 text-[#2D2D2D] text-[11px] font-sans font-bold hover:bg-[#2D2D2D]/25 transition cursor-pointer"
-            >
-              <span>明天待續</span>
-              <Lock className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        {/* Card Body */}
+        {/* Card Body (Touches here scroll the page naturally!) */}
         <div className="p-5 sm:p-6 space-y-4">
           {/* Top Brand Calligraphic Header */}
           <div className="text-center pb-1">
