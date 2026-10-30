@@ -45,21 +45,26 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   onBlockedTomorrow,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
+  const [tearDirection, setTearDirection] = useState<'down' | 'left'>('left');
+  const [dragOffsetX, setDragOffsetX] = useState(0);
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [copied, setCopied] = useState(false);
+  const dragStartX = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
 
   const dateInfo = parseQuoteDateDisplay(quote.date);
   const nextDateInfo = nextQuotePreview ? parseQuoteDateDisplay(nextQuotePreview.date) : dateInfo;
   const charMeta = CHARACTER_META[quote.character];
 
-  const triggerTearAnimation = () => {
+  const triggerTearAnimation = (direction: 'down' | 'left' = 'left') => {
     if (isTearing) return;
     if (!canGoNext) {
       onBlockedTomorrow();
       return;
     }
+    setTearDirection(direction);
     setIsTearing(true);
+    setDragOffsetX(0);
     setDragOffsetY(0);
     onTearOff();
     setTimeout(() => {
@@ -69,24 +74,43 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
+    dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (dragStartY.current === null || isTearing) return;
+    if (dragStartX.current === null || dragStartY.current === null || isTearing) return;
+    const deltaX = e.clientX - dragStartX.current;
     const deltaY = e.clientY - dragStartY.current;
+
+    setDragOffsetX(Math.max(-160, Math.min(160, deltaX)));
     if (deltaY > 0) {
       setDragOffsetY(Math.min(deltaY, 150));
     }
   };
 
   const handlePointerUp = () => {
-    if (dragStartY.current === null) return;
-    if (dragOffsetY > 65) {
-      triggerTearAnimation();
+    if (dragStartX.current === null || dragStartY.current === null) return;
+    const finalX = dragOffsetX;
+    const finalY = dragOffsetY;
+
+    // Swipe Left (<-) OR Pull Down (v) to Tear off and advance to next day!
+    if (finalX < -50 || finalY > 50) {
+      triggerTearAnimation(finalX < -50 ? 'left' : 'down');
+    }
+    // Swipe Right (->) to Flip back to previous day!
+    else if (finalX > 50) {
+      if (canGoPrev) {
+        onPrevDay();
+      }
+      setDragOffsetX(0);
+      setDragOffsetY(0);
     } else {
+      setDragOffsetX(0);
       setDragOffsetY(0);
     }
+
+    dragStartX.current = null;
     dragStartY.current = null;
   };
 
@@ -174,15 +198,15 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         style={
-          dragOffsetY > 0 && !isTearing
+          (Math.abs(dragOffsetX) > 0 || dragOffsetY > 0) && !isTearing
             ? {
-                transform: `translateY(${dragOffsetY * 0.65}px) rotate(${dragOffsetY * 0.04}deg)`,
+                transform: `translate(${dragOffsetX * 0.9}px, ${Math.max(0, dragOffsetY) * 0.65}px) rotate(${dragOffsetX * 0.06 + dragOffsetY * 0.04}deg)`,
                 transition: 'none',
               }
             : undefined
         }
-        className={`relative rounded-[26px] paper-texture border-2 border-[#2D2D2D] shadow-[0_14px_32px_rgba(45,45,45,0.12),0_4px_0_#2D2D2D] overflow-hidden transition-transform duration-200 cursor-grab active:cursor-grabbing ${
-          isTearing ? 'animate-tear-off pointer-events-none' : ''
+        className={`relative rounded-[26px] paper-texture border-2 border-[#2D2D2D] shadow-[0_14px_32px_rgba(45,45,45,0.12),0_4px_0_#2D2D2D] overflow-hidden transition-transform duration-200 cursor-grab active:cursor-grabbing touch-none select-none ${
+          isTearing ? (tearDirection === 'left' ? '-translate-x-full rotate-[-12deg] opacity-0 duration-500' : 'animate-tear-off pointer-events-none') : ''
         }`}
       >
         {/* Top Calendar Stand Binding Block & Brass Rivets */}
@@ -205,12 +229,12 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
         <div className="relative px-5 py-2 bg-[#F3EFE6] perforated-line flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63]">
             <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
-            <span>{isPastDate ? '已存檔・可左右翻閱歷史' : '每日一頁・往下滑動撕下一頁'}</span>
+            <span>{isPastDate ? '已存檔・可左右滑動翻閱歷史' : '每日一頁・往左滑或向下拉撕下此頁'}</span>
           </div>
           {canGoNext ? (
             <button
               type="button"
-              onClick={triggerTearAnimation}
+              onClick={() => triggerTearAnimation('left')}
               className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] text-[11px] font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm"
             >
               <span>撕下一頁</span>

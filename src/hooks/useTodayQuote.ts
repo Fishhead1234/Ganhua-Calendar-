@@ -152,27 +152,17 @@ export function useTodayQuote({
       };
     }
 
-    // Look up directly by month and day
-    let match = quotesList.find(
-      (q) => q.month === targetMonth && q.day === targetDay
-    );
-
-    // If character filter is active and different from match character
-    if (selectedThemeFilter !== 'all' && match && match.character !== selectedThemeFilter) {
-      // Find the quote for that theme closest to this date or same theme
-      const themeMatch = quotesList.find(
-        (q) => q.character === selectedThemeFilter && Math.abs(q.month - targetMonth) <= 1
-      ) || quotesList.find((q) => q.character === selectedThemeFilter);
-      if (themeMatch) {
-        match = themeMatch;
-      }
-    }
-
-    if (!match) {
-      match = quotesList[0];
-    }
+    // Look up directly by month and day: every date of 365 days has its own unique quote!
+    const match =
+      quotesList.find((q) => q.month === targetMonth && q.day === targetDay) || quotesList[0];
 
     const formatted = formatQuoteFrom365(match, targetDate);
+
+    // If user explicitly filtered by a specific character theme, adjust character badge and svg
+    if (selectedThemeFilter !== 'all') {
+      formatted.character = selectedThemeFilter;
+      formatted.illustrationSvg = `${selectedThemeFilter}_svg`;
+    }
 
     // 3. Dynamic Roast Override (If Pro + Calendar Connected + Today)
     if (dateOffset === 0 && isPro && calendarConnected && roastResult) {

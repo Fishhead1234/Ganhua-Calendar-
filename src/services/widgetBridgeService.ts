@@ -38,3 +38,4 @@ export async function syncNativeWidgetData(quote: CalendarQuote): Promise<boolea
 
   return false;
 }
+

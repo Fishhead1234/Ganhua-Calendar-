@@ -172,3 +172,4 @@ export const BirthdayModal: React.FC<BirthdayModalProps> = ({
     </div>
   );
 };
+

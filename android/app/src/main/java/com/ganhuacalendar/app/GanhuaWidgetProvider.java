@@ -68,3 +68,4 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }
+

@@ -43,16 +43,47 @@ interface PersistedState {
   artStyle: 'original' | 'svg';
   calendarConnected: boolean;
   birthday?: { month: number; day: number } | null;
+  lastOpenedDateStr?: string; // YYYY-MM-DD: tracks last torn/opened date
+}
+
+function getTodayYmd(): string {
+  const t = new Date();
+  const y = t.getFullYear();
+  const m = String(t.getMonth() + 1).padStart(2, '0');
+  const d = String(t.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function loadPersistedState(): PersistedState {
+  const todayYmd = getTodayYmd();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      let initialOffset = 0;
+
+      // Experience the joy of tearing calendar:
+      // If user opened on a previous date, resume from that date so user can tear off missed days!
+      if (typeof parsed.lastOpenedDateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOpenedDateStr)) {
+        const [ly, lm, ld] = parsed.lastOpenedDateStr.split('-').map(Number);
+        const t = new Date();
+        const todayDate = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+        const lastOpenedDate = new Date(ly, lm - 1, ld);
+        const diffMs = lastOpenedDate.getTime() - todayDate.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+          // In the past: resume from last opened date (max 365 days back)
+          initialOffset = Math.max(-365, diffDays);
+        } else {
+          initialOffset = 0;
+        }
+      } else if (typeof parsed.dateOffset === 'number') {
+        initialOffset = parsed.dateOffset;
+      }
+
       return {
-        selectedTheme: parsed.selectedTheme || 'cat',
-        dateOffset: typeof parsed.dateOffset === 'number' ? parsed.dateOffset : 0,
+        selectedTheme: parsed.selectedTheme || 'all',
+        dateOffset: initialOffset,
         favoritedIds: Array.isArray(parsed.favoritedIds) ? parsed.favoritedIds : ['q365-01-01'],
         survivedDates: Array.isArray(parsed.survivedDates) ? parsed.survivedDates : [],
         streakCount: typeof parsed.streakCount === 'number' ? parsed.streakCount : 3,
@@ -65,13 +96,14 @@ function loadPersistedState(): PersistedState {
           typeof parsed.birthday.day === 'number'
             ? parsed.birthday
             : null,
+        lastOpenedDateStr: parsed.lastOpenedDateStr || todayYmd,
       };
     }
   } catch {
     // ignore
   }
   return {
-    selectedTheme: 'cat',
+    selectedTheme: 'all',
     dateOffset: 0,
     favoritedIds: ['q365-01-01'],
     survivedDates: [],
@@ -80,6 +112,7 @@ function loadPersistedState(): PersistedState {
     artStyle: 'original',
     calendarConnected: false,
     birthday: null,
+    lastOpenedDateStr: todayYmd,
   };
 }
 
@@ -149,10 +182,10 @@ export const App: React.FC = () => {
     setTimeout(() => setToastText(null), 2800);
   };
 
-  // Enforce Free Tier Character Gating: if free, force 'cat'
+  // Enforce Free Tier Character Gating: if free, prevent selecting locked characters
   useEffect(() => {
-    if (!isPro && !isAdmin && persisted.selectedTheme !== 'cat') {
-      setPersisted((prev) => ({ ...prev, selectedTheme: 'cat' }));
+    if (!isPro && !isAdmin && (persisted.selectedTheme === 'capybara' || persisted.selectedTheme === 'ghost')) {
+      setPersisted((prev) => ({ ...prev, selectedTheme: 'all' }));
     }
   }, [isPro, isAdmin, persisted.selectedTheme]);
 
@@ -196,6 +229,16 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (currentQuote) {
       syncNativeWidgetData(currentQuote);
+      // Advance lastOpenedDateStr whenever user tears forward / views a newer date
+      setPersisted((prev) => {
+        if (!prev.lastOpenedDateStr || currentQuote.date > prev.lastOpenedDateStr) {
+          return {
+            ...prev,
+            lastOpenedDateStr: currentQuote.date,
+          };
+        }
+        return prev;
+      });
     }
   }, [currentQuote]);
 
