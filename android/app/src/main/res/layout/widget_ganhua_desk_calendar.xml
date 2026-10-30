@@ -16,7 +16,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp">
 
-        <View
+        <FrameLayout
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:background="@drawable/widget_rivet" />
@@ -32,7 +32,7 @@
             android:textSize="10sp"
             android:textStyle="bold" />
 
-        <View
+        <FrameLayout
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:background="@drawable/widget_rivet" />
@@ -83,8 +83,8 @@
                 android:textSize="8sp" />
         </LinearLayout>
 
-        <!-- Vertical Divider -->
-        <View
+        <!-- Vertical Divider (FrameLayout for strict RemoteViews compatibility) -->
+        <FrameLayout
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="@color/widget_divider_color"
