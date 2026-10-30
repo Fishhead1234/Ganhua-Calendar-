@@ -1,14 +1,49 @@
 apply plugin: 'com.android.application'
 
+def computeVersionCode() {
+    def runNum = System.getenv("GITHUB_RUN_NUMBER")
+    if (runNum != null && runNum.isInteger()) {
+        return 100 + Integer.parseInt(runNum)
+    }
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--count', 'HEAD'
+            standardOutput = stdout
+        }
+        return 100 + Integer.parseInt(stdout.toString().trim())
+    } catch (Exception ignored) {
+        return 101
+    }
+}
+
+def computeVersionName() {
+    def runNum = System.getenv("GITHUB_RUN_NUMBER")
+    if (runNum != null && runNum.isInteger()) {
+        return "1.0." + runNum
+    }
+    return "1.0.1"
+}
+
 android {
     namespace "com.ganhuacalendar.app"
     compileSdk rootProject.ext.compileSdkVersion
+
+    signingConfigs {
+        debug {
+            storeFile file('ganhua.keystore')
+            storePassword 'ganhuacalendar'
+            keyAlias 'ganhuakey'
+            keyPassword 'ganhuacalendar'
+        }
+    }
+
     defaultConfig {
         applicationId "com.ganhuacalendar.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode computeVersionCode()
+        versionName computeVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -17,7 +52,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
