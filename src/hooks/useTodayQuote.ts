@@ -1,6 +1,4 @@
-import { useMemo } from 'react';
-import rawQuotes365 from '../data/quotes365.json';
-import birthdayQuotesRaw from '../data/birthday_quotes.json';
+import { useMemo, useState, useEffect } from 'react';
 import {
   CalendarQuote,
   RawStaticQuote365,
@@ -8,6 +6,7 @@ import {
   QuoteCategory,
 } from '../types/calendar';
 import { CalendarRoastResult } from '../services/calendarRoastService';
+import { contentSyncService } from '../services/contentSyncService';
 
 // Lunar date lookup helpers for authentic Taiwanese desk calendar feel
 const LUNAR_MONTHS = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
@@ -120,7 +119,18 @@ export function useTodayQuote({
   canGoNext: boolean;
   canGoPrev: boolean;
 } {
-  const quotesList = rawQuotes365 as RawStaticQuote365[];
+  const [quotesList, setQuotesList] = useState<RawStaticQuote365[]>(() => contentSyncService.getQuotes365());
+  const [birthdayQuotesList, setBirthdayQuotesList] = useState<any[]>(() => contentSyncService.getBirthdayQuotes());
+
+  // Subscribe to OTA updates
+  useEffect(() => {
+    return contentSyncService.subscribe((status) => {
+      if (status === 'updated') {
+        setQuotesList(contentSyncService.getQuotes365());
+        setBirthdayQuotesList(contentSyncService.getBirthdayQuotes());
+      }
+    });
+  }, []);
 
   // 1. Calculate Target Date based on dateOffset (0 = today, -1 = yesterday...)
   const targetDate = useMemo(() => {
@@ -143,10 +153,10 @@ export function useTodayQuote({
     if (birthday && birthday.month === targetMonth && birthday.day === targetDay) {
       const bList =
         selectedThemeFilter !== 'all'
-          ? birthdayQuotesRaw.filter((b) => b.character === selectedThemeFilter)
-          : birthdayQuotesRaw;
+          ? birthdayQuotesList.filter((b) => b.character === selectedThemeFilter)
+          : birthdayQuotesList;
       const bIndex = (targetDate.getFullYear() + targetMonth * 31 + targetDay) % (bList.length || 1);
-      const selectedBday = bList[bIndex] || birthdayQuotesRaw[0];
+      const selectedBday = bList[bIndex] || birthdayQuotesList[0];
       const charType = (selectedThemeFilter !== 'all' ? selectedThemeFilter : selectedBday.character) as CharacterType;
 
       return {
@@ -196,6 +206,7 @@ export function useTodayQuote({
     return formatted;
   }, [
     quotesList,
+    birthdayQuotesList,
     targetMonth,
     targetDay,
     targetDate,

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-30",
+  "baseAssetUrl": "",
+  "files": {
+    "quotes365": "/quotes365.json",
+    "birthdayQuotes": "/birthday_quotes.json",
+    "scenesManifest": "/scenes_manifest.json"
+  }
+}

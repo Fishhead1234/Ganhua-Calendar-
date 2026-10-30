@@ -24,6 +24,7 @@ import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
 import { useTodayQuote } from './hooks/useTodayQuote';
+import { contentSyncService } from './services/contentSyncService';
 import { AppTier } from './services/purchaseService';
 import {
   CalendarMeeting,
@@ -218,6 +219,15 @@ export const App: React.FC = () => {
     selectedThemeFilter: persisted.selectedTheme,
     birthday: persisted.birthday || null,
   });
+
+  // Check for OTA Remote Content Updates in background on app start
+  useEffect(() => {
+    contentSyncService.checkForUpdates().then((res) => {
+      if (res.updated) {
+        showToast(`✨ 日曆內容已自動更新至最新版本 (v${res.version})！`);
+      }
+    });
+  }, []);
 
   // Confetti celebration if today is user's birthday
   useEffect(() => {

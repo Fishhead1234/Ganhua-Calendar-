@@ -8,10 +8,10 @@
     "subtext": "新年新希望：希望不用上班也有錢",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 2,
@@ -36,10 +36,10 @@
     "subtext": "你的肝是老闆財富自由的墊腳石",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 4,
@@ -64,10 +64,10 @@
     "subtext": "有事請明天再跟我的靈魂預約",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_soul_exit",
-    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 6,
@@ -78,10 +78,10 @@
     "subtext": "算下來根本是在做功德",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 7,
@@ -134,10 +134,10 @@
     "subtext": "藏拙是老祖宗留下來的頂級智慧",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 11,
@@ -148,10 +148,10 @@
     "subtext": "症狀包括尷尬微笑、手心冒汗與想逃跑",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 12,
@@ -190,10 +190,10 @@
     "subtext": "除非直接發餐費現金，否則一律家裡有事",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_night_market",
-    "assetPath": "/assets/scenes/ghost_night_market.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 15,
@@ -204,10 +204,10 @@
     "subtext": "安慰獎是明天早上九點準時開會",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_meeting_loading",
-    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 16,
@@ -218,10 +218,10 @@
     "subtext": "我不需要願景，我需要現金",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 17,
@@ -232,10 +232,10 @@
     "subtext": "放過自己，是每天的第一要務",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 18,
@@ -260,10 +260,10 @@
     "subtext": "警惕：千萬不要當看起來最閒的人",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_meeting_loading",
-    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 20,
@@ -274,10 +274,10 @@
     "subtext": "這是一場感人肺腑的人床情未了",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 21,
@@ -302,10 +302,10 @@
     "subtext": "如果這不算理想，那我沒有理想",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 23,
@@ -316,10 +316,10 @@
     "subtext": "退一步海闊天空，躺下來直接入夢",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 24,
@@ -330,10 +330,10 @@
     "subtext": "在心裡回過，就算已經回了",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 25,
@@ -344,10 +344,10 @@
     "subtext": "年後的意思就是：能拖就拖",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 26,
@@ -358,10 +358,10 @@
     "subtext": "打卡鐘見證了醫學奇蹟",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 27,
@@ -372,10 +372,10 @@
     "subtext": "時間就像乳溝，躺平了就什麼都沒有",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 28,
@@ -386,10 +386,10 @@
     "subtext": "防禦力點滿的過年生存法則",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 29,
@@ -428,9 +428,9 @@
     "subtext": "輪得到我，代表這只是苦力活",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "50% 50%"
   },
   {
@@ -456,10 +456,10 @@
     "subtext": "不動就不會產生碳排放，我是環保小尖兵",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 34,
@@ -470,10 +470,10 @@
     "subtext": "表面說『好可惜喔』，內心放起雙十國慶煙火",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_dnd_sign",
-    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 35,
@@ -484,10 +484,10 @@
     "subtext": "通常下午四點五十分會突然來個急件",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 36,
@@ -498,10 +498,10 @@
     "subtext": "這筆交易怎麼算都是詐騙",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 37,
@@ -512,10 +512,10 @@
     "subtext": "投資報酬率最穩定的選擇",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 38,
@@ -526,10 +526,10 @@
     "subtext": "出門一步都算我輸",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 39,
@@ -554,10 +554,10 @@
     "subtext": "保護雙腿，從隨時坐下躺平開始",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 41,
@@ -568,10 +568,10 @@
     "subtext": "不是對公司忠誠，是單純懶得面試",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 42,
@@ -582,9 +582,9 @@
     "subtext": "週一早上請保持電梯肅靜",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "50% 50%"
   },
   {
@@ -596,10 +596,10 @@
     "subtext": "九九八十一難，今天才到第三難",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 44,
@@ -624,10 +624,10 @@
     "subtext": "今日宜：早點回家抱棉被",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 46,
@@ -652,10 +652,10 @@
     "subtext": "辦公室最穩固的友誼建立在共同討厭的人身上",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 48,
@@ -666,10 +666,10 @@
     "subtext": "油花分布均勻，完全不想動",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 49,
@@ -680,10 +680,10 @@
     "subtext": "不當第一個，也絕不當最後一個，完美隱身",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 50,
@@ -694,10 +694,10 @@
     "subtext": "貧窮是最好的晨間喚醒服務",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 51,
@@ -708,10 +708,10 @@
     "subtext": "低調做人，高調放空",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 52,
@@ -722,10 +722,10 @@
     "subtext": "為什麼不能全世界都改用文字訊息就好",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 53,
@@ -736,10 +736,10 @@
     "subtext": "奧斯卡欠所有社畜一座小金人",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 54,
@@ -750,9 +750,9 @@
     "subtext": "把光陰虛度在美好的廢事上",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_salted_fish",
-    "assetPath": "/assets/scenes/capy_salted_fish.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "100% 50%"
   },
   {
@@ -764,10 +764,10 @@
     "subtext": "寧願爬十層樓，也不願尬聊十秒鐘",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 56,
@@ -806,10 +806,10 @@
     "subtext": "成年人的客套話，誰當真誰就輸了",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_night_market",
-    "assetPath": "/assets/scenes/ghost_night_market.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 59,
@@ -820,10 +820,10 @@
     "subtext": "連假總是過得比薪水消失還快",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_daydream_beach",
-    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 60,
@@ -834,10 +834,10 @@
     "subtext": "多說多錯，少說少錯，不說不錯",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 61,
@@ -848,10 +848,10 @@
     "subtext": "項目：無干擾連續翻身熟睡十六小時",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 62,
@@ -862,10 +862,10 @@
     "subtext": "連蚊子飛進來我都嫌太擠",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 63,
@@ -876,10 +876,10 @@
     "subtext": "絕對不能讓任何人覺得我還有空檔",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 64,
@@ -890,10 +890,10 @@
     "subtext": "把機會讓給那些喜歡努力的人吧",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 65,
@@ -904,10 +904,10 @@
     "subtext": "閉上眼睛裝睡是唯一的防禦手段",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 66,
@@ -946,10 +946,10 @@
     "subtext": "鹹魚至少耐放，不會壞掉",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 69,
@@ -974,10 +974,10 @@
     "subtext": "帶薪拉屎是社畜神聖不可侵犯的權利",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 71,
@@ -1016,10 +1016,10 @@
     "subtext": "沒有巧克力，只有滿滿的會議紀錄",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_meeting_loading",
-    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 74,
@@ -1030,10 +1030,10 @@
     "subtext": "就算裡面其實是在算午餐要吃什麼",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_keyboard_coma",
-    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 75,
@@ -1044,10 +1044,10 @@
     "subtext": "從源頭解決失敗的可能性",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 76,
@@ -1058,9 +1058,9 @@
     "subtext": "房租這麼貴，出門就是在虧錢",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "0% 0%"
   },
   {
@@ -1072,10 +1072,10 @@
     "subtext": "從此戒掉了亂買東西的壞習慣（並沒有）",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 78,
@@ -1086,9 +1086,9 @@
     "subtext": "如果可以，我連夏眠、春眠、秋眠都想申請",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "50% 0%"
   },
   {
@@ -1100,10 +1100,10 @@
     "subtext": "或者突然對牆上的滅火器說明書產生濃厚興趣",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 80,
@@ -1114,10 +1114,10 @@
     "subtext": "通常那個『一下』等於你整個下午",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 81,
@@ -1142,10 +1142,10 @@
     "subtext": "萬用敷衍金句，適用99%的職場對話",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 83,
@@ -1156,10 +1156,10 @@
     "subtext": "輕薄、脆弱、毫無歸屬感",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 84,
@@ -1170,10 +1170,10 @@
     "subtext": "至少有體力繼續逃避了",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 85,
@@ -1184,10 +1184,10 @@
     "subtext": "這時候連腳趾都能在鞋裡抠出一棟三房兩廳",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 86,
@@ -1198,10 +1198,10 @@
     "subtext": "目前『忍一下』以微弱優勢領先",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 87,
@@ -1212,10 +1212,10 @@
     "subtext": "物理避震法，完全不受傷",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 88,
@@ -1226,10 +1226,10 @@
     "subtext": "心理年齡已經到達退休標準",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 89,
@@ -1240,10 +1240,10 @@
     "subtext": "特別是在被點名上台自我介紹的那一秒",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 90,
@@ -1254,10 +1254,10 @@
     "subtext": "職場上的五分鐘，等於現實世界的一小時",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 91,
@@ -1268,9 +1268,9 @@
     "subtext": "這是我今年開過最危險的玩笑",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "50% 50%"
   },
   {
@@ -1282,10 +1282,10 @@
     "subtext": "發光太累了，發芽比較簡單",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 93,
@@ -1296,10 +1296,10 @@
     "subtext": "我叫什麼不重要，反正你們下班也不會記得",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 94,
@@ -1324,10 +1324,10 @@
     "subtext": "請幫我的工作熱忱上三柱香",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 96,
@@ -1338,10 +1338,10 @@
     "subtext": "想要超頻運作，請先課金升級",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 97,
@@ -1352,10 +1352,10 @@
     "subtext": "總之沒有一天適合起床上班",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 98,
@@ -1394,10 +1394,10 @@
     "subtext": "與其傷悲兩次，不如現在先快樂一下",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 101,
@@ -1408,10 +1408,10 @@
     "subtext": "一年見一次面還不尷尬的才是真朋友",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 102,
@@ -1422,10 +1422,10 @@
     "subtext": "愛因斯坦肯定沒在台灣上過班",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 103,
@@ -1450,10 +1450,10 @@
     "subtext": "營業用微笑今日已售罄",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 105,
@@ -1520,10 +1520,10 @@
     "subtext": "順其自然是道家的核心思想",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 110,
@@ -1534,10 +1534,10 @@
     "subtext": "下班後的每一秒鐘都屬於私人領地",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 111,
@@ -1548,10 +1548,10 @@
     "subtext": "深呼吸，告訴自己殺人犯法",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 112,
@@ -1562,9 +1562,9 @@
     "subtext": "避開生物鏈最危險的時段",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "50% 0%"
   },
   {
@@ -1576,10 +1576,10 @@
     "subtext": "最後只能一直假裝滑手機看天氣預報",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 114,
@@ -1590,10 +1590,10 @@
     "subtext": "瞬間覺得世界充滿了愛與和平",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 115,
@@ -1618,9 +1618,9 @@
     "subtext": "只要我不出聲，門外的人就會自己離開",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "0% 0%"
   },
   {
@@ -1632,10 +1632,10 @@
     "subtext": "鍵盤敲得越響，怨氣越重",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 118,
@@ -1646,10 +1646,10 @@
     "subtext": "姿勢決定命運，橫著最穩",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 119,
@@ -1660,10 +1660,10 @@
     "subtext": "電池健康度：需要維修",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 120,
@@ -1730,10 +1730,10 @@
     "subtext": "長期規劃是給有錢人做的，我只看眼前",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 125,
@@ -1744,10 +1744,10 @@
     "subtext": "繳完稅後，連吃土都要分期付款",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 126,
@@ -1758,10 +1758,10 @@
     "subtext": "預計整修期：無限期順延",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 127,
@@ -1786,10 +1786,10 @@
     "subtext": "純正天然社畜怨氣再生能源",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 129,
@@ -1800,10 +1800,10 @@
     "subtext": "如果能加一杯珍奶就更完美了",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 130,
@@ -1828,10 +1828,10 @@
     "subtext": "但還是會準時回家蹭飯吃",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 132,
@@ -1842,10 +1842,10 @@
     "subtext": "其實大家都在互相誤會",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 133,
@@ -1856,10 +1856,10 @@
     "subtext": "邏輯清晰，令人無法反駁",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 134,
@@ -1884,10 +1884,10 @@
     "subtext": "職場廢話文學大師",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_meeting_loading",
-    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 136,
@@ -1912,10 +1912,10 @@
     "subtext": "演完之後自己累得半死",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 138,
@@ -1926,10 +1926,10 @@
     "subtext": "不要奢望我洗頭或化妝",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 139,
@@ -1968,10 +1968,10 @@
     "subtext": "今日社交配額已圓滿達成",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 142,
@@ -1982,10 +1982,10 @@
     "subtext": "這是一場沒有劇本的鴻門宴",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 143,
@@ -1996,10 +1996,10 @@
     "subtext": "電池老化嚴重，建議直接報廢休息",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_salted_fish",
-    "assetPath": "/assets/scenes/capy_salted_fish.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 144,
@@ -2024,10 +2024,10 @@
     "subtext": "時間管理大師也救不了的絕望",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 146,
@@ -2038,10 +2038,10 @@
     "subtext": "綠葉也是生態系不可或缺的一環",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 147,
@@ -2052,10 +2052,10 @@
     "subtext": "佛系通訊法，隨緣接聽",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 148,
@@ -2066,10 +2066,10 @@
     "subtext": "塑料家族情誼，風一吹就散",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 149,
@@ -2080,10 +2080,10 @@
     "subtext": "現在已經冷卻完畢，準備躺回被窩",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 150,
@@ -2094,9 +2094,9 @@
     "subtext": "山洞裡最安全，沒有人類打擾",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "0% 0%"
   },
   {
@@ -2108,10 +2108,10 @@
     "subtext": "粽子熱量很高，但上班的怨氣更高",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 152,
@@ -2122,10 +2122,10 @@
     "subtext": "大概是從投履歷給這家公司開始",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 153,
@@ -2136,10 +2136,10 @@
     "subtext": "而且我拒絕保釋出獄",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 154,
@@ -2150,10 +2150,10 @@
     "subtext": "距離產生美感，太近產生焦慮",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 155,
@@ -2164,10 +2164,10 @@
     "subtext": "誰都別想阻擋我準時打卡的手",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 156,
@@ -2178,10 +2178,10 @@
     "subtext": "那才是真正屬於我的人生開始",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 157,
@@ -2192,10 +2192,10 @@
     "subtext": "不需要破冰，請讓我直接沉入海底",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 158,
@@ -2234,10 +2234,10 @@
     "subtext": "今日宜：用眼神與點頭完成所有溝通",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 161,
@@ -2248,10 +2248,10 @@
     "subtext": "把發呆三小時寫成『跨部門流程深度優化思考』",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 162,
@@ -2262,10 +2262,10 @@
     "subtext": "肉眼看不見進度是正常的",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 163,
@@ -2276,10 +2276,10 @@
     "subtext": "內心戲比誰都還要豐富",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 164,
@@ -2318,10 +2318,10 @@
     "subtext": "別擔心，很快你也會失去眼神的光",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 167,
@@ -2332,10 +2332,10 @@
     "subtext": "科技進步最大的貢獻",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 168,
@@ -2346,10 +2346,10 @@
     "subtext": "恐懼是最穩定持久的燃料",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 169,
@@ -2360,10 +2360,10 @@
     "subtext": "平靜無波才是養生之道",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 170,
@@ -2374,10 +2374,10 @@
     "subtext": "連燈都懶得開，在黑暗中緩慢回血",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 171,
@@ -2388,10 +2388,10 @@
     "subtext": "每天消耗高達五千卡路里的耐心",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 172,
@@ -2402,9 +2402,9 @@
     "subtext": "冷氣是唯一讓我留在辦公室的理由",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_daydream_beach",
-    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "50% 100%"
   },
   {
@@ -2416,10 +2416,10 @@
     "subtext": "請勿要求植物寫報告或開會",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_onsen_orange",
-    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 174,
@@ -2430,10 +2430,10 @@
     "subtext": "人間觀察員今日休假",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_dnd_sign",
-    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 175,
@@ -2444,10 +2444,10 @@
     "subtext": "戴上口罩不是防感冒，是防表情管理失敗",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 176,
@@ -2458,10 +2458,10 @@
     "subtext": "子非魚，安知我摸魚之樂",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 177,
@@ -2486,10 +2486,10 @@
     "subtext": "從今天起立志當個無能的人",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 179,
@@ -2500,10 +2500,10 @@
     "subtext": "空腹思考容易做出錯誤決定",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 180,
@@ -2528,10 +2528,10 @@
     "subtext": "這不是讚美，這是甩鍋的前奏",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 182,
@@ -2542,10 +2542,10 @@
     "subtext": "把『減肥十公斤』改成『活著就好』",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 183,
@@ -2556,10 +2556,10 @@
     "subtext": "換個文青的名字，聽起來就高級多了",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_salted_fish",
-    "assetPath": "/assets/scenes/capy_salted_fish.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 184,
@@ -2570,10 +2570,10 @@
     "subtext": "看不見我、看不見我、看不見我",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 185,
@@ -2584,10 +2584,10 @@
     "subtext": "空氣是甜的，但明天早上九點還要回籠",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 186,
@@ -2598,10 +2598,10 @@
     "subtext": "地球不會因為我睡半小時就停止轉動",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 187,
@@ -2612,10 +2612,10 @@
     "subtext": "語言系統重新載入失敗",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 188,
@@ -2626,10 +2626,10 @@
     "subtext": "慢工出細活，摸魚保平安",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 189,
@@ -2654,10 +2654,10 @@
     "subtext": "而且還不用穿正式服裝",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 191,
@@ -2682,10 +2682,10 @@
     "subtext": "順便欣賞一下風景",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_onsen_orange",
-    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 193,
@@ -2696,10 +2696,10 @@
     "subtext": "鏡頭恐懼症末期患者",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 194,
@@ -2724,10 +2724,10 @@
     "subtext": "不用繳稅也不用打卡的夢幻職缺",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 196,
@@ -2738,10 +2738,10 @@
     "subtext": "好想放一個不用寫作業也不用上班的暑假",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 197,
@@ -2766,10 +2766,10 @@
     "subtext": "催一次做一點，不催就當沒發生過",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 199,
@@ -2780,10 +2780,10 @@
     "subtext": "裸奔在躺平的大道上",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 200,
@@ -2794,10 +2794,10 @@
     "subtext": "這才是最踏實的幸福",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 201,
@@ -2822,10 +2822,10 @@
     "subtext": "與自己和解的最佳方式",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_salted_fish",
-    "assetPath": "/assets/scenes/capy_salted_fish.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 50%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 203,
@@ -2836,10 +2836,10 @@
     "subtext": "驚喜通常都是驚嚇",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 204,
@@ -2850,10 +2850,10 @@
     "subtext": "此時交辦任何工作都將無法寫入記憶體",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 205,
@@ -2878,10 +2878,10 @@
     "subtext": "連一滴眼淚或一絲憤怒都懶得浪費",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 207,
@@ -2892,10 +2892,10 @@
     "subtext": "醒醒吧，去裝杯水比較實在",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 208,
@@ -2906,10 +2906,10 @@
     "subtext": "薛丁格的工作法",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 209,
@@ -2920,10 +2920,10 @@
     "subtext": "用五十塊買到五分鐘的快樂",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_night_market",
-    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 210,
@@ -2934,10 +2934,10 @@
     "subtext": "職場時間膨脹定律",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 211,
@@ -2948,10 +2948,10 @@
     "subtext": "近視眼專屬的套濾鏡技能",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 212,
@@ -2990,10 +2990,10 @@
     "subtext": "用睡眠體驗億萬富翁的快樂",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 215,
@@ -3004,10 +3004,10 @@
     "subtext": "精神勝利法讓我省下了好幾萬",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 216,
@@ -3018,10 +3018,10 @@
     "subtext": "眉頭深鎖盯著螢幕看蝦皮拍賣",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 217,
@@ -3032,10 +3032,10 @@
     "subtext": "加滿油也只會原地怠速",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 218,
@@ -3046,10 +3046,10 @@
     "subtext": "視覺饗宴，零卡路里又省錢",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 219,
@@ -3060,10 +3060,10 @@
     "subtext": "加價購項目：真誠的微笑每次五百元",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 220,
@@ -3088,10 +3088,10 @@
     "subtext": "三線合一，長命百歲",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 222,
@@ -3102,10 +3102,10 @@
     "subtext": "連兩百塊都跟我無緣",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 223,
@@ -3116,10 +3116,10 @@
     "subtext": "至於問誰？問天問大地",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 224,
@@ -3130,10 +3130,10 @@
     "subtext": "空谷幽蘭般的腦容量",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 225,
@@ -3144,9 +3144,9 @@
     "subtext": "可惜熬夜只換來了黑眼圈跟肝指數",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "0% 0%"
   },
   {
@@ -3158,10 +3158,10 @@
     "subtext": "之後意志力就呈現自由落體式下滑",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 227,
@@ -3200,10 +3200,10 @@
     "subtext": "請珍惜每一口免費的空氣",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 230,
@@ -3214,10 +3214,10 @@
     "subtext": "自我實現可以在夏威夷海灘上進行",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 231,
@@ -3228,10 +3228,10 @@
     "subtext": "職場隱身術修煉至滿級",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_box_hide",
-    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 232,
@@ -3242,10 +3242,10 @@
     "subtext": "數學天才的省錢邏輯",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 233,
@@ -3256,10 +3256,10 @@
     "subtext": "裹著毛毯打字的社畜日常",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_office_cold",
-    "assetPath": "/assets/scenes/cat_office_cold.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 234,
@@ -3270,10 +3270,10 @@
     "subtext": "看透紅塵的智者選擇退後一步",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 235,
@@ -3284,10 +3284,10 @@
     "subtext": "實戰經驗零，腦內格鬥冠軍",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 236,
@@ -3298,10 +3298,10 @@
     "subtext": "而且沒有滅火器",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 237,
@@ -3326,10 +3326,10 @@
     "subtext": "接下來請讓我靜靜地坐到天黑",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 239,
@@ -3340,10 +3340,10 @@
     "subtext": "無糖＝生人勿近；全糖＝勉強微笑",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 240,
@@ -3368,10 +3368,10 @@
     "subtext": "甚至還鋪好了格紋野餐墊",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_onsen_orange",
-    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 242,
@@ -3382,10 +3382,10 @@
     "subtext": "選擇性記憶體載入中",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 243,
@@ -3396,10 +3396,10 @@
     "subtext": "三不政策讓心靈重獲平靜",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 244,
@@ -3410,10 +3410,10 @@
     "subtext": "精神上永遠處於想翹課的狀態",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 245,
@@ -3424,10 +3424,10 @@
     "subtext": "深度睡眠八小時比什麼都珍貴",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 246,
@@ -3438,10 +3438,10 @@
     "subtext": "連上廁所都需要跨樓層遠征",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 247,
@@ -3452,10 +3452,10 @@
     "subtext": "建議把通知音效改成木魚聲，順便積功德",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 248,
@@ -3466,10 +3466,10 @@
     "subtext": "人體工學的極致應用",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 249,
@@ -3494,10 +3494,10 @@
     "subtext": "無聲的默契，勝過千言萬語",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 251,
@@ -3508,10 +3508,10 @@
     "subtext": "正在腦海中踏浪喝椰子水",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_daydream_beach",
-    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 252,
@@ -3522,10 +3522,10 @@
     "subtext": "電話恐懼症患者的標準SOP",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 253,
@@ -3550,10 +3550,10 @@
     "subtext": "計畫通，完美避開所有麻煩",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 255,
@@ -3564,10 +3564,10 @@
     "subtext": "深怕被捲入任何對話漩渦",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_hide_box",
-    "assetPath": "/assets/scenes/ghost_hide_box.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 256,
@@ -3578,10 +3578,10 @@
     "subtext": "無欲則剛，無心則安",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 257,
@@ -3592,10 +3592,10 @@
     "subtext": "眼角甚至還流下了一滴貧窮的淚水",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 258,
@@ -3606,10 +3606,10 @@
     "subtext": "半夜的演算法總是特別迷人",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 259,
@@ -3620,10 +3620,10 @@
     "subtext": "這是一個歷史悠久的哲學難題",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 260,
@@ -3634,10 +3634,10 @@
     "subtext": "月餅吃一顆，體重胖三斤",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 261,
@@ -3662,10 +3662,10 @@
     "subtext": "元宇宙旅遊也是旅遊",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 263,
@@ -3676,10 +3676,10 @@
     "subtext": "而且還是清空式捐款",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 264,
@@ -3690,10 +3690,10 @@
     "subtext": "股市裡的特級嫩韭菜",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 265,
@@ -3732,10 +3732,10 @@
     "subtext": "貼心保護展示品的優良市民",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 268,
@@ -3760,10 +3760,10 @@
     "subtext": "連擋都擋不住的現金流",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 270,
@@ -3774,10 +3774,10 @@
     "subtext": "留不住的才叫青春跟金錢",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_box_hide",
-    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 271,
@@ -3788,10 +3788,10 @@
     "subtext": "學會裝死是最高級的職場技能",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 272,
@@ -3802,10 +3802,10 @@
     "subtext": "下次約見面請約在各自的夢裡",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 273,
@@ -3830,10 +3830,10 @@
     "subtext": "只吸天地精華，不食人間煙火",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 275,
@@ -3872,10 +3872,10 @@
     "subtext": "仔細一看，每一筆都是自己吃進肚子裡的",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 278,
@@ -3886,10 +3886,10 @@
     "subtext": "最後決定微笑點頭蒙混過去",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 279,
@@ -3900,10 +3900,10 @@
     "subtext": "這種自由比快樂更讓人快樂",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 280,
@@ -3914,10 +3914,10 @@
     "subtext": "我願意承受這份沉重的世俗負擔",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 281,
@@ -3928,10 +3928,10 @@
     "subtext": "非接觸式配送是人類文明之光",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "sceneId": "ghost_delivery_bag",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 282,
@@ -3942,10 +3942,10 @@
     "subtext": "做夢不犯法，而且免費",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 283,
@@ -3956,9 +3956,9 @@
     "subtext": "把手機開飛航是放假的基本禮儀",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_airplane_mode",
+    "assetPath": "/assets/scenes/ghost_airplane_mode.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "50% 100%"
   },
   {
@@ -3970,10 +3970,10 @@
     "subtext": "從此放棄記帳，拒絕二次傷害",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_phone_scroll",
-    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 285,
@@ -3984,10 +3984,10 @@
     "subtext": "一人吃飽，全家不餓",
     "character": "ghost",
     "theme": "money",
-    "sceneId": "ghost_night_market",
-    "assetPath": "/assets/scenes/ghost_night_market.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "sceneId": "ghost_battery_charging",
+    "assetPath": "/assets/scenes/ghost_battery_charging.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 286,
@@ -3998,10 +3998,10 @@
     "subtext": "便當加滷蛋已經變成一種奢侈消費",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 287,
@@ -4026,10 +4026,10 @@
     "subtext": "等待會消耗我僅存的求生意志",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 289,
@@ -4040,10 +4040,10 @@
     "subtext": "過路財神本人就是我",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 290,
@@ -4054,9 +4054,9 @@
     "subtext": "堅持到底的睡眠精神",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "50% 0%"
   },
   {
@@ -4068,10 +4068,10 @@
     "subtext": "只能緊盯著微波爐裡轉圈圈的便當盒",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_night_market",
-    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 292,
@@ -4082,10 +4082,10 @@
     "subtext": "每週花五十元購買一個離職的希望",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 293,
@@ -4096,10 +4096,10 @@
     "subtext": "每天負責吃竹子跟滾來滾去就能當國寶",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 294,
@@ -4110,10 +4110,10 @@
     "subtext": "電話行銷與主管來電並列兩大時間黑洞",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 295,
@@ -4124,10 +4124,10 @@
     "subtext": "效率比我寫報告還高",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 296,
@@ -4138,10 +4138,10 @@
     "subtext": "風吹日曬都不動如山",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 297,
@@ -4194,10 +4194,10 @@
     "subtext": "連多等六十秒紅燈都覺得是對下班時間的褻瀆",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_elevator_stairs",
+    "assetPath": "/assets/scenes/ghost_elevator_stairs.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 301,
@@ -4222,10 +4222,10 @@
     "subtext": "專注凝視螢幕空白處長達三小時",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 303,
@@ -4236,9 +4236,9 @@
     "subtext": "只要一直跟狗玩，就不用跟人類講話了",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "sceneId": "ghost_curtain_wrap",
+    "assetPath": "/assets/scenes/ghost_curtain_wrap.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "0% 0%"
   },
   {
@@ -4278,10 +4278,10 @@
     "subtext": "身上的肉對我不離不棄，令人感動又生氣",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 307,
@@ -4292,10 +4292,10 @@
     "subtext": "其實只是單純臉色太差像剛大病初癒",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_umbrella_shield",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 308,
@@ -4306,10 +4306,10 @@
     "subtext": "簡單兩句＝前因後果加上人生哲學",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 309,
@@ -4320,10 +4320,10 @@
     "subtext": "只要不站起來，我就是專業菁英",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 310,
@@ -4334,10 +4334,10 @@
     "subtext": "如果能用唸經代替報告就好了",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_gaming_bed",
+    "assetPath": "/assets/scenes/ghost_gaming_bed.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 311,
@@ -4348,10 +4348,10 @@
     "subtext": "請勿測試社畜的物理極限",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 312,
@@ -4376,10 +4376,10 @@
     "subtext": "願世界和平，願噪音退散",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_headphones",
-    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 314,
@@ -4404,10 +4404,10 @@
     "subtext": "未來的我會想辦法還卡費的",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 316,
@@ -4418,10 +4418,10 @@
     "subtext": "極致省力模式啟動",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 317,
@@ -4446,10 +4446,10 @@
     "subtext": "文字遊戲的最高境界",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 319,
@@ -4460,10 +4460,10 @@
     "subtext": "能好好睡覺、順利排便就是人間天堂",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 320,
@@ -4474,10 +4474,10 @@
     "subtext": "多問我一句要不要集點我就會當機",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_low_battery",
-    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 321,
@@ -4488,10 +4488,10 @@
     "subtext": "每天進門先嘆三口氣保平安",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 322,
@@ -4502,10 +4502,10 @@
     "subtext": "天生我材必有用，只是用法不同",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 323,
@@ -4516,10 +4516,10 @@
     "subtext": "潛行任務達成，獲得經驗值+100",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_sunglasses_mask",
+    "assetPath": "/assets/scenes/ghost_sunglasses_mask.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 324,
@@ -4544,10 +4544,10 @@
     "subtext": "民生問題永遠優先於企業發展",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 326,
@@ -4558,10 +4558,10 @@
     "subtext": "辛苦了，今晚准許自己當回快樂的小廢物",
     "character": "ghost",
     "theme": "social_battery",
-    "sceneId": "ghost_boba_keyboard",
-    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
-    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "ghost_drama_popcorn",
+    "assetPath": "/assets/scenes/ghost_drama_popcorn.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 327,
@@ -4572,10 +4572,10 @@
     "subtext": "聽懂職場暗語能救自己一命",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 328,
@@ -4586,10 +4586,10 @@
     "subtext": "逃避雖然可恥，但真的超級有用",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_box_hide",
-    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 100%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 329,
@@ -4600,10 +4600,10 @@
     "subtext": "只要表格做得漂亮，沒有人知道裡面是空的",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_pile_of_work",
+    "assetPath": "/assets/scenes/cat_pile_of_work.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 330,
@@ -4614,10 +4614,10 @@
     "subtext": "連算命師都放棄幫我改運",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_laptop_rage",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 331,
@@ -4628,10 +4628,10 @@
     "subtext": "實現真正的做一休二",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_alarm_smash",
+    "assetPath": "/assets/scenes/capy_alarm_smash.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 332,
@@ -4642,10 +4642,10 @@
     "subtext": "保證全公司士氣暴增200%",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 333,
@@ -4656,10 +4656,10 @@
     "subtext": "下輩子投胎志願：大安森林公園的鴿子",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 334,
@@ -4670,10 +4670,10 @@
     "subtext": "向新台幣低頭不算懦弱，算懂事",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_red_envelope",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 335,
@@ -4684,10 +4684,10 @@
     "subtext": "如果年終太少，明年就用同等的態度上班",
     "character": "cat",
     "theme": "seasonal",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 336,
@@ -4712,10 +4712,10 @@
     "subtext": "社畜舒壓必備硬體設施",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_toilet_hide",
+    "assetPath": "/assets/scenes/cat_toilet_hide.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 338,
@@ -4740,9 +4740,9 @@
     "subtext": "否則你的週末就會在修Bug中度過",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "sceneId": "cat_eye_roll",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "0% 50%"
   },
   {
@@ -4754,10 +4754,10 @@
     "subtext": "唯有團購與零食能凝聚部門向心力",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 341,
@@ -4768,10 +4768,10 @@
     "subtext": "至少我們都有屬於自己的成就",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_instant_noodles",
+    "assetPath": "/assets/scenes/cat_instant_noodles.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 342,
@@ -4782,10 +4782,10 @@
     "subtext": "需要打氣，但最好是打錢進我戶頭",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_bubble_bath",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 343,
@@ -4796,10 +4796,10 @@
     "subtext": "千萬別被高帽子騙去當苦力",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 344,
@@ -4810,10 +4810,10 @@
     "subtext": "毒雞湯喝一口，精神百倍痛",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_potato_couch",
+    "assetPath": "/assets/scenes/capy_potato_couch.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 345,
@@ -4838,10 +4838,10 @@
     "subtext": "看誰吵架都像在看戲，心情無比愉悅",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_meditate_float",
+    "assetPath": "/assets/scenes/capy_meditate_float.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 347,
@@ -4852,10 +4852,10 @@
     "subtext": "穿著濕襪子坐八小時堪比滿清十大酷刑",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_fake_smile",
-    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "50% 50%"
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 348,
@@ -4866,10 +4866,10 @@
     "subtext": "我連爬出被窩都覺得缺氧需要吸氧氣瓶",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hotpot_feast",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 349,
@@ -4908,10 +4908,10 @@
     "subtext": "反向成長也是一種成長",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_zen_woodfish",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%"
   },
   {
     "dayOfYear": 352,
@@ -4922,10 +4922,10 @@
     "subtext": "見證無數後輩倒下，我依然穩穩躺著",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_rain_window",
+    "assetPath": "/assets/scenes/capy_rain_window.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 353,
@@ -4964,10 +4964,10 @@
     "subtext": "歲月催人老，工作催人瘋",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "capy_fan_summer",
+    "assetPath": "/assets/scenes/capy_fan_summer.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 356,
@@ -4978,10 +4978,10 @@
     "subtext": "精準度堪比瑞士原子鐘",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_clock_watch",
-    "assetPath": "/assets/scenes/cat_clock_watch.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "sceneId": "cat_sprint_home",
+    "assetPath": "/assets/scenes/cat_sprint_home.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 357,
@@ -4992,10 +4992,10 @@
     "subtext": "雖然拆開包裹後常常忘記自己為什麼要買",
     "character": "capybara",
     "theme": "money",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 358,
@@ -5006,10 +5006,10 @@
     "subtext": "誰在平安夜發工作訊息，誰就沒有聖誕禮物",
     "character": "ghost",
     "theme": "seasonal",
-    "sceneId": "ghost_phone_panic",
-    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
-    "spritePosition": "50% 100%"
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 359,
@@ -5034,10 +5034,10 @@
     "subtext": "起來走動裝水是為了拯救屁股",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_coffee",
-    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 361,
@@ -5048,10 +5048,10 @@
     "subtext": "記憶體分配非常合理",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_fried_chicken",
-    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 50%"
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 362,
@@ -5062,10 +5062,10 @@
     "subtext": "整理錢包時發現自己買了一堆廢物",
     "character": "cat",
     "theme": "money",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
-    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "sceneId": "cat_lottery_pray",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 363,
@@ -5076,10 +5076,10 @@
     "subtext": "為什麼不能下午兩點再開始上班",
     "character": "capybara",
     "theme": "layflat",
-    "sceneId": "capy_blanket_burrito",
-    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "50% 0%"
+    "sceneId": "capy_hammock_nap",
+    "assetPath": "/assets/scenes/capy_hammock_nap.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 364,
@@ -5090,10 +5090,10 @@
     "subtext": "互相體諒，我遲到你別扣錢",
     "character": "cat",
     "theme": "workplace",
-    "sceneId": "cat_empty_wallet",
-    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
-    "spritePosition": "100% 0%"
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 365,
@@ -5104,9 +5104,9 @@
     "subtext": "明年的事明年再放棄，今晚先跨年",
     "character": "capybara",
     "theme": "seasonal",
-    "sceneId": "capy_desk_melt",
-    "assetPath": "/assets/scenes/capy_desk_melt.webp",
-    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
-    "spritePosition": "0% 0%"
+    "sceneId": "capy_white_flag",
+    "assetPath": "/assets/scenes/capy_white_flag.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "0% 100%"
   }
 ]
