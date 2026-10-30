@@ -4,55 +4,57 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/widget_calendar_bg"
-    android:padding="0dp">
+    android:background="@drawable/widget_calendar_bg">
 
     <!-- Binder Header -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="26dp"
         android:background="@drawable/widget_binder_header"
-        android:paddingHorizontal="14dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp">
 
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
             android:background="@drawable/widget_rivet" />
 
         <TextView
             android:id="@+id/tv_widget_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="幹話日曆 • 每日生存指南"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="GAN-HUA CALENDAR"
             android:textColor="#F9F6F0"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
 
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
             android:background="@drawable/widget_rivet" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <!-- Calendar Content Body -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:gravity="center_vertical"
+        android:padding="10dp">
 
         <!-- Left Date Column -->
         <LinearLayout
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingEnd="8dp">
+            android:paddingRight="6dp">
 
             <TextView
                 android:id="@+id/tv_widget_month"
@@ -60,25 +62,26 @@
                 android:layout_height="wrap_content"
                 android:text="10月 / OCT"
                 android:textColor="#6E6A63"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_widget_day"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="29"
+                android:text="30"
                 android:textColor="#2D2D2D"
-                android:textSize="36sp"
-                android:textStyle="bold" />
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:includeFontPadding="false" />
 
             <TextView
                 android:id="@+id/tv_widget_lunar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="農曆九月廿九"
+                android:text="農曆九月三十"
                 android:textColor="#6E6A63"
-                android:textSize="9sp" />
+                android:textSize="8sp" />
         </LinearLayout>
 
         <!-- Vertical Divider -->
@@ -87,45 +90,49 @@
             android:layout_height="match_parent"
             android:background="#2D2D2D"
             android:alpha="0.2"
-            android:layout_marginEnd="10dp" />
+            android:layout_marginRight="8dp" />
 
         <!-- Right Quote Column -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
             <!-- Top Row: Character Badge + Red Seal -->
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="2dp">
 
                 <TextView
                     android:id="@+id/tv_widget_character"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
+                    android:layout_weight="1"
                     android:text="🐱 厭世社畜貓"
                     android:textColor="#785A3C"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
                 <TextView
                     android:id="@+id/tv_widget_seal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
                     android:background="@drawable/widget_stamp_circle"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="1dp"
-                    android:text="平安下班"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="1dp"
+                    android:paddingRight="5dp"
+                    android:paddingBottom="1dp"
+                    android:text="今日已生還"
                     android:textColor="#C83E31"
-                    android:textSize="9sp"
+                    android:textSize="8sp"
                     android:textStyle="bold" />
-            </RelativeLayout>
+            </LinearLayout>
 
             <!-- Main Sarcastic Quote -->
             <TextView
@@ -134,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:text="「每天都想辭職，但每天都準時上班。」"
                 android:textColor="#2D2D2D"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:maxLines="2"
                 android:ellipsize="end" />
@@ -144,10 +151,10 @@
                 android:id="@+id/tv_widget_yiji"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="3dp"
                 android:text="宜：大杯冰美式・準時關機 / 忌：週五臨時會"
                 android:textColor="#6E6A63"
-                android:textSize="9sp"
+                android:textSize="8sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>

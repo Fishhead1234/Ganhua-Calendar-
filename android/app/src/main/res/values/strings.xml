@@ -4,4 +4,5 @@
     <string name="title_activity_main">幹話日曆</string>
     <string name="package_name">com.ganhuacalendar.app</string>
     <string name="custom_url_scheme">com.ganhuacalendar.app</string>
+    <string name="widget_description">幹話日曆桌面小工具，每日自動更換毒舌職場生存金句</string>
 </resources>
