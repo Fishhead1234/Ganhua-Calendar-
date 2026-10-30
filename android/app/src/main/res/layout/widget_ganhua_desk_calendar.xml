@@ -28,10 +28,9 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="GAN-HUA CALENDAR"
-            android:textColor="#F9F6F0"
+            android:textColor="@color/widget_header_text"
             android:textSize="10sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.1" />
+            android:textStyle="bold" />
 
         <View
             android:layout_width="8dp"
@@ -61,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10月 / OCT"
-                android:textColor="#6E6A63"
+                android:textColor="@color/widget_text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -70,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="30"
-                android:textColor="#2D2D2D"
+                android:textColor="@color/widget_text_title"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:includeFontPadding="false" />
@@ -80,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="農曆九月三十"
-                android:textColor="#6E6A63"
+                android:textColor="@color/widget_text_muted"
                 android:textSize="8sp" />
         </LinearLayout>
 
@@ -88,8 +87,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#2D2D2D"
-            android:alpha="0.2"
+            android:background="@color/widget_divider_color"
             android:layout_marginRight="8dp" />
 
         <!-- Right Quote Column -->
@@ -113,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="🐱 厭世社畜貓"
-                    android:textColor="#785A3C"
+                    android:textColor="@color/widget_text_badge"
                     android:textSize="9sp"
                     android:textStyle="bold"
                     android:maxLines="1"
@@ -129,7 +127,7 @@
                     android:paddingRight="5dp"
                     android:paddingBottom="1dp"
                     android:text="今日已生還"
-                    android:textColor="#C83E31"
+                    android:textColor="@color/widget_seal_red"
                     android:textSize="8sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -140,7 +138,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="「每天都想辭職，但每天都準時上班。」"
-                android:textColor="#2D2D2D"
+                android:textColor="@color/widget_text_title"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:maxLines="2"
@@ -153,7 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="宜：大杯冰美式・準時關機 / 忌：週五臨時會"
-                android:textColor="#6E6A63"
+                android:textColor="@color/widget_text_muted"
                 android:textSize="8sp"
                 android:maxLines="1"
                 android:ellipsize="end" />

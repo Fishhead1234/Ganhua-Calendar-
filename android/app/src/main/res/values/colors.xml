@@ -4,5 +4,19 @@
     <color name="colorPrimaryDark">#FAF7F0</color>
     <color name="colorAccent">#C83E31</color>
     <color name="status_bar_color">#F9F6F0</color>
+
+    <!-- Widget Safe Colors -->
+    <color name="widget_card_bg">#FAF7F0</color>
+    <color name="widget_card_border">#2D2D2D</color>
+    <color name="widget_header_bg">#2D2D2D</color>
+    <color name="widget_header_text">#F9F6F0</color>
+    <color name="widget_rivet_color">#D4B483</color>
+    <color name="widget_rivet_border">#B38354</color>
+    <color name="widget_text_title">#2D2D2D</color>
+    <color name="widget_text_muted">#6E6A63</color>
+    <color name="widget_text_badge">#785A3C</color>
+    <color name="widget_seal_red">#C83E31</color>
+    <color name="widget_seal_bg">#1FF9F6F0</color>
+    <color name="widget_divider_color">#332D2D2D</color>
 </resources>
 
