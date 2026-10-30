@@ -1,20 +1,17 @@
 import React from 'react';
 import { CharacterType } from '../types/calendar';
 
-interface CharacterIllustrationProps {
+export interface CharacterIllustrationProps {
   character: CharacterType;
   variant?: string;
   artStyle?: 'original' | 'svg';
   className?: string;
   compact?: boolean;
+  spriteSheet?: string;
+  spritePosition?: string;
+  sceneId?: string;
 }
 
-/**
- * Exact crop coordinates from /characters/reference-trio.jpg (1024 x 765):
- * - Left Card (Cat): x=58..328 (w=270), y=212..474 (h=262)
- * - Middle Card (Capybara): x=372..652 (w=280), y=212..474 (h=262)
- * - Right Card (Ghost): x=695..965 (w=270), y=212..474 (h=262)
- */
 export const REFERENCE_CROP_MAP: Record<
   CharacterType,
   { sx: number; sy: number; sw: number; sh: number; bgPos: string; bgSize: string }
@@ -24,24 +21,24 @@ export const REFERENCE_CROP_MAP: Record<
     sy: 215,
     sw: 266,
     sh: 256,
-    bgPos: '8.2% 42.5%',
-    bgSize: '380% auto',
+    bgPos: '0% 0%',
+    bgSize: '300% 300%',
   },
   capybara: {
     sx: 374,
     sy: 215,
     sw: 276,
     sh: 256,
-    bgPos: '50% 42.5%',
-    bgSize: '372% auto',
+    bgPos: '0% 0%',
+    bgSize: '300% 300%',
   },
   ghost: {
     sx: 696,
     sy: 215,
     sw: 266,
     sh: 256,
-    bgPos: '91.8% 42.5%',
-    bgSize: '380% auto',
+    bgPos: '0% 0%',
+    bgSize: '300% 300%',
   },
 };
 
@@ -50,23 +47,30 @@ export const CharacterIllustration: React.FC<CharacterIllustrationProps> = ({
   artStyle = 'original',
   className = '',
   compact = false,
+  spriteSheet,
+  spritePosition,
+  sceneId,
 }) => {
   if (artStyle === 'original') {
-    const crop = REFERENCE_CROP_MAP[character];
+    const sheet = spriteSheet || `/assets/sheets/${character}_sheet.jpg`;
+    const position = spritePosition || '0% 0%';
+
     return (
       <div
         className={`relative overflow-hidden select-none flex items-center justify-center ${
-          compact ? 'w-20 h-20' : 'w-full h-52 sm:h-56'
+          compact ? 'w-20 h-20' : 'w-full'
         } ${className}`}
       >
         <div
-          aria-label={character}
-          className="w-full h-full bg-no-repeat mix-blend-multiply transition-transform duration-300 hover:scale-[1.03]"
+          className={`${
+            compact ? 'w-16 h-16 rounded-lg' : 'w-56 h-56 rounded-xl'
+          } mx-auto bg-no-repeat transition-all duration-300 overflow-hidden mix-blend-multiply`}
           style={{
-            backgroundImage: 'url(/characters/reference-trio.jpg)',
-            backgroundPosition: crop.bgPos,
-            backgroundSize: crop.bgSize,
+            backgroundImage: `url(${sheet})`,
+            backgroundSize: '300% 300%',
+            backgroundPosition: position,
           }}
+          aria-label={sceneId || `${character}_pose`}
         />
       </div>
     );

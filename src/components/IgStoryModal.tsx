@@ -135,17 +135,39 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
     ctx.font = 'bold 25px "Noto Sans TC", sans-serif';
     ctx.fillText(charMeta.nameZh, cardX + cardW - 80, cardY + 265);
 
-    // 6. Character Illustration
+    // 6. Character Illustration from 3x3 Sprite Sheet
     try {
-      const refImg = await loadImage('/characters/reference-trio.jpg');
-      const crop = REFERENCE_CROP_MAP[quote.character];
-      const destW = 540;
-      const destH = 515;
-      const destX = 540 - destW / 2;
+      const sheetUrl = quote.spriteSheet || `/assets/sheets/${quote.character}_sheet.jpg`;
+      const sheetImg = await loadImage(sheetUrl);
+
+      let col = 0;
+      let row = 0;
+      if (quote.spritePosition) {
+        const parts = quote.spritePosition.split(' ');
+        const xPercent = parseFloat(parts[0]) || 0;
+        const yPercent = parseFloat(parts[1]) || 0;
+        col = xPercent >= 90 ? 2 : xPercent >= 40 ? 1 : 0;
+        row = yPercent >= 90 ? 2 : yPercent >= 40 ? 1 : 0;
+      }
+
+      const cellW = sheetImg.width / 3;
+      const cellH = sheetImg.height / 3;
+      const sx = col * cellW;
+      const sy = row * cellH;
+
+      const destSize = 520;
+      const destX = 540 - destSize / 2;
       const destY = cardY + 340;
-      ctx.drawImage(refImg, crop.sx, crop.sy, crop.sw, crop.sh, destX, destY, destW, destH);
+      ctx.drawImage(sheetImg, sx, sy, cellW, cellH, destX, destY, destSize, destSize);
     } catch {
-      // ignore
+      // Fallback
+      try {
+        const refImg = await loadImage('/characters/reference-trio.jpg');
+        const crop = REFERENCE_CROP_MAP[quote.character];
+        ctx.drawImage(refImg, crop.sx, crop.sy, crop.sw, crop.sh, 280, cardY + 340, 520, 520);
+      } catch {
+        // ignore
+      }
     }
 
     // 7. Quote Text
@@ -350,14 +372,15 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
                 </div>
               </div>
 
-              <div className="my-auto scale-90">
+              <div className="my-auto scale-90 flex justify-center">
                 <div
-                  className="w-full h-32 bg-no-repeat mix-blend-multiply"
+                  className="w-32 h-32 bg-no-repeat rounded-lg overflow-hidden mix-blend-multiply"
                   style={{
-                    backgroundImage: 'url(/characters/reference-trio.jpg)',
-                    backgroundPosition: REFERENCE_CROP_MAP[quote.character].bgPos,
-                    backgroundSize: REFERENCE_CROP_MAP[quote.character].bgSize,
+                    backgroundImage: `url(${quote.spriteSheet || `/assets/sheets/${quote.character}_sheet.jpg`})`,
+                    backgroundPosition: quote.spritePosition || '0% 0%',
+                    backgroundSize: '300% 300%',
                   }}
+                  aria-label={quote.sceneId || quote.character}
                 />
               </div>
 

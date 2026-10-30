@@ -193,7 +193,13 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
             </div>
           </div>
           <div className="my-auto opacity-60 scale-95">
-            <CharacterIllustration character={nextQuotePreview.character} artStyle={artStyle} />
+            <CharacterIllustration
+              character={nextQuotePreview.character}
+              artStyle={artStyle}
+              spriteSheet={nextQuotePreview.spriteSheet}
+              spritePosition={nextQuotePreview.spritePosition}
+              sceneId={nextQuotePreview.sceneId}
+            />
           </div>
           <div className="text-center pb-4">
             <p className="font-serif font-bold text-lg text-[#2D2D2D]">
@@ -339,6 +345,9 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
               character={quote.character}
               variant={quote.illustrationSvg}
               artStyle={artStyle}
+              spriteSheet={quote.spriteSheet}
+              spritePosition={quote.spritePosition}
+              sceneId={quote.sceneId}
             />
 
             {/* Stamp: Today Survived Stamp OR Past Archive "已生還" Stamp */}

@@ -44,7 +44,13 @@ export const TrioDeskShowcase: React.FC<TrioDeskShowcaseProps> = ({
 
               {/* Center Illustration */}
               <div className="w-full my-2">
-                <CharacterIllustration character={card.character} artStyle={artStyle} />
+                <CharacterIllustration
+                  character={card.character}
+                  artStyle={artStyle}
+                  spriteSheet={card.spriteSheet}
+                  spritePosition={card.spritePosition}
+                  sceneId={card.sceneId}
+                />
               </div>
 
               {/* Quote */}

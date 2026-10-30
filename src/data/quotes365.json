@@ -7,7 +7,11 @@
     "quote": "新的一年，新的開始，一樣的想離職。",
     "subtext": "新年新希望：希望不用上班也有錢",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 2,
@@ -17,7 +21,11 @@
     "quote": "連假結束的第一天，我的靈魂還在去年的被窩裡。",
     "subtext": "收假症候群屬於法定職業傷害",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 3,
@@ -27,7 +35,11 @@
     "quote": "只要我夠努力，老闆明年就能換最新款的保時捷了。",
     "subtext": "你的肝是老闆財富自由的墊腳石",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 4,
@@ -37,7 +49,11 @@
     "quote": "今天也是一塊沒用的爛泥，而且是扶不上牆、只想攤在地板上的那種。",
     "subtext": "爛泥至少很濕潤，我連水分都乾了",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 5,
@@ -47,7 +63,11 @@
     "quote": "我的靈魂已經在下午三點先行下班了，現在留在座位上的是全自動導航肉體。",
     "subtext": "有事請明天再跟我的靈魂預約",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 6,
@@ -57,7 +77,11 @@
     "quote": "上班是為了賺錢，但上班害我花更多錢看醫生跟吃大餐洩憤。",
     "subtext": "算下來根本是在做功德",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 7,
@@ -67,7 +91,11 @@
     "quote": "在哪裡跌倒，就在哪裡躺好，順便蓋上棉被睡一覺。",
     "subtext": "地板其實比想像中還要舒服",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 8,
@@ -77,7 +105,11 @@
     "quote": "社交電量已低於 3%，畫面即將變暗，請勿拍打、餵食或找我尬聊。",
     "subtext": "急需躲進廁所隔間充個電",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 9,
@@ -87,7 +119,11 @@
     "quote": "今天又是為了五斗米折腰，順便折壽的一天。",
     "subtext": "腰可以彎，但下班時間一秒都不能讓",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 10,
@@ -97,7 +133,11 @@
     "quote": "只要我不努力，老闆就永遠沒辦法利用我的才華。",
     "subtext": "藏拙是老祖宗留下來的頂級智慧",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 11,
@@ -107,7 +147,11 @@
     "quote": "我不是冷漠，我只是對過度熱情的人類有嚴重的過敏反應。",
     "subtext": "症狀包括尷尬微笑、手心冒汗與想逃跑",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 12,
@@ -117,7 +161,11 @@
     "quote": "會議的本質就是：一群沒事做的人，找有事做的人討論怎麼做。",
     "subtext": "最後結論：下次再約時間討論",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 13,
@@ -127,7 +175,11 @@
     "quote": "能明天做的事情，絕不今天做；萬一明天地球毀滅，今天就白做了。",
     "subtext": "這叫風險控管與資源最佳化",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 14,
@@ -137,7 +189,11 @@
     "quote": "下班後的公司聚餐不叫福利，那叫換個地方繼續看老闆臉色的無薪加班。",
     "subtext": "除非直接發餐費現金，否則一律家裡有事",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 15,
@@ -147,7 +203,11 @@
     "quote": "尾牙抽獎沒中沒關係，至少我還有滿滿的工作量。",
     "subtext": "安慰獎是明天早上九點準時開會",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 16,
@@ -157,7 +217,11 @@
     "quote": "老闆畫的餅太大太硬，我的胃不好，真的消化不良。",
     "subtext": "我不需要願景，我需要現金",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 17,
@@ -167,7 +231,11 @@
     "quote": "人生苦短，及時擺爛；與其內耗自己，不如外耗別人。",
     "subtext": "放過自己，是每天的第一要務",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 18,
@@ -177,7 +245,11 @@
     "quote": "假裝戴著耳機講電話，是社恐人在走廊上避開熟人最偉大的發明。",
     "subtext": "就算耳機裡其實什麼聲音都沒有",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 19,
@@ -187,7 +259,11 @@
     "quote": "所謂團隊合作，就是五個人開會，最後全部推給最老實的那個做。",
     "subtext": "警惕：千萬不要當看起來最閒的人",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 20,
@@ -197,7 +273,11 @@
     "quote": "我的床今天生了重病，需要我二十四小時貼身照顧，不能去上班。",
     "subtext": "這是一場感人肺腑的人床情未了",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 21,
@@ -207,7 +287,11 @@
     "quote": "走在路上遠遠看到認識的鄰居，我立刻轉身走進超商逛了十五分鐘。",
     "subtext": "為了逃避一句『吃飽沒』，我多走了兩條街",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 22,
@@ -217,7 +301,11 @@
     "quote": "不要跟我談理想，我的理想就是不上班還有薪水領。",
     "subtext": "如果這不算理想，那我沒有理想",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 23,
@@ -227,7 +315,11 @@
     "quote": "世上無難事，只要肯放棄，你會發現天空瞬間變得很藍。",
     "subtext": "退一步海闊天空，躺下來直接入夢",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 24,
@@ -237,7 +329,11 @@
     "quote": "回訊息太快會讓人覺得我很閒，所以我決定先放著，結果放了三天就忘了。",
     "subtext": "在心裡回過，就算已經回了",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 25,
@@ -247,7 +343,11 @@
     "quote": "快過年了，現在任何需要動腦的工作都請年後再說。",
     "subtext": "年後的意思就是：能拖就拖",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 26,
@@ -257,7 +357,11 @@
     "quote": "上班時的我：步履蹣跚、眼神死；下班時的我：健步如飛、跑百米。",
     "subtext": "打卡鐘見證了醫學奇蹟",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 27,
@@ -267,7 +371,11 @@
     "quote": "今日事，明日畢；如果明日太忙，下禮拜再看心情也可以。",
     "subtext": "時間就像乳溝，躺平了就什麼都沒有",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 28,
@@ -277,7 +385,11 @@
     "quote": "除夕圍爐最怕親戚關心，建議統一回答：在呼吸、沒存錢、不結婚。",
     "subtext": "防禦力點滿的過年生存法則",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 29,
@@ -287,7 +399,11 @@
     "quote": "初一早，初二早，初三睡到飽；其實我初一就想睡到飽。",
     "subtext": "過年唯一的運動是翻身繼續睡",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 30,
@@ -297,7 +413,11 @@
     "quote": "靈魂出竅中，有事請燒紙，小事請發信，急事請找別人。",
     "subtext": "自動回覆設定：此人已不在服務區",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 31,
@@ -307,7 +427,11 @@
     "quote": "如果工作真的能帶來成就感，老闆早就自己搶著做了。",
     "subtext": "輪得到我，代表這只是苦力活",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 32,
@@ -317,7 +441,11 @@
     "quote": "紅包發出去的是血汗，收回來的是長輩的碎念。",
     "subtext": "荷包比我的社交電量還快見底",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 33,
@@ -327,7 +455,11 @@
     "quote": "我不是懶，我只是在執行低耗能模式，為地球節能減碳盡一份力。",
     "subtext": "不動就不會產生碳排放，我是環保小尖兵",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 34,
@@ -337,7 +469,11 @@
     "quote": "成年人最頂級的快樂，就是原本約好的飯局，對方突然傳訊息說要取消。",
     "subtext": "表面說『好可惜喔』，內心放起雙十國慶煙火",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 35,
@@ -347,7 +483,11 @@
     "quote": "今天工作很順利？小心點，這代表暴風雨前的寧靜。",
     "subtext": "通常下午四點五十分會突然來個急件",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 36,
@@ -357,7 +497,11 @@
     "quote": "開工紅包只有兩百塊，卻想買我一整年的賣命。",
     "subtext": "這筆交易怎麼算都是詐騙",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 37,
@@ -367,7 +511,11 @@
     "quote": "努力不一定會成功，但不努力真的超級輕鬆，親測有效。",
     "subtext": "投資報酬率最穩定的選擇",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 38,
@@ -377,7 +525,11 @@
     "quote": "不要問我週末去哪裡玩，我的週末行程是跟房間的天花板進行深度對視。",
     "subtext": "出門一步都算我輸",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 39,
@@ -387,7 +539,11 @@
     "quote": "離職信已經在草稿匣躺了三年，是我每天撐下去的唯一精神支柱。",
     "subtext": "每天打開看一眼，心情就會平靜許多",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 40,
@@ -397,7 +553,11 @@
     "quote": "躺下吧，反正站著也不會突然變有錢，還容易靜脈曲張。",
     "subtext": "保護雙腿，從隨時坐下躺平開始",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 41,
@@ -407,7 +567,11 @@
     "quote": "年後轉職潮開始了，但我連履歷都懶得打開。",
     "subtext": "不是對公司忠誠，是單純懶得面試",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 42,
@@ -417,7 +581,11 @@
     "quote": "如果眼神可以殺人，今天電梯裡那個一直找我聊天的同事已經投胎三次了。",
     "subtext": "週一早上請保持電梯肅靜",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 43,
@@ -427,7 +595,11 @@
     "quote": "我以為我是來這家公司賺錢的，原來我是來人間渡劫的。",
     "subtext": "九九八十一難，今天才到第三難",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 44,
@@ -437,7 +609,11 @@
     "quote": "我是一隻泡在柚子溫泉裡的水豚，世俗的KPI與我無關。",
     "subtext": "頭上頂著橘子，心裡沒有蚊子",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 45,
@@ -447,7 +623,11 @@
     "quote": "情人節空氣中都是戀愛的酸臭味，只有我散發著加班的清香。",
     "subtext": "今日宜：早點回家抱棉被",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 46,
@@ -457,7 +637,11 @@
     "quote": "降噪耳機是我最後的社交防線，戴上它，全世界都與我無關。",
     "subtext": "請尊重一個戴著大耳機的人的孤獨",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 47,
@@ -467,7 +651,11 @@
     "quote": "世界上沒有真正的感同身受，直到同事也一起被老闆罵。",
     "subtext": "辦公室最穩固的友誼建立在共同討厭的人身上",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 48,
@@ -477,7 +665,11 @@
     "quote": "夢想很豐滿，現實很骨感，而我只想當一塊五花肉靜靜躺著。",
     "subtext": "油花分布均勻，完全不想動",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 49,
@@ -487,7 +679,11 @@
     "quote": "我最擅長的社交技能，就是在群組裡跟著大家複製貼上『+1』跟『謝謝！』。",
     "subtext": "不當第一個，也絕不當最後一個，完美隱身",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 50,
@@ -497,7 +693,11 @@
     "quote": "每天早上叫醒我的不是鬧鐘，也不是夢想，是房租跟卡費。",
     "subtext": "貧窮是最好的晨間喚醒服務",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 51,
@@ -507,7 +707,11 @@
     "quote": "今天的唯一目標：平安呼吸到下班，並且不發表任何有建設性的意見。",
     "subtext": "低調做人，高調放空",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 52,
@@ -517,7 +721,11 @@
     "quote": "接電話前需要做五分鐘的心理建設，講完兩分鐘的電話需要休息兩小時。",
     "subtext": "為什麼不能全世界都改用文字訊息就好",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 53,
@@ -527,7 +735,11 @@
     "quote": "工作時數越長，代表我在辦公室裝忙的演技越精湛。",
     "subtext": "奧斯卡欠所有社畜一座小金人",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 54,
@@ -537,7 +749,11 @@
     "quote": "別人是時間管理大師，我是時間浪費大師，專長是發呆兩小時。",
     "subtext": "把光陰虛度在美好的廢事上",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 55,
@@ -547,7 +763,11 @@
     "quote": "電梯門打開看到裡面有同事，我會假裝東西忘了拿，轉身走樓梯。",
     "subtext": "寧願爬十層樓，也不願尬聊十秒鐘",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 56,
@@ -557,7 +777,11 @@
     "quote": "老闆說『把公司當自己家』，所以我決定今天在會議室穿睡衣躺著。",
     "subtext": "既然是自己家，那我可以先把老闆趕出去嗎",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 57,
@@ -567,7 +791,11 @@
     "quote": "不要叫我走出舒適圈，我好不容易才把舒適圈鋪滿軟墊跟零食。",
     "subtext": "外面風大雨大，圈內四季如春",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 58,
@@ -577,7 +805,11 @@
     "quote": "每次別人說『改天約吃飯』，我都真心希望那個『改天』永遠不要來。",
     "subtext": "成年人的客套話，誰當真誰就輸了",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 59,
@@ -587,7 +819,11 @@
     "quote": "放假一秒鐘，收假像一輩子，這就是時間相對論。",
     "subtext": "連假總是過得比薪水消失還快",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 60,
@@ -597,7 +833,11 @@
     "quote": "能用『收到』解決的事，絕對不要多打一個字。",
     "subtext": "多說多錯，少說少錯，不說不錯",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 61,
@@ -607,7 +847,11 @@
     "quote": "如果睡覺有奧運比賽，我肯定能為台灣拿下一面金牌。",
     "subtext": "項目：無干擾連續翻身熟睡十六小時",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 62,
@@ -617,7 +861,11 @@
     "quote": "我的社交舒適圈大概只有我的床那麼大，而且限乘一人。",
     "subtext": "連蚊子飛進來我都嫌太擠",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 63,
@@ -627,7 +875,11 @@
     "quote": "當有人問我工作忙不忙，標準答案一律是：忙到快往生了。",
     "subtext": "絕對不能讓任何人覺得我還有空檔",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 64,
@@ -637,7 +889,11 @@
     "quote": "比你優秀的人還在努力，那你努力還有什麼用？不如直接休息。",
     "subtext": "把機會讓給那些喜歡努力的人吧",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 65,
@@ -647,7 +903,11 @@
     "quote": "去剪頭髮最怕遇到愛聊天的設計師，我只想安靜地看著鏡子裡的自己變醜。",
     "subtext": "閉上眼睛裝睡是唯一的防禦手段",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 66,
@@ -657,7 +917,11 @@
     "quote": "薪水就像大姨媽，一個月來一次，一個禮拜之內就流光了。",
     "subtext": "而且來的時候總是伴隨著陣痛",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 67,
@@ -667,7 +931,11 @@
     "quote": "今天無論什麼節，我都只想過不用回訊息的節。",
     "subtext": "已讀不回是現代人的基本人權",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 68,
@@ -677,7 +945,11 @@
     "quote": "今天適合做一個沒有夢想的鹹魚，記得偶爾翻個面才不會黏鍋。",
     "subtext": "鹹魚至少耐放，不會壞掉",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 69,
@@ -687,7 +959,11 @@
     "quote": "計程車司機如果一路不講話，下車時我一定給他五顆星外加滿分好評。",
     "subtext": "沉默是金，安靜是鑽石",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 70,
@@ -697,7 +973,11 @@
     "quote": "我在公司最大的貢獻，就是每天準時來吹冷氣、裝水、上廁所。",
     "subtext": "帶薪拉屎是社畜神聖不可侵犯的權利",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 71,
@@ -707,7 +987,11 @@
     "quote": "人生就像一場馬拉松，既然跑不贏別人，不如在路邊補給站吃飽喝足。",
     "subtext": "順便幫跑過去的人拍拍手",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 72,
@@ -717,7 +1001,11 @@
     "quote": "群組裡有人標記『@所有人』的時候，我的厭世指數會瞬間飆升到頂點。",
     "subtext": "通常『所有人』的事，都跟我沒什麼關係",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 73,
@@ -727,7 +1015,11 @@
     "quote": "白色情人節？我只知道今天白白上了一天班。",
     "subtext": "沒有巧克力，只有滿滿的會議紀錄",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 74,
@@ -737,7 +1029,11 @@
     "quote": "職場生存法則第一條：永遠讓你的桌面上開著一個複雜的 Excel 表。",
     "subtext": "就算裡面其實是在算午餐要吃什麼",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 75,
@@ -747,7 +1043,11 @@
     "quote": "我的字典裡沒有『放棄』兩個字，因為我連『開始』都懶得翻開。",
     "subtext": "從源頭解決失敗的可能性",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 76,
@@ -757,7 +1057,11 @@
     "quote": "我不是宅，我只是在幫房東充分利用每一寸租來的空間。",
     "subtext": "房租這麼貴，出門就是在虧錢",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 77,
@@ -767,7 +1071,11 @@
     "quote": "這份工作唯一的好處，就是讓我深刻體會到錢有多難賺。",
     "subtext": "從此戒掉了亂買東西的壞習慣（並沒有）",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 78,
@@ -777,7 +1085,11 @@
     "quote": "每天早上醒來都在想：人類為什麼不能像熊一樣冬眠三個月？",
     "subtext": "如果可以，我連夏眠、春眠、秋眠都想申請",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 79,
@@ -787,7 +1099,11 @@
     "quote": "跟不熟的人獨處五分鐘，我能把鞋頭的紋路研究得一清二楚。",
     "subtext": "或者突然對牆上的滅火器說明書產生濃厚興趣",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 80,
@@ -797,7 +1113,11 @@
     "quote": "同事說『這很簡單，一下就好了』的時候，千萬不要相信。",
     "subtext": "通常那個『一下』等於你整個下午",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 81,
@@ -807,7 +1127,11 @@
     "quote": "運動太傷膝蓋了，為了健康著想，我決定躺在沙發上滑手機就好。",
     "subtext": "大拇指已經得到了充分的有氧運動",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 82,
@@ -817,7 +1141,11 @@
     "quote": "每天說最多的一句話是『哈哈對啊』，其實我根本沒聽清楚對方講了什麼。",
     "subtext": "萬用敷衍金句，適用99%的職場對話",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 83,
@@ -827,7 +1155,11 @@
     "quote": "我對公司的感情就像便利商店的塑膠袋，花兩塊錢買來的，隨時可以丟。",
     "subtext": "輕薄、脆弱、毫無歸屬感",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 84,
@@ -837,7 +1169,11 @@
     "quote": "遇到困難不要怕，閉上眼睛睡一覺，醒來你會發現困難還在，但你精神變好了。",
     "subtext": "至少有體力繼續逃避了",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 85,
@@ -847,7 +1183,11 @@
     "quote": "最怕空氣突然安靜，更怕有人為了打破安靜開始講冷笑話。",
     "subtext": "這時候連腳趾都能在鞋裡抠出一棟三房兩廳",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 86,
@@ -857,7 +1197,11 @@
     "quote": "每天都在『算了忍一下』跟『老子不幹了』之間反覆橫跳。",
     "subtext": "目前『忍一下』以微弱優勢領先",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 87,
@@ -867,7 +1211,11 @@
     "quote": "我的抗壓性很高，因為所有的壓力來到我面前，我都會直接躺下讓它跨過去。",
     "subtext": "物理避震法，完全不受傷",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 88,
@@ -877,7 +1225,11 @@
     "quote": "青年節跟社畜無關，因為我們的青春早就奉獻給打卡鐘了。",
     "subtext": "心理年齡已經到達退休標準",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 89,
@@ -887,7 +1239,11 @@
     "quote": "如果可以選擇超能力，我絕對選『隨時隨地原地消失術』。",
     "subtext": "特別是在被點名上台自我介紹的那一秒",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 90,
@@ -897,7 +1253,11 @@
     "quote": "上班最怕聽到的一句話：『你現在有空嗎？我們快速聊五分鐘。』",
     "subtext": "職場上的五分鐘，等於現實世界的一小時",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 91,
@@ -907,7 +1267,11 @@
     "quote": "愚人節跟老闆說我愛上班，結果老闆居然當真了。",
     "subtext": "這是我今年開過最危險的玩笑",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 92,
@@ -917,7 +1281,11 @@
     "quote": "與其當個發光發熱的太陽，我更想當一顆躲在棉被裡的馬鈴薯。",
     "subtext": "發光太累了，發芽比較簡單",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 93,
@@ -927,7 +1295,11 @@
     "quote": "自我介紹簡直是人類文明史上最殘酷的酷刑之一。",
     "subtext": "我叫什麼不重要，反正你們下班也不會記得",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 94,
@@ -937,7 +1309,11 @@
     "quote": "兒童節快樂，長大後才發現，當大人除了能自己買玩具，其他都很累。",
     "subtext": "而且買了玩具也沒時間玩",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 95,
@@ -947,7 +1323,11 @@
     "quote": "清明連假結束，我覺得需要被祭拜的是我死去的上班動力。",
     "subtext": "請幫我的工作熱忱上三柱香",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 96,
@@ -957,7 +1337,11 @@
     "quote": "不是我工作效率低，是公司給的薪水只買得起我 30% 的CPU算力。",
     "subtext": "想要超頻運作，請先課金升級",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 97,
@@ -967,7 +1351,11 @@
     "quote": "今天的天氣太適合睡覺了：晴天適合曬太陽睡，雨天適合聽雨聲睡。",
     "subtext": "總之沒有一天適合起床上班",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 98,
@@ -977,7 +1365,11 @@
     "quote": "去買衣服只要店員走過來問『需要介紹嗎』，我就會立刻放下衣服逃出店家。",
     "subtext": "讓我安靜地自己看，我買的機率會高十倍",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 99,
@@ -987,7 +1379,11 @@
     "quote": "看到行事曆排滿會議，我連呼吸都覺得是在浪費體力。",
     "subtext": "開啟自動點頭與放空模式",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 100,
@@ -997,7 +1393,11 @@
     "quote": "別跟我說『年輕不努力，老大徒傷悲』，我現在努力也很傷悲啊。",
     "subtext": "與其傷悲兩次，不如現在先快樂一下",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 101,
@@ -1007,7 +1407,11 @@
     "quote": "我的朋友很少，因為維護友誼需要社交能量，而我的能量只夠維持生命。",
     "subtext": "一年見一次面還不尷尬的才是真朋友",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 102,
@@ -1017,7 +1421,11 @@
     "quote": "為什麼週一到週五像走了五萬年，週六到週日卻只像眨了一次眼？",
     "subtext": "愛因斯坦肯定沒在台灣上過班",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 103,
@@ -1027,7 +1435,11 @@
     "quote": "當一隻水豚最棒的地方，就是不管天塌下來還是地裂開，表情都一樣呆滯。",
     "subtext": "情緒穩定到像一尊石雕",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 104,
@@ -1037,7 +1449,11 @@
     "quote": "今天笑得太用力，臉部肌肉已經抽筋，接下來請允許我擺臭臉到下班。",
     "subtext": "營業用微笑今日已售罄",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 105,
@@ -1047,7 +1463,11 @@
     "quote": "每次打開公司信箱，都像在拆未爆彈，永遠不知道哪一封會炸。",
     "subtext": "今天決定先把信箱關掉保平安",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 106,
@@ -1057,7 +1477,11 @@
     "quote": "今天工作效率高達 5%，其中 4% 用在決定午餐要點哪一家外送。",
     "subtext": "剩下 1% 用在去門口拿外送",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 107,
@@ -1067,7 +1491,11 @@
     "quote": "把通訊軟體的『上線狀態』跟『已讀顯示』關掉，人生瞬間獲得了真正的自由。",
     "subtext": "沒有人知道我在線，我就等於不在這個世界上",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 108,
@@ -1077,7 +1505,11 @@
     "quote": "客戶說『我想要簡單一點，但又要有設計感』，我決定給他一張白紙。",
     "subtext": "留白是最高級的設計藝術",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 109,
@@ -1087,7 +1519,11 @@
     "quote": "如果生活給了你一顆酸檸檬，別擠汁了，直接放著長黴吧，反正我也懶得切。",
     "subtext": "順其自然是道家的核心思想",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 110,
@@ -1097,7 +1533,11 @@
     "quote": "下班路上如果跟同事同方向，我會假裝要去買東西，在路口果斷分道揚鑣。",
     "subtext": "下班後的每一秒鐘都屬於私人領地",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 111,
@@ -1107,7 +1547,11 @@
     "quote": "改到第十版之後，客戶說：『我們還是用第一版好了。』",
     "subtext": "深呼吸，告訴自己殺人犯法",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 112,
@@ -1117,7 +1561,11 @@
     "quote": "早起的鳥兒有蟲吃，早起的蟲兒被鳥吃；所以我決定睡到中午吃早午餐。",
     "subtext": "避開生物鏈最危險的時段",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 113,
@@ -1127,7 +1575,11 @@
     "quote": "我不喜歡團體活動，因為在人群中我總是不知道手要放哪裡。",
     "subtext": "最後只能一直假裝滑手機看天氣預報",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 114,
@@ -1137,7 +1589,11 @@
     "quote": "職場上最動聽的情話，不是我愛你，而是『這件事不用你負責』。",
     "subtext": "瞬間覺得世界充滿了愛與和平",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 115,
@@ -1147,7 +1603,11 @@
     "quote": "不要問我假日在幹嘛，我在進行一項長達四十八小時的床墊壓力測試。",
     "subtext": "測試結果：床墊非常合格，不想離開",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 116,
@@ -1157,7 +1617,11 @@
     "quote": "當有人敲門而我一個人在家時，我會立刻屏住呼吸假裝家裡沒人。",
     "subtext": "只要我不出聲，門外的人就會自己離開",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 117,
@@ -1167,7 +1631,11 @@
     "quote": "在辦公室打字很大聲，不代表我在認真工作，可能只是在跟朋友罵老闆。",
     "subtext": "鍵盤敲得越響，怨氣越重",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 118,
@@ -1177,7 +1645,11 @@
     "quote": "人家是斜槓青年，我是橫躺青年，不管在哪裡都能找到支點躺平。",
     "subtext": "姿勢決定命運，橫著最穩",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 119,
@@ -1187,7 +1659,11 @@
     "quote": "每天的能量就像手機電池，早上出門看似 100%，其實踏進公司就跳電剩 20%。",
     "subtext": "電池健康度：需要維修",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 120,
@@ -1197,7 +1673,11 @@
     "quote": "早會的意義，就是把大家叫醒，然後換個地方繼續集體昏迷。",
     "subtext": "左耳進，右耳出，大腦完全沒參與",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 121,
@@ -1207,7 +1687,11 @@
     "quote": "勞動節的最高敬意，就是今天絕對不勞動。",
     "subtext": "躺在沙發上才是對勞工的尊重",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 122,
@@ -1217,7 +1701,11 @@
     "quote": "只要我不跟別人比較，這世界上就沒有人能贏過我。",
     "subtext": "自成一派的廢柴武林宗師",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 123,
@@ -1227,7 +1715,11 @@
     "quote": "聚會超過兩個小時，我的靈魂就會開始在天花板上盤旋，看著底下的自己假笑。",
     "subtext": "眼神逐漸失去對焦",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 124,
@@ -1237,7 +1729,11 @@
     "quote": "別問我未來的職涯規劃，我的規劃就是怎麼撐過今天下午五點。",
     "subtext": "長期規劃是給有錢人做的，我只看眼前",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 125,
@@ -1247,7 +1743,11 @@
     "quote": "五月報稅季，政府比我還清楚我去年有多窮。",
     "subtext": "繳完稅後，連吃土都要分期付款",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 126,
@@ -1257,7 +1757,11 @@
     "quote": "大腦今天貼出了『暫停營業，內部整修中』的告示牌。",
     "subtext": "預計整修期：無限期順延",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 127,
@@ -1267,7 +1771,11 @@
     "quote": "不要隨便打語音電話給我，除非辦公室失火或是我中了威力彩頭獎。",
     "subtext": "沒事先傳訊息問『方便講電話嗎』是基本禮貌",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 128,
@@ -1277,7 +1785,11 @@
     "quote": "如果抱怨工作可以發電，我一個人就能供應全台灣的夏天用電。",
     "subtext": "純正天然社畜怨氣再生能源",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 129,
@@ -1287,7 +1799,11 @@
     "quote": "生活不需要太多掌聲，只需要一張夠軟的床跟吹不完的冷氣。",
     "subtext": "如果能加一杯珍奶就更完美了",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 130,
@@ -1297,7 +1813,11 @@
     "quote": "在茶水間遇到不熟的別部門同事，那三十秒的裝水時間比一個世紀還漫長。",
     "subtext": "水還沒滿就決定先逃跑",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 131,
@@ -1307,7 +1827,11 @@
     "quote": "母親節到了，媽，對不起，我長大後沒有變成有錢人，只變成社畜。",
     "subtext": "但還是會準時回家蹭飯吃",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 132,
@@ -1317,7 +1841,11 @@
     "quote": "老闆總覺得我們很閒，就像我們總覺得老闆很有錢一樣。",
     "subtext": "其實大家都在互相誤會",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 133,
@@ -1327,7 +1855,11 @@
     "quote": "萬事起頭難，中間難，結尾更難；所以乾脆別做了。",
     "subtext": "邏輯清晰，令人無法反駁",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 134,
@@ -1337,7 +1869,11 @@
     "quote": "我的心已經打烊了，今日恕不接待任何人類的情緒勒索。",
     "subtext": "鐵門已拉下，請明年再來",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 135,
@@ -1347,7 +1883,11 @@
     "quote": "我的專業技能：把一句話能講完的事情，寫成十頁看起來很厲害的報告。",
     "subtext": "職場廢話文學大師",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 136,
@@ -1357,7 +1897,11 @@
     "quote": "我對未來的規劃就是：船到橋頭自然直，如果不直，那就翻船順便游泳。",
     "subtext": "隨遇而安的最高境界",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 137,
@@ -1367,7 +1911,11 @@
     "quote": "所謂『高敏人』，就是別人隨口說一句話，我可以在腦內小劇場演完八十集八點檔。",
     "subtext": "演完之後自己累得半死",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 138,
@@ -1377,7 +1925,11 @@
     "quote": "上班穿搭原則：只要有穿衣服出門，就是我對公司最大的尊重。",
     "subtext": "不要奢望我洗頭或化妝",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 139,
@@ -1387,7 +1939,11 @@
     "quote": "今天也是靠著一口仙氣跟半杯奶茶勉強維持生命體徵的一天。",
     "subtext": "呼吸已經花光了我所有的力氣",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 140,
@@ -1397,7 +1953,11 @@
     "quote": "520 我愛你？我只愛準時下班跟發薪日。",
     "subtext": "唯一不會背叛我的是我的床",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 141,
@@ -1407,7 +1967,11 @@
     "quote": "今天最大的社交成就：跟早餐店阿姨說了『早安，謝謝』而沒有結巴。",
     "subtext": "今日社交配額已圓滿達成",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 142,
@@ -1417,7 +1981,11 @@
     "quote": "當主管說『大家隨便聊聊，不用有壓力』的時候，壓力通常最大。",
     "subtext": "這是一場沒有劇本的鴻門宴",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 143,
@@ -1427,7 +1995,11 @@
     "quote": "別人充電需要兩小時，我充電需要整整兩個月，而且還會漏電。",
     "subtext": "電池老化嚴重，建議直接報廢休息",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 144,
@@ -1437,7 +2009,11 @@
     "quote": "每次參加婚禮或大型聚餐，我最關心的是桌上的菜什麼時候上完可以走人。",
     "subtext": "專注於低頭吃蝦，避免任何眼神接觸",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 145,
@@ -1447,7 +2023,11 @@
     "quote": "這禮拜已經過得像一年一樣長了，結果低頭一看才禮拜二。",
     "subtext": "時間管理大師也救不了的絕望",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 146,
@@ -1457,7 +2037,11 @@
     "quote": "既然天生我材必有用，那我最大的用處應該就是湊人數跟當背景板。",
     "subtext": "綠葉也是生態系不可或缺的一環",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 147,
@@ -1467,7 +2051,11 @@
     "quote": "手機開靜音已經五年了，任何能找到我的人都是靠緣分。",
     "subtext": "佛系通訊法，隨緣接聽",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 148,
@@ -1477,7 +2065,11 @@
     "quote": "公司說我們是一家人，但發年終的時候卻把我當外人。",
     "subtext": "塑料家族情誼，風一吹就散",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 149,
@@ -1487,7 +2079,11 @@
     "quote": "三分鐘熱度也算一種熱度，至少我溫暖過那三分鐘。",
     "subtext": "現在已經冷卻完畢，準備躺回被窩",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 150,
@@ -1497,7 +2093,11 @@
     "quote": "別人週末去露營社交，我週末在家把窗簾拉上，體驗穴居人的寧靜快樂。",
     "subtext": "山洞裡最安全，沒有人類打擾",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 151,
@@ -1507,7 +2107,11 @@
     "quote": "端午節立蛋太累了，我選擇立一個絕對不加班的flag。",
     "subtext": "粽子熱量很高，但上班的怨氣更高",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 152,
@@ -1517,7 +2121,11 @@
     "quote": "每天早上坐在辦公桌前的前三十分鐘，都在思考人生到底哪一步走錯了。",
     "subtext": "大概是從投履歷給這家公司開始",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 153,
@@ -1527,7 +2135,11 @@
     "quote": "如果懶惰是一種罪，我應該已經被判無期徒刑，關在自己的房間裡了。",
     "subtext": "而且我拒絕保釋出獄",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 154,
@@ -1537,7 +2149,11 @@
     "quote": "我對人類沒有惡意，我只是覺得大家保持兩公尺以上的安全距離最美。",
     "subtext": "距離產生美感，太近產生焦慮",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 155,
@@ -1547,7 +2163,11 @@
     "quote": "下班前十分鐘收到新任務，我的笑容會瞬間從臉上轉移到離職申請書上。",
     "subtext": "誰都別想阻擋我準時打卡的手",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 156,
@@ -1557,7 +2177,11 @@
     "quote": "每天最期待的行程，就是晚上洗完澡鑽進被窩的那一秒鐘。",
     "subtext": "那才是真正屬於我的人生開始",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 157,
@@ -1567,7 +2191,11 @@
     "quote": "聽到『我們來玩破冰遊戲吧！』這句話，我的心會瞬間結成萬年寒冰。",
     "subtext": "不需要破冰，請讓我直接沉入海底",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 158,
@@ -1577,7 +2205,11 @@
     "quote": "不是我愛喝咖啡，是我體內的血液已經被冰美式完全取代了。",
     "subtext": "拿鐵是最後的溫柔，美式是續命的藥水",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 159,
@@ -1587,7 +2219,11 @@
     "quote": "少壯不努力，老大一樣滑手機。",
     "subtext": "科技始終來自於人性，特別是惰性",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 160,
@@ -1597,7 +2233,11 @@
     "quote": "有時候不是不想說話，是連張開嘴巴都覺得下巴好累。",
     "subtext": "今日宜：用眼神與點頭完成所有溝通",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 161,
@@ -1607,7 +2247,11 @@
     "quote": "每次寫工作週報，都覺得自己是個偉大的科幻小說家。",
     "subtext": "把發呆三小時寫成『跨部門流程深度優化思考』",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 162,
@@ -1617,7 +2261,11 @@
     "quote": "不要催我，我已經在用全宇宙最慢的量子速度往前挪動了。",
     "subtext": "肉眼看不見進度是正常的",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 163,
@@ -1627,7 +2275,11 @@
     "quote": "在群組裡發了一句話如果三分鐘沒人回，我就會想把整個帳號註銷搬去深山。",
     "subtext": "內心戲比誰都還要豐富",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 164,
@@ -1637,7 +2289,11 @@
     "quote": "能用貼圖回覆的訊息，絕對不打字；能已讀的，連貼圖都省了。",
     "subtext": "職場極簡主義實踐者",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 165,
@@ -1647,7 +2303,11 @@
     "quote": "別人的野心是征服世界，我的野心是今天下午茶能搶到最後一塊雞排。",
     "subtext": "具體、可行、充滿幸福感的小目標",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 166,
@@ -1657,7 +2317,11 @@
     "quote": "畢業季來了，歡迎新鮮的肝加入社畜大家庭。",
     "subtext": "別擔心，很快你也會失去眼神的光",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 167,
@@ -1667,7 +2331,11 @@
     "quote": "去餐廳最喜歡掃碼點餐，不用跟店員講半句話就能吃到飯，簡直是社恐救星。",
     "subtext": "科技進步最大的貢獻",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 168,
@@ -1677,7 +2345,11 @@
     "quote": "有人問我工作的動力是什麼？我說是害怕成為街友的恐懼感。",
     "subtext": "恐懼是最穩定持久的燃料",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 169,
@@ -1687,7 +2359,11 @@
     "quote": "人生就像心電圖，如果一直平平順順的……其實躺平也滿舒服的。",
     "subtext": "平靜無波才是養生之道",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 170,
@@ -1697,7 +2373,11 @@
     "quote": "下班回到家坐在玄關發呆半小時，是我把『社會人模式』切換回『幽靈模式』的必要儀式。",
     "subtext": "連燈都懶得開，在黑暗中緩慢回血",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 171,
@@ -1707,7 +2387,11 @@
     "quote": "上班最大的運動量，就是翻白眼跟嘆氣。",
     "subtext": "每天消耗高達五千卡路里的耐心",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 172,
@@ -1717,7 +2401,11 @@
     "quote": "夏至到了，天氣熱到連敷衍同事的力氣都蒸發了。",
     "subtext": "冷氣是唯一讓我留在辦公室的理由",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 173,
@@ -1727,7 +2415,11 @@
     "quote": "今天決定當一棵植物，只需要陽光、空氣、水和手搖飲進行光合作用。",
     "subtext": "請勿要求植物寫報告或開會",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 174,
@@ -1737,7 +2429,11 @@
     "quote": "如果可以，我想把自己的狀態永久設定為『離線中，勿擾』。",
     "subtext": "人間觀察員今日休假",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_dnd_sign",
+    "assetPath": "/assets/scenes/ghost_dnd_sign.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 175,
@@ -1747,7 +2443,11 @@
     "quote": "在公司遇到討厭的人，我連呼吸都覺得跟他共用空氣很委屈。",
     "subtext": "戴上口罩不是防感冒，是防表情管理失敗",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 176,
@@ -1757,7 +2457,11 @@
     "quote": "我不是在摸魚，我是在與水中的魚兒進行深度的心靈溝通。",
     "subtext": "子非魚，安知我摸魚之樂",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 177,
@@ -1767,7 +2471,11 @@
     "quote": "看到未接來電的第一反應不是回撥，而是盯著號碼看五分鐘猜他是誰。",
     "subtext": "然後去搜尋引擎查這支電話是不是詐騙",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 178,
@@ -1777,7 +2485,11 @@
     "quote": "所謂『能者多勞』，翻譯成白話文就是『好欺負的人做最多事』。",
     "subtext": "從今天起立志當個無能的人",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 179,
@@ -1787,7 +2499,11 @@
     "quote": "減肥這件事，等我吃飽了才有力氣開始考慮。",
     "subtext": "空腹思考容易做出錯誤決定",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 180,
@@ -1797,7 +2513,11 @@
     "quote": "跟人聊天最累的地方，就是還要配合對方的語氣做出驚訝或讚嘆的表情。",
     "subtext": "『真的假的！』『太誇張了吧！』輪流播放",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 181,
@@ -1807,7 +2527,11 @@
     "quote": "當同事開始稱讚你『這件事只有你能做』，請立刻握緊你的逃生門把。",
     "subtext": "這不是讚美，這是甩鍋的前奏",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 182,
@@ -1817,7 +2541,11 @@
     "quote": "下半年開始了，上半年的目標一個都沒達成，決定直接改目標。",
     "subtext": "把『減肥十公斤』改成『活著就好』",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 183,
@@ -1827,7 +2555,11 @@
     "quote": "如果有人問我為什麼這麼廢，我會說這叫『低慾望慢活美學』。",
     "subtext": "換個文青的名字，聽起來就高級多了",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 184,
@@ -1837,7 +2569,11 @@
     "quote": "今天決定關閉所有感官，當一個安靜飄過辦公室走廊的透明小幽靈。",
     "subtext": "看不見我、看不見我、看不見我",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 185,
@@ -1847,7 +2583,11 @@
     "quote": "每天下班走出公司大樓，都覺得自己像剛從監獄假釋出來。",
     "subtext": "空氣是甜的，但明天早上九點還要回籠",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 186,
@@ -1857,7 +2597,11 @@
     "quote": "不管今天發生什麼天大的事，都等我睡飽午覺起來再說。",
     "subtext": "地球不會因為我睡半小時就停止轉動",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 187,
@@ -1867,7 +2611,11 @@
     "quote": "連假過後回公司，發現自己已經忘記怎麼跟人類正常寒暄了。",
     "subtext": "語言系統重新載入失敗",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 188,
@@ -1877,7 +2625,11 @@
     "quote": "為什麼工作永遠做不完？因為你做得太快，別人就會塞更多給你。",
     "subtext": "慢工出細活，摸魚保平安",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 189,
@@ -1887,7 +2639,11 @@
     "quote": "我的自律只維持在每天準時點開外送平台的那一刻。",
     "subtext": "對美食的執著從不遲到",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 190,
@@ -1897,7 +2653,11 @@
     "quote": "獨處不是孤單，獨處是我跟自己開的一場高品質VIP派對。",
     "subtext": "而且還不用穿正式服裝",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 191,
@@ -1907,7 +2667,11 @@
     "quote": "開會時最安全的座位，永遠是離投影機最遠、離門口最近的那個。",
     "subtext": "隨時準備尿遁或是神遊太虛",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 192,
@@ -1917,7 +2681,11 @@
     "quote": "人生沒有過不去的坎，如果有，就搬張椅子坐在坎前面休息。",
     "subtext": "順便欣賞一下風景",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 193,
@@ -1927,7 +2695,11 @@
     "quote": "別問我為什麼不愛拍照，因為每次喊『一二三笑』的時候，我的臉都會僵硬成石膏像。",
     "subtext": "鏡頭恐懼症末期患者",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 194,
@@ -1937,7 +2709,11 @@
     "quote": "看到新來的實習生眼裡有光，我默默幫他點了一首《夢醒時分》。",
     "subtext": "給他三個月，他也會變成跟我們一樣的石頭",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 195,
@@ -1947,7 +2723,11 @@
     "quote": "今天不想做人了，想當巷口那隻每天被阿嬤餵飽、躺在機車坐墊上曬太陽的橘貓。",
     "subtext": "不用繳稅也不用打卡的夢幻職缺",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 196,
@@ -1957,7 +2737,11 @@
     "quote": "暑假是學生的，中暑是社畜的。",
     "subtext": "好想放一個不用寫作業也不用上班的暑假",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 197,
@@ -1967,7 +2751,11 @@
     "quote": "只要戴上帽子、口罩加耳機，走在街上我就擁有全宇宙最強的隱形防護罩。",
     "subtext": "社恐人的全套神裝",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 198,
@@ -1977,7 +2765,11 @@
     "quote": "我的工作座右銘：只要沒有人催，這件事就不算急。",
     "subtext": "催一次做一點，不催就當沒發生過",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 199,
@@ -1987,7 +2779,11 @@
     "quote": "把所有的煩惱都丟進洗衣機洗一洗，拿出來還是皺的，那就乾脆別穿了。",
     "subtext": "裸奔在躺平的大道上",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 200,
@@ -1997,7 +2793,11 @@
     "quote": "別人下班是去夜店狂歡，我下班是去超市買半價便當然後回家躲起來吃。",
     "subtext": "這才是最踏實的幸福",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 201,
@@ -2007,7 +2807,11 @@
     "quote": "老闆問我有沒有問題，我最大的問題就是為什麼我還在這裡上班。",
     "subtext": "但我只能微笑說：『目前沒問題！』",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 202,
@@ -2017,7 +2821,11 @@
     "quote": "所謂成熟，就是學會心安理得地當一個廢物，不再為此感到內疚。",
     "subtext": "與自己和解的最佳方式",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_salted_fish",
+    "assetPath": "/assets/scenes/capy_salted_fish.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 203,
@@ -2027,7 +2835,11 @@
     "quote": "如果有人突然拍我的肩膀說『猜猜我是誰』，我只會想直接報警。",
     "subtext": "驚喜通常都是驚嚇",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 204,
@@ -2037,7 +2849,11 @@
     "quote": "每個禮拜五下午三點過後，我的大腦就會自動進入週末待機狀態。",
     "subtext": "此時交辦任何工作都將無法寫入記憶體",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 205,
@@ -2047,7 +2863,11 @@
     "quote": "今天最大的運動：把頭從左邊的枕頭翻到右邊的枕頭。",
     "subtext": "頸部轉體運動，已完成今日健身目標",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 206,
@@ -2057,7 +2877,11 @@
     "quote": "今天誰都別想消耗我的情緒，我的心已經進入冰封省電模式。",
     "subtext": "連一滴眼淚或一絲憤怒都懶得浪費",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 207,
@@ -2067,7 +2891,11 @@
     "quote": "上班族的三大錯覺：今天能準時下班、這案子快結束了、下個月會加薪。",
     "subtext": "醒醒吧，去裝杯水比較實在",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 208,
@@ -2077,7 +2905,11 @@
     "quote": "只要我不打開待辦清單，今天就是完全沒有待辦事項的完美一天。",
     "subtext": "薛丁格的工作法",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 209,
@@ -2087,7 +2919,11 @@
     "quote": "何以解憂？唯有暴富；如果暴富太難，那先來一杯大杯珍奶微糖微冰。",
     "subtext": "用五十塊買到五分鐘的快樂",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 210,
@@ -2097,7 +2933,11 @@
     "quote": "每次說『我再五分鐘就改好』，其實我連檔案都還沒打開。",
     "subtext": "職場時間膨脹定律",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 211,
@@ -2107,7 +2947,11 @@
     "quote": "不想面對現實的時候，就把眼鏡拿下來，整個世界瞬間都溫柔模糊了。",
     "subtext": "近視眼專屬的套濾鏡技能",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 212,
@@ -2117,7 +2961,11 @@
     "quote": "貧窮限制了我的想像力，但大大豐富了我的省錢料理創意。",
     "subtext": "月底用一包泡麵變出三道菜的魔法師",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 213,
@@ -2127,7 +2975,11 @@
     "quote": "今天最大的成就：在會議中連續點頭二十分鐘，其實一句話都沒聽進去。",
     "subtext": "頸椎得到了充分的鍛鍊",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 214,
@@ -2137,7 +2989,11 @@
     "quote": "如果時間就是金錢，那我每天躺在床上揮霍無度，根本是個隱形富豪。",
     "subtext": "用睡眠體驗億萬富翁的快樂",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 215,
@@ -2147,7 +3003,11 @@
     "quote": "看到喜歡的東西太貴，我會告訴自己：不是我買不起，是它不配出現在我家。",
     "subtext": "精神勝利法讓我省下了好幾萬",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 216,
@@ -2157,7 +3017,11 @@
     "quote": "如果裝忙是一門藝術，我已經是達文西等級的大師了。",
     "subtext": "眉頭深鎖盯著螢幕看蝦皮拍賣",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 217,
@@ -2167,7 +3031,11 @@
     "quote": "別叫我加油，油價很貴，我現在改用省電待機模式。",
     "subtext": "加滿油也只會原地怠速",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 218,
@@ -2177,7 +3045,11 @@
     "quote": "月底的生存菜單：早餐睡過去，午餐喝水飽，晚餐看美食節目配白飯。",
     "subtext": "視覺饗宴，零卡路里又省錢",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 219,
@@ -2187,7 +3059,11 @@
     "quote": "這份薪水不包含我的情緒價值，想看我笑請另外加錢。",
     "subtext": "加價購項目：真誠的微笑每次五百元",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 220,
@@ -2197,7 +3073,11 @@
     "quote": "父親節快樂，小時候覺得爸爸很偉大，長大才發現養家真的會讓人禿頭。",
     "subtext": "致敬所有在職場渡劫的爸爸",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 221,
@@ -2207,7 +3087,11 @@
     "quote": "人生下半場的策略：守住髮際線，放低標準線，拉長睡眠線。",
     "subtext": "三線合一，長命百歲",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 222,
@@ -2217,7 +3101,11 @@
     "quote": "人家是『財富自由』，我是『發票對獎自由』——每次對獎都自由地槓龜。",
     "subtext": "連兩百塊都跟我無緣",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 223,
@@ -2227,7 +3115,11 @@
     "quote": "在職場上，學會說『我幫你問問看』，就能合法拖延兩天時間。",
     "subtext": "至於問誰？問天問大地",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 224,
@@ -2237,7 +3129,11 @@
     "quote": "今天適合把腦袋放空，如果有人敲我的頭，應該會聽到清脆的回音。",
     "subtext": "空谷幽蘭般的腦容量",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 225,
@@ -2247,7 +3143,11 @@
     "quote": "如果熬夜可以換錢，我現在應該已經住在信義區的豪宅裡了。",
     "subtext": "可惜熬夜只換來了黑眼圈跟肝指數",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 226,
@@ -2257,7 +3157,11 @@
     "quote": "每天早上穿鞋出門的那一刻，是我一天當中意志力最巔峰的時刻。",
     "subtext": "之後意志力就呈現自由落體式下滑",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 227,
@@ -2267,7 +3171,11 @@
     "quote": "農曆七月鬼門開，其實不可怕，因為同事甩鍋的樣子比鬼還恐怖。",
     "subtext": "還有比鬼更陰魂不散的未讀訊息",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 228,
@@ -2277,7 +3185,11 @@
     "quote": "我已經跟床融為一體了，強行分離會造成嚴重的物理與心理創傷。",
     "subtext": "請尊重床與人的共生關係",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 229,
@@ -2287,7 +3199,11 @@
     "quote": "現在的物價，連呼吸都覺得像是在刷卡分期付款。",
     "subtext": "請珍惜每一口免費的空氣",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 230,
@@ -2297,7 +3213,11 @@
     "quote": "別再說工作是為了自我實現，我只想實現財富自由然後原地退休。",
     "subtext": "自我實現可以在夏威夷海灘上進行",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 231,
@@ -2307,7 +3227,11 @@
     "quote": "當個透明人真好，開會沒人點名，聚餐沒人找，下班沒人攔。",
     "subtext": "職場隱身術修煉至滿級",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 232,
@@ -2317,7 +3241,11 @@
     "quote": "為了省運費湊免運，我花了比運費多十倍的錢買了一堆沒用的東西。",
     "subtext": "數學天才的省錢邏輯",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 233,
@@ -2327,7 +3255,11 @@
     "quote": "公司冷氣開太冷，是為了讓我們保持頭腦清醒，還是為了幫停屍間預熱？",
     "subtext": "裹著毛毯打字的社畜日常",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 234,
@@ -2337,7 +3269,11 @@
     "quote": "不爭不搶，不是因為我佛系，是因為搶贏了通常要負更多責任。",
     "subtext": "看透紅塵的智者選擇退後一步",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 235,
@@ -2347,7 +3283,11 @@
     "quote": "今天最大的運動量：在心裡把討厭的客戶過肩摔了八百次。",
     "subtext": "實戰經驗零，腦內格鬥冠軍",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 236,
@@ -2357,7 +3297,11 @@
     "quote": "當所有人都說『這案子很有挑戰性』，意思是這案子根本是個火坑。",
     "subtext": "而且沒有滅火器",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 237,
@@ -2367,7 +3311,11 @@
     "quote": "七夕情人節，牛郎織女一年見一次都比我跟我的存款見面次數多。",
     "subtext": "月老可能把我的紅線拿去織毛衣了",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 238,
@@ -2377,7 +3325,11 @@
     "quote": "今天的努力配額已經在早上刷牙洗臉時全部用完了。",
     "subtext": "接下來請讓我靜靜地坐到天黑",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 239,
@@ -2387,7 +3339,11 @@
     "quote": "手搖飲的甜度，決定了我今天對待同事的和善程度。",
     "subtext": "無糖＝生人勿近；全糖＝勉強微笑",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 240,
@@ -2397,7 +3353,11 @@
     "quote": "我不是工作狂，我只是窮得很有危機感。",
     "subtext": "帳戶餘額是我最嚴格的督導",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 241,
@@ -2407,7 +3367,11 @@
     "quote": "哪怕全世界都在催我前進，我也堅持在原地野餐。",
     "subtext": "甚至還鋪好了格紋野餐墊",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_onsen_orange",
+    "assetPath": "/assets/scenes/capy_onsen_orange.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 242,
@@ -2417,7 +3381,11 @@
     "quote": "我的腦袋像裝了過期的防毒軟體，遇到工作就卡頓，遇到八卦就高速運轉。",
     "subtext": "選擇性記憶體載入中",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 243,
@@ -2427,7 +3395,11 @@
     "quote": "今天決定走極簡風工作法：不做、不問、不負責。",
     "subtext": "三不政策讓心靈重獲平靜",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 244,
@@ -2437,7 +3409,11 @@
     "quote": "九月開學季，雖然不用開學，但每天早上都像被抓去勞改。",
     "subtext": "精神上永遠處於想翹課的狀態",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 245,
@@ -2447,7 +3423,11 @@
     "quote": "與其追求卓越，不如追求卓越的睡眠品質。",
     "subtext": "深度睡眠八小時比什麼都珍貴",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 246,
@@ -2457,7 +3437,11 @@
     "quote": "每次去上廁所遇到保潔阿姨在拖地，我都會愧疚地去隔壁樓層上。",
     "subtext": "連上廁所都需要跨樓層遠征",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 247,
@@ -2467,7 +3451,11 @@
     "quote": "每次聽到通訊軟體的提示音，我的心臟都會漏跳一拍，並伴隨血壓升高。",
     "subtext": "建議把通知音效改成木魚聲，順便積功德",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 248,
@@ -2477,7 +3465,11 @@
     "quote": "我的座右銘：能坐著絕不站著，能躺著絕不坐著，能睡著絕不醒著。",
     "subtext": "人體工學的極致應用",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 249,
@@ -2487,7 +3479,11 @@
     "quote": "下班後看到公司群組跳出訊息，我會閉上眼睛默念：我是瞎子，我看不見。",
     "subtext": "眼不見為淨，明天早上九點再恢復視力",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 250,
@@ -2497,7 +3493,11 @@
     "quote": "上班最大的樂趣，就是跟隔壁同事用眼神交流『這個人在公三小』。",
     "subtext": "無聲的默契，勝過千言萬語",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 251,
@@ -2507,7 +3507,11 @@
     "quote": "今天的工作狀態：人還在座位上，但意識已經飄到墾丁海邊了。",
     "subtext": "正在腦海中踏浪喝椰子水",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_daydream_beach",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 252,
@@ -2517,7 +3521,11 @@
     "quote": "每次要打電話給客戶前，我都要先在紙上寫好逐字稿，連『你好』都要寫下來。",
     "subtext": "電話恐懼症患者的標準SOP",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 253,
@@ -2527,7 +3535,11 @@
     "quote": "我對工作的熱情，就像冬天早上離開被窩的勇氣一樣，趨近於零。",
     "subtext": "完全靠求生本能在維持運作",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 254,
@@ -2537,7 +3549,11 @@
     "quote": "失敗乃成功之母，但我不想當媽，所以我選擇直接放棄。",
     "subtext": "計畫通，完美避開所有麻煩",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 255,
@@ -2547,7 +3563,11 @@
     "quote": "公司飲水機旁邊是情報交換中心，但我去裝水只想快點裝完逃回座位。",
     "subtext": "深怕被捲入任何對話漩渦",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_hide_box",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 256,
@@ -2557,7 +3577,11 @@
     "quote": "只要把期望降到最低，上班就沒有什麼事情能真正傷害到我。",
     "subtext": "無欲則剛，無心則安",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 257,
@@ -2567,7 +3591,11 @@
     "quote": "買東西不眨眼的人有很多，我買東西也不眨眼，因為我看價錢看到眼睛直接瞪大了。",
     "subtext": "眼角甚至還流下了一滴貧窮的淚水",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 258,
@@ -2577,7 +3605,11 @@
     "quote": "每次說『要早點睡』，結果滑手機滑到凌晨兩點，開始看別人修馬蹄跟洗地毯。",
     "subtext": "半夜的演算法總是特別迷人",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 259,
@@ -2587,7 +3619,11 @@
     "quote": "錢不是問題，問題是我根本沒錢。",
     "subtext": "這是一個歷史悠久的哲學難題",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 260,
@@ -2597,7 +3633,11 @@
     "quote": "中秋節烤肉，我就像烤網上的甜不辣，被工作反覆煎熬還膨脹。",
     "subtext": "月餅吃一顆，體重胖三斤",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 261,
@@ -2607,7 +3647,11 @@
     "quote": "只要我不打開網銀App，我就依然過著體面、優雅的中產階級生活。",
     "subtext": "薛丁格的存款餘額",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 262,
@@ -2617,7 +3661,11 @@
     "quote": "同事問我週末怎麼沒出門？我說：我出門了啊，在動森跟峽谷裡逛了一整天。",
     "subtext": "元宇宙旅遊也是旅遊",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 263,
@@ -2627,7 +3675,11 @@
     "quote": "每個月看著銀行帳戶的餘額，都懷疑是不是有駭客進去幫我辦了捐款。",
     "subtext": "而且還是清空式捐款",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 264,
@@ -2637,7 +3689,11 @@
     "quote": "別人投資理財是錢滾錢，我投資理財是錢滾走就再也沒回來過。",
     "subtext": "股市裡的特級嫩韭菜",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 265,
@@ -2647,7 +3703,11 @@
     "quote": "在捷運上搶到博愛座旁邊的普通座位，需要承受比上班還大的心理壓力。",
     "subtext": "全程閉眼裝死，連呼吸都不敢太大聲",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 266,
@@ -2657,7 +3717,11 @@
     "quote": "我的荷包比我的臉還要乾淨，連一隻蚊子飛進去都會餓死。",
     "subtext": "真正的家徒四壁在皮夾裡上演",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 267,
@@ -2667,7 +3731,11 @@
     "quote": "每次去逛百貨公司，我都覺得自己像去參觀博物館，只看不摸更不買。",
     "subtext": "貼心保護展示品的優良市民",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 268,
@@ -2677,7 +3745,11 @@
     "quote": "今天有人誇我情緒很穩定，其實我只是累到連生氣的力氣都沒有了。",
     "subtext": "心如止水，實則死水一潭",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 269,
@@ -2687,7 +3759,11 @@
     "quote": "賺錢像用針挑土一樣慢，花錢像水庫洩洪一樣快。",
     "subtext": "連擋都擋不住的現金流",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 270,
@@ -2697,7 +3773,11 @@
     "quote": "存錢太難了，因為每一塊錢都長了腳，無時無刻不想逃離我的口袋。",
     "subtext": "留不住的才叫青春跟金錢",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 271,
@@ -2707,7 +3787,11 @@
     "quote": "教師節快樂，社會這所學校教會我最重要的一課，就是少管閒事。",
     "subtext": "學會裝死是最高級的職場技能",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 272,
@@ -2717,7 +3801,11 @@
     "quote": "跟朋友出去玩負責拍照，回家後累得像剛搬完三百箱磚頭。",
     "subtext": "下次約見面請約在各自的夢裡",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 273,
@@ -2727,7 +3815,11 @@
     "quote": "小時候以為三十歲會有車有房，長大後才發現三十歲只有購物車跟租來的雅房。",
     "subtext": "偶爾還有醫院的病床",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_office_cold",
+    "assetPath": "/assets/scenes/cat_office_cold.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 274,
@@ -2737,7 +3829,11 @@
     "quote": "當朋友問我週末要不要去吃高檔餐廳，我摸了摸口袋說：我最近在修仙辟穀。",
     "subtext": "只吸天地精華，不食人間煙火",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 275,
@@ -2747,7 +3843,11 @@
     "quote": "每次去參加喜宴跟不熟的親戚同桌，我都假裝自己是來做美食品鑑的米其林密探。",
     "subtext": "只管埋頭苦吃，絕對不抬頭對眼",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 276,
@@ -2757,7 +3857,11 @@
     "quote": "發薪日那天我是國王，發薪日隔天繳完卡費跟房租，我直接變成乞丐。",
     "subtext": "為期二十四小時的富豪體驗卡",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_payday_king",
+    "assetPath": "/assets/scenes/cat_payday_king.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 277,
@@ -2767,7 +3871,11 @@
     "quote": "花錢的時候像大爺，繳信用卡帳單的時候像孫子，還是懷疑被盜刷的那種。",
     "subtext": "仔細一看，每一筆都是自己吃進肚子裡的",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 278,
@@ -2777,7 +3885,11 @@
     "quote": "每次要跟不熟的人講話，我都會在心裡先排練三次，結果開口還是講錯。",
     "subtext": "最後決定微笑點頭蒙混過去",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 279,
@@ -2787,7 +3899,11 @@
     "quote": "錢雖然不能買到真正的快樂，但能買到讓我不用看老闆臉色的自由。",
     "subtext": "這種自由比快樂更讓人快樂",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 280,
@@ -2797,7 +3913,11 @@
     "quote": "有人說錢乃身外之物，那拜託把你們不要的身外之物都砸向我吧！",
     "subtext": "我願意承受這份沉重的世俗負擔",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 281,
@@ -2807,7 +3927,11 @@
     "quote": "最完美的週末：沒有鬧鐘、沒有訊息、沒有出門，只有外送員把食物放在門口的通知。",
     "subtext": "非接觸式配送是人類文明之光",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 282,
@@ -2817,7 +3941,11 @@
     "quote": "如果我有一個億，我一定每天準時去上班——我是說去買下公司然後叫老闆罰站。",
     "subtext": "做夢不犯法，而且免費",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 283,
@@ -2827,7 +3955,11 @@
     "quote": "雙十放假，只要不用打開公司群組，每一天都是值得慶祝的好日子。",
     "subtext": "把手機開飛航是放假的基本禮儀",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 284,
@@ -2837,7 +3969,11 @@
     "quote": "每次決定開始記帳，記了三天發現自己只是更清楚知道錢是怎麼沒的，依然存不到錢。",
     "subtext": "從此放棄記帳，拒絕二次傷害",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_phone_scroll",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 285,
@@ -2847,7 +3983,11 @@
     "quote": "別再問我為什麼單身了，我自己一個人都養不活了，難道要找個人一起喝西北風嗎？",
     "subtext": "一人吃飽，全家不餓",
     "character": "ghost",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 286,
@@ -2857,7 +3997,11 @@
     "quote": "為什麼我的薪水是『固定薪資』，物價卻是『自由搏擊』？",
     "subtext": "便當加滷蛋已經變成一種奢侈消費",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 287,
@@ -2867,7 +4011,11 @@
     "quote": "把電腦螢幕亮度調暗一點，別人就看不出來我其實在閉目養神。",
     "subtext": "辦公室省電與養生雙贏技巧",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 288,
@@ -2877,7 +4025,11 @@
     "quote": "每次去銀行辦事抽號碼牌，看到前面還要等三十個人，我就想直接回家放棄治療。",
     "subtext": "等待會消耗我僅存的求生意志",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 289,
@@ -2887,7 +4039,11 @@
     "quote": "這輩子跟錢最接近的時刻，就是去銀行幫公司存錢的時候。",
     "subtext": "過路財神本人就是我",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 290,
@@ -2897,7 +4053,11 @@
     "quote": "為什麼鬧鐘響了五次我還起不來？因為我的身體很有原則，絕不輕易妥協。",
     "subtext": "堅持到底的睡眠精神",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 291,
@@ -2907,7 +4067,11 @@
     "quote": "在茶水間微波便當的那三分鐘，如果旁邊有人也在等，空氣會尷尬到凝固。",
     "subtext": "只能緊盯著微波爐裡轉圈圈的便當盒",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 292,
@@ -2917,7 +4081,11 @@
     "quote": "買樂透是我對未來所做的唯一一項高風險高報酬投資規劃。",
     "subtext": "每週花五十元購買一個離職的希望",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 293,
@@ -2927,7 +4095,11 @@
     "quote": "如果人生可以重來，我一定在投胎時選『大貓熊』這個選項。",
     "subtext": "每天負責吃竹子跟滾來滾去就能當國寶",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 294,
@@ -2937,7 +4109,11 @@
     "quote": "每次有人打電話來說『耽誤你一分鐘』，最後都會耽誤我整整半小時的人生。",
     "subtext": "電話行銷與主管來電並列兩大時間黑洞",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 295,
@@ -2947,7 +4123,11 @@
     "quote": "我不是月光族，我是『月初光族』，通常五號發薪，八號就光了。",
     "subtext": "效率比我寫報告還高",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 296,
@@ -2957,7 +4137,11 @@
     "quote": "別跟我談什麼狼性文化，我連當哈士奇都嫌太累，我只想當一塊石頭。",
     "subtext": "風吹日曬都不動如山",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 297,
@@ -2967,7 +4151,11 @@
     "quote": "上班族最大的勇氣，就是在全場安靜的會議室裡，肚子突然發出一聲超大聲的咕嚕叫。",
     "subtext": "瞬間成為全場焦點，想找地洞鑽進去",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 298,
@@ -2977,7 +4165,11 @@
     "quote": "我的錢包得了厭食症，吐出去的永遠比吃進來的多。",
     "subtext": "急需一位金主爸爸幫忙灌食",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 299,
@@ -2987,7 +4179,11 @@
     "quote": "下午三點的點心時間，是支撐我沒有把電腦砸向窗外的唯一力量。",
     "subtext": "雞蛋糕與雞排是和平的守護神",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 300,
@@ -2997,7 +4193,11 @@
     "quote": "今天最大的願望：希望回家的路上每一盞紅綠燈都是綠燈。",
     "subtext": "連多等六十秒紅燈都覺得是對下班時間的褻瀆",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 301,
@@ -3007,7 +4207,11 @@
     "quote": "週一的早晨，連咖啡機運作的聲音聽起來都像在嘆氣。",
     "subtext": "濃縮咖啡也濃縮不了我的悲傷",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 302,
@@ -3017,7 +4221,11 @@
     "quote": "如果發呆可以算加班費，我已經是這家公司的最高薪員工了。",
     "subtext": "專注凝視螢幕空白處長達三小時",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 303,
@@ -3027,7 +4235,11 @@
     "quote": "社交場合裡最安全的角落，永遠是有養貓或養狗的那個角落。",
     "subtext": "只要一直跟狗玩，就不用跟人類講話了",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 304,
@@ -3037,7 +4249,11 @@
     "quote": "萬聖節不用特別化妝，我每天早上素顏進辦公室就夠像喪屍了。",
     "subtext": "黑眼圈是最天然的煙燻妝",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_soul_exit",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 305,
@@ -3047,7 +4263,11 @@
     "quote": "今天開會唯一記住的事：訂便當的人忘記幫我加滷蛋。",
     "subtext": "這比專案延期還要嚴重一百倍",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 306,
@@ -3057,7 +4277,11 @@
     "quote": "為什麼我的體重不會像我的存款一樣，不知不覺就自己消失了？",
     "subtext": "身上的肉對我不離不棄，令人感動又生氣",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 307,
@@ -3067,7 +4291,11 @@
     "quote": "在捷運上看到有人讓座給我，我不知道該高興有位子坐，還是難過我看起來像老弱婦孺。",
     "subtext": "其實只是單純臉色太差像剛大病初癒",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 308,
@@ -3077,7 +4305,11 @@
     "quote": "每次主管說『我簡單講兩句』，請做好心理準備迎接半小時的演講。",
     "subtext": "簡單兩句＝前因後果加上人生哲學",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 309,
@@ -3087,7 +4319,11 @@
     "quote": "開視訊會議最棒的地方，就是上半身襯衫筆挺，下半身穿著海綿寶寶睡褲。",
     "subtext": "只要不站起來，我就是專業菁英",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 310,
@@ -3097,7 +4333,11 @@
     "quote": "每次要上台報告前，我的手抖得像在搖泡沫紅茶一樣。",
     "subtext": "如果能用唸經代替報告就好了",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 311,
@@ -3107,7 +4347,11 @@
     "quote": "我的抗壓性就像橡皮筋，拉太緊不會變強，只會直接斷掉彈你的臉。",
     "subtext": "請勿測試社畜的物理極限",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 312,
@@ -3117,7 +4361,11 @@
     "quote": "床以外的地方都是遠方，手夠不到的地方都是他鄉。",
     "subtext": "今日宜：原地冬眠",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 313,
@@ -3127,7 +4375,11 @@
     "quote": "當有人在辦公室大聲講電話，我會在心裡幫他伴奏一首《大悲咒》。",
     "subtext": "願世界和平，願噪音退散",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_headphones",
+    "assetPath": "/assets/scenes/ghost_headphones.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 314,
@@ -3137,7 +4389,11 @@
     "quote": "上班時間過得有多慢？我看了三次時鐘，分針才走了一格。",
     "subtext": "懷疑公司的時鐘裝了減速齒輪",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 315,
@@ -3147,7 +4403,11 @@
     "quote": "雙十一購物節，昨晚清空了購物車，今天順便清空了銀行帳戶。",
     "subtext": "未來的我會想辦法還卡費的",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 316,
@@ -3157,7 +4417,11 @@
     "quote": "今天連打哈欠都懶得張大嘴，只能在肚子裡默默嘆一口氣。",
     "subtext": "極致省力模式啟動",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 317,
@@ -3167,7 +4431,11 @@
     "quote": "下班後去逛夜市，是我確認自己還活在人間、不是孤魂野鬼的重要儀式。",
     "subtext": "地瓜球與臭豆腐是靈魂的救贖",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_night_market",
+    "assetPath": "/assets/scenes/ghost_night_market.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 318,
@@ -3177,7 +4445,11 @@
     "quote": "所謂『彈性上下班』，就是上班時間很固定，下班時間很有彈性（往後延）。",
     "subtext": "文字遊戲的最高境界",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 319,
@@ -3187,7 +4459,11 @@
     "quote": "我對人生的要求已經從『大富大貴』降級成『準時下班、腸胃順暢』了。",
     "subtext": "能好好睡覺、順利排便就是人間天堂",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 320,
@@ -3197,7 +4473,11 @@
     "quote": "今天的社交能量只夠我跟超商店員說一句：『載具，不用袋子，謝謝。』",
     "subtext": "多問我一句要不要集點我就會當機",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_low_battery",
+    "assetPath": "/assets/scenes/ghost_low_battery.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 321,
@@ -3207,7 +4487,11 @@
     "quote": "在辦公室裡，誰先嘆氣誰就贏得了道德制高點，別人都不好意思塞工作給他。",
     "subtext": "每天進門先嘆三口氣保平安",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 322,
@@ -3217,7 +4501,11 @@
     "quote": "當你覺得自己一無是處的時候，別難過，至少你還可以當別人的反面教材。",
     "subtext": "天生我材必有用，只是用法不同",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 323,
@@ -3227,7 +4515,11 @@
     "quote": "今天也順利在不跟任何同事眼神交會的情況下，安全抵達了自己的座位。",
     "subtext": "潛行任務達成，獲得經驗值+100",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 324,
@@ -3237,7 +4529,11 @@
     "quote": "今天寫信結尾打了『祝 順心』，其實內心想打的是『祝 你早點閉嘴』。",
     "subtext": "成年人的禮貌全靠鍵盤修正",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 325,
@@ -3247,7 +4543,11 @@
     "quote": "別人的腦袋裝的是智慧與遠見，我的腦袋裝的是今天晚餐要吃火鍋還是滷味。",
     "subtext": "民生問題永遠優先於企業發展",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 326,
@@ -3257,7 +4557,11 @@
     "quote": "今天也是努力假裝成一個情緒穩定、積極向上的正常成年人的一天。",
     "subtext": "辛苦了，今晚准許自己當回快樂的小廢物",
     "character": "ghost",
-    "theme": "social_battery"
+    "theme": "social_battery",
+    "sceneId": "ghost_boba_keyboard",
+    "assetPath": "/assets/scenes/ghost_boba_keyboard.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 327,
@@ -3267,7 +4571,11 @@
     "quote": "主管說『這個案子交給你我很放心』，翻譯：『這個爛攤子沒人要收，你吞了吧』。",
     "subtext": "聽懂職場暗語能救自己一命",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 328,
@@ -3277,7 +4585,11 @@
     "quote": "只要我把頭埋進鴕鳥沙堆裡，外面的風風雨雨就都淋不到我。",
     "subtext": "逃避雖然可恥，但真的超級有用",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_box_hide",
+    "assetPath": "/assets/scenes/capy_box_hide.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 100%"
   },
   {
     "dayOfYear": 329,
@@ -3287,7 +4599,11 @@
     "quote": "年底KPI考核快到了，現在開始假裝努力還來得及嗎？",
     "subtext": "只要表格做得漂亮，沒有人知道裡面是空的",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 330,
@@ -3297,7 +4613,11 @@
     "quote": "今天去算命，算命師看了一眼我的面相說：『你這輩子就是勞碌命，別算了。』",
     "subtext": "連算命師都放棄幫我改運",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 331,
@@ -3307,7 +4627,11 @@
     "quote": "如果我有魔法棒，第一件事就是把星期一到星期四全部從日曆上變不見。",
     "subtext": "實現真正的做一休二",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 332,
@@ -3317,7 +4641,11 @@
     "quote": "今天老闆問大家有沒有什麼創新的想法，我心想：全員加薪放假三天，夠創新吧？",
     "subtext": "保證全公司士氣暴增200%",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 333,
@@ -3327,7 +4655,11 @@
     "quote": "上班時最喜歡看窗外的鳥飛過去，因為牠們不用寫PPT也不用打卡。",
     "subtext": "下輩子投胎志願：大安森林公園的鴿子",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 334,
@@ -3337,7 +4669,11 @@
     "quote": "我的忍耐力不是修煉出來的，是看著每個月的帳單硬生生逼出來的。",
     "subtext": "向新台幣低頭不算懦弱，算懂事",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 335,
@@ -3347,7 +4683,11 @@
     "quote": "十二月到了，今年剩下的日子，只用來倒數年終獎金。",
     "subtext": "如果年終太少，明年就用同等的態度上班",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 336,
@@ -3357,7 +4697,11 @@
     "quote": "冬天起床需要梁靜茹給我勇氣，還要加上三個鬧鐘跟遲到扣薪水的威脅。",
     "subtext": "棉被裡有強大的萬有引力",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 337,
@@ -3367,7 +4711,11 @@
     "quote": "如果辦公室有設置『尖叫隔音艙』，裡面應該每天都大排長龍。",
     "subtext": "社畜舒壓必備硬體設施",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 338,
@@ -3377,7 +4725,11 @@
     "quote": "今天的工作進度：建了一個新的資料夾，取名為『新建資料夾(1)』。",
     "subtext": "萬事起頭難，頭已經起了，明天再繼續",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 339,
@@ -3387,7 +4739,11 @@
     "quote": "工作教會我最重要的一件事：永遠不要在禮拜五下午部署任何新東西。",
     "subtext": "否則你的週末就會在修Bug中度過",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 340,
@@ -3397,7 +4753,11 @@
     "quote": "在辦公室裡聽到有人撕零食包裝的聲音，我的耳朵會像雷達一樣瞬間豎起來。",
     "subtext": "唯有團購與零食能凝聚部門向心力",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 341,
@@ -3407,7 +4767,11 @@
     "quote": "看到別人年紀輕輕就財富自由，再看看我自己，年紀輕輕就已經腰痠背痛。",
     "subtext": "至少我們都有屬於自己的成就",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 342,
@@ -3417,7 +4781,11 @@
     "quote": "今天的心理狀態：像一顆被戳破的氣球，連飛走的力氣都沒有，只能癱在地上。",
     "subtext": "需要打氣，但最好是打錢進我戶頭",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 343,
@@ -3427,7 +4795,11 @@
     "quote": "每次有人說『這工作非你莫屬』，我只想回『這福氣給你要不要』。",
     "subtext": "千萬別被高帽子騙去當苦力",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 344,
@@ -3437,7 +4809,11 @@
     "quote": "當你覺得工作很累的時候，想想那些不用工作的人，你會發現……更羨慕了。",
     "subtext": "毒雞湯喝一口，精神百倍痛",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 345,
@@ -3447,7 +4823,11 @@
     "quote": "每次開會聽到『賦能、抓手、閉環、底層邏輯』，我的拳頭都會不自覺硬起來。",
     "subtext": "能講人話就不要講咒語",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_meeting_loading",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%"
   },
   {
     "dayOfYear": 346,
@@ -3457,7 +4837,11 @@
     "quote": "今天決定實施『精神離職法』：肉體雖然還在公司領薪水，但心態已經是個局外人。",
     "subtext": "看誰吵架都像在看戲，心情無比愉悅",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 347,
@@ -3467,7 +4851,11 @@
     "quote": "下雨天上班是一種酷刑，鞋子濕掉的那一刻，我的離職意願達到了100%。",
     "subtext": "穿著濕襪子坐八小時堪比滿清十大酷刑",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_fake_smile",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%"
   },
   {
     "dayOfYear": 348,
@@ -3477,7 +4865,11 @@
     "quote": "每次聽到別人說『我週末去爬了百岳』，我都覺得我們可能不是同一個物種。",
     "subtext": "我連爬出被窩都覺得缺氧需要吸氧氣瓶",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 349,
@@ -3487,7 +4879,11 @@
     "quote": "每次電腦當機沒存檔的那三秒鐘，我都會看見人生的跑馬燈在眼前閃過。",
     "subtext": "Ctrl+S 是社畜唯一的保命符",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_keyboard_coma",
+    "assetPath": "/assets/scenes/cat_keyboard_coma.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 350,
@@ -3497,7 +4893,11 @@
     "quote": "與其花時間生氣，不如花時間想想今天晚餐要加什麼小菜。",
     "subtext": "生氣會長皺紋，吃飽只會長肉，肉比較好摸",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 351,
@@ -3507,7 +4907,11 @@
     "quote": "薪水沒漲，髮際線倒是漲了不少；存款沒多，體脂肪倒是存了滿滿一肚子。",
     "subtext": "反向成長也是一種成長",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 352,
@@ -3517,7 +4921,11 @@
     "quote": "如果躺平有段位，我應該已經是『宗師級榮譽長老』了。",
     "subtext": "見證無數後輩倒下，我依然穩穩躺著",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 353,
@@ -3527,7 +4935,11 @@
     "quote": "當主管問『大家對這個方案有沒有信心？』，全場的沉默震耳欲聾。",
     "subtext": "空氣中瀰漫著『你自己信嗎』的尷尬",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 354,
@@ -3537,7 +4949,11 @@
     "quote": "別人是『時間的朋友』，我是『床鋪的連體嬰』。",
     "subtext": "每天早上都要經歷一場痛苦的分割手術",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 355,
@@ -3547,7 +4963,11 @@
     "quote": "冬至吃湯圓長一歲，我的薪水卻依然停留在三年前的身高。",
     "subtext": "歲月催人老，工作催人瘋",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 356,
@@ -3557,7 +4977,11 @@
     "quote": "我不是沒有企圖心，我的企圖心全部用在怎麼準時在 18:00:00 按下打卡鍵。",
     "subtext": "精準度堪比瑞士原子鐘",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_clock_watch",
+    "assetPath": "/assets/scenes/cat_clock_watch.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 357,
@@ -3567,7 +4991,11 @@
     "quote": "每個月最期待的不是發薪水，而是包裹寄到超商簡訊通知的那一刻。",
     "subtext": "雖然拆開包裹後常常忘記自己為什麼要買",
     "character": "capybara",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 358,
@@ -3577,7 +5005,11 @@
     "quote": "平安夜的願望很卑微：希望今天晚上沒有人標記我改檔案。",
     "subtext": "誰在平安夜發工作訊息，誰就沒有聖誕禮物",
     "character": "ghost",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "ghost_phone_panic",
+    "assetPath": "/assets/scenes/ghost_phone_panic.webp",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 100%"
   },
   {
     "dayOfYear": 359,
@@ -3587,7 +5019,11 @@
     "quote": "聖誕老人如果真的存在，請把我的工作連同老闆一起塞進煙囪帶走。",
     "subtext": "今年最想要的禮物是帶薪長假",
     "character": "cat",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 360,
@@ -3597,7 +5033,11 @@
     "quote": "別人是『少年得志』，我是『少年得痔』——因為每天在辦公椅上坐太久。",
     "subtext": "起來走動裝水是為了拯救屁股",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_coffee",
+    "assetPath": "/assets/scenes/cat_coffee.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%"
   },
   {
     "dayOfYear": 361,
@@ -3607,7 +5047,11 @@
     "quote": "今天的大腦使用率：工作 10%，假裝在聽 20%，思考人生 30%，想吃什麼 40%。",
     "subtext": "記憶體分配非常合理",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_fried_chicken",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%"
   },
   {
     "dayOfYear": 362,
@@ -3617,7 +5061,11 @@
     "quote": "錢包裡最多的不是鈔票，而是累積了三個月忘記對獎的雲端與紙本發票。",
     "subtext": "整理錢包時發現自己買了一堆廢物",
     "character": "cat",
-    "theme": "money"
+    "theme": "money",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 363,
@@ -3627,7 +5075,11 @@
     "quote": "每次聽到鬧鐘響，我都覺得這世界對愛睡覺的人充滿了深深的惡意。",
     "subtext": "為什麼不能下午兩點再開始上班",
     "character": "capybara",
-    "theme": "layflat"
+    "theme": "layflat",
+    "sceneId": "capy_blanket_burrito",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%"
   },
   {
     "dayOfYear": 364,
@@ -3637,7 +5089,11 @@
     "quote": "老闆說『年輕人不要太計較薪水』，那老闆能不能也不要太計較我的上班時間？",
     "subtext": "互相體諒，我遲到你別扣錢",
     "character": "cat",
-    "theme": "workplace"
+    "theme": "workplace",
+    "sceneId": "cat_empty_wallet",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 0%"
   },
   {
     "dayOfYear": 365,
@@ -3647,6 +5103,10 @@
     "quote": "今年辛苦了！雖然沒存到錢也沒瘦下來，但至少平安苟活到了最後一天。",
     "subtext": "明年的事明年再放棄，今晚先跨年",
     "character": "capybara",
-    "theme": "seasonal"
+    "theme": "seasonal",
+    "sceneId": "capy_desk_melt",
+    "assetPath": "/assets/scenes/capy_desk_melt.webp",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 0%"
   }
 ]

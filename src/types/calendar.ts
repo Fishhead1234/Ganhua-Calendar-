@@ -14,6 +14,10 @@ export interface RawStaticQuote365 {
   lunarDate?: string;
   yi?: string;
   ji?: string;
+  sceneId?: string;
+  assetPath?: string;
+  spriteSheet?: string;
+  spritePosition?: string;
 }
 
 export interface CalendarQuote {
@@ -29,6 +33,10 @@ export interface CalendarQuote {
   yi: string;
   ji: string;
   illustrationSvg: string;
+  sceneId?: string;
+  assetPath?: string;
+  spriteSheet?: string;
+  spritePosition?: string;
 }
 
 export interface CharacterMeta {

@@ -139,3 +139,4 @@ export async function fetchAndParseIcs(url: string, targetDate: Date = new Date(
 
   throw new Error('無法取得行事曆資料，請檢查網址是否為公開或私人 iCal/ICS 訂閱連結。');
 }
+

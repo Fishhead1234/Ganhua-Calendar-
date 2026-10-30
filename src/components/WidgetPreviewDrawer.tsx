@@ -194,6 +194,9 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                       <CharacterIllustration
                         character={quote.character}
                         artStyle={artStyle}
+                        spriteSheet={quote.spriteSheet}
+                        spritePosition={quote.spritePosition}
+                        sceneId={quote.sceneId}
                         compact
                       />
                     </div>
@@ -269,6 +272,9 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                         <CharacterIllustration
                           character={quote.character}
                           artStyle={artStyle}
+                          spriteSheet={quote.spriteSheet}
+                          spritePosition={quote.spritePosition}
+                          sceneId={quote.sceneId}
                           className="!h-28"
                         />
                       </div>

@@ -471,3 +471,4 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     </div>
   );
 };
+
