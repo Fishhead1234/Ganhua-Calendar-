@@ -1,7 +1,11 @@
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { parseQuoteDateDisplay } from '../components/DeskCalendarCard';
 
-export async function syncNativeWidgetData(quote: CalendarQuote): Promise<boolean> {
+export async function syncNativeWidgetData(
+  quote: CalendarQuote,
+  streakCount: number = 3,
+  offWorkHour: number = 18
+): Promise<boolean> {
   const isNative =
     typeof window !== 'undefined' &&
     (window as any).Capacitor &&
@@ -11,12 +15,14 @@ export async function syncNativeWidgetData(quote: CalendarQuote): Promise<boolea
   const charMeta = CHARACTER_META[quote.character];
 
   const payload = {
-    monthStr: `${dateInfo.monthZh} / ${dateInfo.monthEn}`,
+    monthStr: `${dateInfo.monthEn} • ${dateInfo.weekdayEn}`,
     dayStr: String(dateInfo.dayNumber),
-    lunarStr: quote.lunarDate,
-    characterStr: `${charMeta?.badge || '🐱 社畜貓'}`,
-    quoteStr: `「${quote.quote}」`,
-    yijiStr: `宜：${quote.yi} / 忌：${quote.ji}`,
+    characterStr: charMeta?.badge || '🐱 厭世社畜貓',
+    characterKey: quote.character || 'cat',
+    quoteStr: quote.quote,
+    yijiStr: `宜：${quote.yi}`,
+    offworkStr: `目標 ${offWorkHour}:00 下班`,
+    streakStr: `🔥 連續生還 ${streakCount} 天`,
   };
 
   // 1. Sync to native Android widget via Capacitor Plugin Bridge
@@ -38,4 +44,3 @@ export async function syncNativeWidgetData(quote: CalendarQuote): Promise<boolea
 
   return false;
 }
-

@@ -37,23 +37,37 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
             SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
             Calendar cal = Calendar.getInstance();
-            int monthNum = cal.get(Calendar.MONTH) + 1;
             int dayNum = cal.get(Calendar.DAY_OF_MONTH);
+            String monthEn = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.ENGLISH).toUpperCase();
+            String weekdayEn = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ENGLISH).toUpperCase();
+            String defaultMonthStr = monthEn + " • " + weekdayEn;
 
-            String monthStr = prefs.getString("month_str", monthNum + "月 / " + cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.ENGLISH).toUpperCase());
+            String monthStr = prefs.getString("month_str", defaultMonthStr);
             String dayStr = prefs.getString("day_str", String.valueOf(dayNum));
-            String lunarStr = prefs.getString("lunar_str", "農曆日曆");
             String characterStr = prefs.getString("character_str", "🐱 厭世社畜貓");
-            String quoteStr = prefs.getString("quote_str", "「每天都想辭職，但每天都準時上班。」");
-            String yijiStr = prefs.getString("yiji_str", "宜：喝大杯冰美式・準時下班 / 忌：週五臨時會");
+            String characterKey = prefs.getString("character_key", "cat");
+            String quoteStr = prefs.getString("quote_str", "週五下午四點後開會的人，靈魂注定得不到安息。");
+            String yijiStr = prefs.getString("yiji_str", "宜：假裝網路不順退出會議・眼神渙散點頭");
+            String offworkStr = prefs.getString("offwork_str", "目標 18:00 下班");
+            String streakStr = prefs.getString("streak_str", "🔥 連續生還 3 天");
 
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_ganhua_desk_calendar);
             views.setTextViewText(R.id.tv_widget_month, monthStr);
             views.setTextViewText(R.id.tv_widget_day, dayStr);
-            views.setTextViewText(R.id.tv_widget_lunar, lunarStr);
             views.setTextViewText(R.id.tv_widget_character, characterStr);
             views.setTextViewText(R.id.tv_widget_quote, quoteStr);
             views.setTextViewText(R.id.tv_widget_yiji, yijiStr);
+            views.setTextViewText(R.id.tv_widget_offwork, offworkStr);
+            views.setTextViewText(R.id.tv_widget_streak, streakStr);
+
+            // Set character avatar illustration
+            int avatarRes = R.drawable.widget_char_cat;
+            if ("capybara".equals(characterKey)) {
+                avatarRes = R.drawable.widget_char_capybara;
+            } else if ("ghost".equals(characterKey)) {
+                avatarRes = R.drawable.widget_char_ghost;
+            }
+            views.setImageViewResource(R.id.iv_widget_avatar, avatarRes);
 
             // Tap widget to launch app
             Intent intent = new Intent(context, MainActivity.class);
@@ -72,4 +86,3 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
         }
     }
 }
-

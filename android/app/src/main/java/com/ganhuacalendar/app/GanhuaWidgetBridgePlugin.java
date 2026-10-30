@@ -20,6 +20,9 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             String characterStr = call.getString("characterStr", "🐱 厭世社畜貓");
             String quoteStr = call.getString("quoteStr", "");
             String yijiStr = call.getString("yijiStr", "");
+            String offworkStr = call.getString("offworkStr", "目標 18:00 下班");
+            String streakStr = call.getString("streakStr", "🔥 連續生還 3 天");
+            String characterKey = call.getString("characterKey", "cat");
 
             SharedPreferences prefs = getContext().getSharedPreferences(
                     GanhuaWidgetProvider.PREFS_NAME,
@@ -32,6 +35,9 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             if (!characterStr.isEmpty()) editor.putString("character_str", characterStr);
             if (!quoteStr.isEmpty()) editor.putString("quote_str", quoteStr);
             if (!yijiStr.isEmpty()) editor.putString("yiji_str", yijiStr);
+            if (!offworkStr.isEmpty()) editor.putString("offwork_str", offworkStr);
+            if (!streakStr.isEmpty()) editor.putString("streak_str", streakStr);
+            if (!characterKey.isEmpty()) editor.putString("character_key", characterKey);
             editor.apply();
 
             // Refresh all widgets placed on Android Home Screen

@@ -245,10 +245,10 @@ export const App: React.FC = () => {
     }
   }, [isBirthday, isToday]);
 
-  // Sync to native Android widget whenever quote updates
+  // Sync to native Android widget whenever quote or streak updates
   useEffect(() => {
     if (currentQuote) {
-      syncNativeWidgetData(currentQuote);
+      syncNativeWidgetData(currentQuote, persisted.streakCount, persisted.offWorkHour);
       // Advance lastOpenedDateStr whenever user tears forward / views a newer date
       setPersisted((prev) => {
         if (!prev.lastOpenedDateStr || currentQuote.date > prev.lastOpenedDateStr) {
@@ -260,7 +260,7 @@ export const App: React.FC = () => {
         return prev;
       });
     }
-  }, [currentQuote]);
+  }, [currentQuote, persisted.streakCount, persisted.offWorkHour]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {

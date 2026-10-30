@@ -3,159 +3,166 @@
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/widget_calendar_bg">
+    android:orientation="horizontal"
+    android:background="@drawable/widget_calendar_bg"
+    android:gravity="center_vertical"
+    android:padding="12dp">
 
-    <!-- Binder Header -->
+    <!-- Left Column: Month/Weekday • Day Number • Character Avatar -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="26dp"
-        android:background="@drawable/widget_binder_header"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp">
-
-        <FrameLayout
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/widget_rivet" />
+        android:layout_width="72dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal|center_vertical"
+        android:paddingRight="6dp">
 
         <TextView
-            android:id="@+id/tv_widget_title"
-            android:layout_width="0dp"
+            android:id="@+id/tv_widget_month"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="GAN-HUA CALENDAR"
-            android:textColor="@color/widget_header_text"
-            android:textSize="10sp"
+            android:text="OCT • FRI"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="9sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_widget_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30"
+            android:textColor="@color/widget_text_title"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false" />
+
+        <!-- Mini Character Avatar -->
         <FrameLayout
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/widget_rivet" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/widget_avatar_card_bg"
+            android:layout_marginTop="2dp">
+
+            <ImageView
+                android:id="@+id/iv_widget_avatar"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center"
+                android:src="@drawable/widget_char_cat"
+                android:scaleType="fitCenter" />
+        </FrameLayout>
     </LinearLayout>
 
-    <!-- Calendar Content Body -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="10dp">
+    <!-- Vertical Divider -->
+    <FrameLayout
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/widget_divider_color"
+        android:layout_marginRight="10dp" />
 
-        <!-- Left Date Column -->
+    <!-- Right Column: Badge & Title, Quote, Yi, Footer Target & Streak -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <!-- Top Header Row: Pill Badge + "幹話日曆" -->
         <LinearLayout
-            android:layout_width="72dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingRight="6dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/tv_widget_month"
+                android:id="@+id/tv_widget_character"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10月 / OCT"
-                android:textColor="@color/widget_text_muted"
-                android:textSize="10sp"
+                android:background="@drawable/widget_badge_pill"
+                android:paddingLeft="7dp"
+                android:paddingTop="1.5dp"
+                android:paddingRight="7dp"
+                android:paddingBottom="1.5dp"
+                android:text="👻 下班幽靈"
+                android:textColor="@color/widget_badge_text"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tv_widget_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="30"
-                android:textColor="@color/widget_text_title"
-                android:textSize="32sp"
-                android:textStyle="bold"
-                android:includeFontPadding="false" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <TextView
-                android:id="@+id/tv_widget_lunar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="農曆九月三十"
+                android:text="幹話日曆"
                 android:textColor="@color/widget_text_muted"
-                android:textSize="8sp" />
+                android:textSize="9sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Vertical Divider (FrameLayout for strict RemoteViews compatibility) -->
-        <FrameLayout
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/widget_divider_color"
-            android:layout_marginRight="8dp" />
-
-        <!-- Right Quote Column -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <!-- Main Quote Text -->
+        <TextView
+            android:id="@+id/tv_widget_quote"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginTop="4dp"
+            android:text="週五下午四點後開會的人，靈魂注定得不到安息。"
+            android:textColor="@color/widget_text_title"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-            <!-- Top Row: Character Badge + Red Seal -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+        <!-- Yi Advice -->
+        <TextView
+            android:id="@+id/tv_widget_yiji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="宜：假裝網路不順退出會議・眼神渙散點頭"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="8.5sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-                <TextView
-                    android:id="@+id/tv_widget_character"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="🐱 厭世社畜貓"
-                    android:textColor="@color/widget_text_badge"
-                    android:textSize="9sp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+        <!-- Bottom Footer Divider -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/widget_divider_color"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="3dp" />
 
-                <TextView
-                    android:id="@+id/tv_widget_seal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/widget_stamp_circle"
-                    android:paddingLeft="5dp"
-                    android:paddingTop="1dp"
-                    android:paddingRight="5dp"
-                    android:paddingBottom="1dp"
-                    android:text="今日已生還"
-                    android:textColor="@color/widget_seal_red"
-                    android:textSize="8sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+        <!-- Bottom Footer Row: Off-work Target & Streak Counter -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Main Sarcastic Quote -->
             <TextView
-                android:id="@+id/tv_widget_quote"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_widget_offwork"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="「每天都想辭職，但每天都準時上班。」"
-                android:textColor="@color/widget_text_title"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end" />
-
-            <!-- Yi / Ji Advice -->
-            <TextView
-                android:id="@+id/tv_widget_yiji"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="宜：大杯冰美式・準時關機 / 忌：週五臨時會"
+                android:text="目標 18:00 下班"
                 android:textColor="@color/widget_text_muted"
-                android:textSize="8sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="8sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tv_widget_streak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔥 連續生還 8 天"
+                android:textColor="@color/widget_streak_fire"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
-
