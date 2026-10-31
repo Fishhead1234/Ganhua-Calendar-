@@ -613,6 +613,8 @@ export const App: React.FC = () => {
           artStyle={persisted.artStyle}
           streakCount={persisted.streakCount}
           offWorkHour={persisted.offWorkHour}
+          survivedDates={persisted.survivedDates}
+          activeMeetings={activeMeetings}
         />
       </main>
 
