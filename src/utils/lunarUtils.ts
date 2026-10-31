@@ -23,6 +23,11 @@ const CHINESE_DAY_NAMES = [
   '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十',
 ];
 
+export const CHINESE_MONTH_NAMES = [
+  '正月', '二月', '三月', '四月', '五月', '六月',
+  '七月', '八月', '九月', '十月', '十一月', '十二月'
+];
+
 const HEAVENLY_STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 const EARTHLY_BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 
@@ -140,7 +145,12 @@ export function getLunarDetails(date: Date = new Date()): LunarInfo {
     const parts = formatter.formatToParts(date);
     for (const p of parts) {
       if (p.type === 'month') {
-        lunarMonth = p.value;
+        const m = parseInt(p.value, 10);
+        if (!isNaN(m) && m >= 1 && m <= 12) {
+          lunarMonth = CHINESE_MONTH_NAMES[m - 1];
+        } else if (p.value.includes('月')) {
+          lunarMonth = p.value;
+        }
       } else if (p.type === 'day') {
         const parsed = parseInt(p.value, 10);
         if (!isNaN(parsed) && parsed >= 1 && parsed <= 30) {
@@ -194,3 +204,4 @@ export function getLunarDetails(date: Date = new Date()): LunarInfo {
     isHoliday: Boolean(taiwanHoliday),
   };
 }
+

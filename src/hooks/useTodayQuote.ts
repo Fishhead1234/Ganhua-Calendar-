@@ -6,7 +6,14 @@ import {
   QuoteCategory,
 } from '../types/calendar';
 import { CalendarRoastResult } from '../services/calendarRoastService';
+import { CalendarMeeting } from '../services/calendarService';
 import { contentSyncService } from '../services/contentSyncService';
+import {
+  matchSpecialEventRoast,
+  applySpecialEventToQuote,
+  MatchSpecialEventResult,
+  SpecialEventQuote,
+} from '../utils/eventRoastMatcher';
 
 // Lunar date lookup helpers for authentic Taiwanese desk calendar feel
 const LUNAR_MONTHS = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
@@ -98,6 +105,8 @@ interface UseTodayQuoteOptions {
   roastResult: CalendarRoastResult | null;
   selectedThemeFilter?: CharacterType | 'all';
   birthday?: { month: number; day: number } | null;
+  calendarEvents?: CalendarMeeting[];
+  specialQuoteCycleIndex?: number;
 }
 
 export function useTodayQuote({
@@ -109,6 +118,8 @@ export function useTodayQuote({
   roastResult,
   selectedThemeFilter = 'all',
   birthday = null,
+  calendarEvents = [],
+  specialQuoteCycleIndex = 0,
 }: UseTodayQuoteOptions): {
   currentQuote: CalendarQuote;
   nextQuotePreview: CalendarQuote;
@@ -118,9 +129,11 @@ export function useTodayQuote({
   isBirthday: boolean;
   canGoNext: boolean;
   canGoPrev: boolean;
+  specialEventResult: MatchSpecialEventResult;
 } {
   const [quotesList, setQuotesList] = useState<RawStaticQuote365[]>(() => contentSyncService.getQuotes365());
   const [birthdayQuotesList, setBirthdayQuotesList] = useState<any[]>(() => contentSyncService.getBirthdayQuotes());
+  const [specialEventsList, setSpecialEventsList] = useState<SpecialEventQuote[]>(() => contentSyncService.getSpecialEventsQuotes());
 
   // Subscribe to OTA updates
   useEffect(() => {
@@ -128,6 +141,7 @@ export function useTodayQuote({
       if (status === 'updated') {
         setQuotesList(contentSyncService.getQuotes365());
         setBirthdayQuotesList(contentSyncService.getBirthdayQuotes());
+        setSpecialEventsList(contentSyncService.getSpecialEventsQuotes());
       }
     });
   }, []);
@@ -147,10 +161,34 @@ export function useTodayQuote({
     return Boolean(birthday && birthday.month === targetMonth && birthday.day === targetDay);
   }, [birthday, targetMonth, targetDay]);
 
-  // 2. Look up target date directly from quotes365.json (or birthday_quotes.json on birthday)
+  // Special Event Match Result
+  const specialEventResult: MatchSpecialEventResult = useMemo(() => {
+    return matchSpecialEventRoast({
+      targetDate,
+      calendarEvents,
+      userBirthday: birthday,
+      cycleIndex: specialQuoteCycleIndex,
+      specialEventsList,
+      calendarConnected,
+    });
+  }, [
+    targetDate,
+    calendarEvents,
+    birthday,
+    specialQuoteCycleIndex,
+    specialEventsList,
+    calendarConnected,
+  ]);
+
+  // Priority Resolution for Daily Quote:
+  // 1. User Birthday Override
+  // 2. Synced Calendar Event Keyword Match
+  // 3. Lunar / Solar Holiday Match
+  // 4. Meeting Count Fallback
+  // 5. Default Daily Quote
   const baseQuote: CalendarQuote = useMemo(() => {
-    // 2.1 Birthday Special Quote from birthday_quotes.json
-    if (birthday && birthday.month === targetMonth && birthday.day === targetDay) {
+    // Priority 1: User Birthday Override
+    if (isBirthday) {
       const bList =
         selectedThemeFilter !== 'all'
           ? birthdayQuotesList.filter((b) => b.character === selectedThemeFilter)
@@ -176,23 +214,50 @@ export function useTodayQuote({
         assetPath: selectedBday.assetPath || `/assets/scenes/${charType}_birthday.webp`,
         spriteSheet: `/assets/sheets/${charType}_sheet.jpg`,
         spritePosition: selectedBday.spritePosition || '100% 100%',
+        eventLabel: '🎂 壽星避難模式',
+        eventType: 'birthday',
       };
     }
 
-    // Look up directly by month and day: every date of 365 days has its own unique quote!
+    // Default base quote from quotes365.json
     const match =
       quotesList.find((q) => q.month === targetMonth && q.day === targetDay) || quotesList[0];
-
     const formatted = formatQuoteFrom365(match, targetDate);
 
-    // If user explicitly filtered by a specific character theme, adjust character badge and sprite sheet
+    // If user filtered by specific character, apply preference
     if (selectedThemeFilter !== 'all') {
       formatted.character = selectedThemeFilter;
       formatted.illustrationSvg = `${selectedThemeFilter}_svg`;
       formatted.spriteSheet = `/assets/sheets/${selectedThemeFilter}_sheet.jpg`;
     }
 
-    // 3. Dynamic Roast Override (If Pro + Calendar Connected + Today)
+    // Priority 2 & 3: Calendar Event Keyword Match OR Lunar/Solar Holiday Match
+    if (
+      (specialEventResult.matchedSource === 'calendar_keyword' ||
+        specialEventResult.matchedSource === 'holiday') &&
+      specialEventResult.selectedQuote
+    ) {
+      return applySpecialEventToQuote(
+        formatted,
+        specialEventResult.selectedQuote,
+        specialEventResult.totalCandidates,
+        specialEventResult.selectedIndex
+      );
+    }
+
+    // Priority 4: Meeting Count Fallback (Density Rule / Dynamic Roast)
+    if (
+      specialEventResult.matchedSource === 'meeting_density' &&
+      specialEventResult.selectedQuote
+    ) {
+      return applySpecialEventToQuote(
+        formatted,
+        specialEventResult.selectedQuote,
+        specialEventResult.totalCandidates,
+        specialEventResult.selectedIndex
+      );
+    }
+
     if (dateOffset === 0 && isPro && calendarConnected && roastResult) {
       return {
         ...formatted,
@@ -204,11 +269,14 @@ export function useTodayQuote({
         sceneId: roastResult.sceneId || formatted.sceneId,
         spriteSheet: roastResult.spriteSheet || formatted.spriteSheet,
         spritePosition: roastResult.spritePosition || formatted.spritePosition,
+        eventLabel: roastResult.summaryBadge,
       };
     }
 
+    // Priority 5: Default Daily Quote
     return formatted;
   }, [
+    isBirthday,
     quotesList,
     birthdayQuotesList,
     targetMonth,
@@ -219,7 +287,7 @@ export function useTodayQuote({
     isPro,
     calendarConnected,
     roastResult,
-    birthday,
+    specialEventResult,
   ]);
 
   // Next quote preview (for under-sheet peeling preview)
@@ -251,6 +319,7 @@ export function useTodayQuote({
     isBirthday,
     canGoNext,
     canGoPrev,
+    specialEventResult,
   };
 }
 

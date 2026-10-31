@@ -1,6 +1,7 @@
 import bundledQuotes365 from '../data/quotes365.json';
 import bundledBirthdayQuotes from '../data/birthday_quotes.json';
 import bundledScenesManifest from '../data/scenes_manifest.json';
+import bundledSpecialEventsQuotes from '../data/special_events_quotes.json';
 import { RawStaticQuote365 } from '../types/calendar';
 
 export interface RemoteVersionManifest {
@@ -11,6 +12,7 @@ export interface RemoteVersionManifest {
     quotes365?: string;
     birthdayQuotes?: string;
     scenesManifest?: string;
+    specialEventsQuotes?: string;
   };
 }
 
@@ -21,6 +23,7 @@ const STORAGE_KEYS = {
   QUOTES_365: 'ganhua_ota_quotes365',
   BIRTHDAY_QUOTES: 'ganhua_ota_birthday_quotes',
   SCENES_MANIFEST: 'ganhua_ota_scenes_manifest',
+  SPECIAL_EVENTS: 'ganhua_ota_special_events_quotes',
 };
 
 // Default remote manifest URL:
@@ -116,6 +119,24 @@ class ContentSyncService {
       // ignore
     }
     return bundledScenesManifest;
+  }
+
+  /**
+   * Returns current active special events quotes
+   */
+  public getSpecialEventsQuotes(): any[] {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEYS.SPECIAL_EVENTS);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return this.resolveAssetUrlsInQuotes(parsed);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return this.resolveAssetUrlsInQuotes(bundledSpecialEventsQuotes);
   }
 
   /**

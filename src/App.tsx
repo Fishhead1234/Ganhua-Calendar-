@@ -148,6 +148,7 @@ export const App: React.FC = () => {
   const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
   const [isMonthlyCalendarOpen, setIsMonthlyCalendarOpen] = useState(false);
+  const [specialQuoteCycleIndex, setSpecialQuoteCycleIndex] = useState(0);
   const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
 
@@ -212,6 +213,11 @@ export const App: React.FC = () => {
     }
   }, [isPro, isAdmin, persisted.selectedTheme]);
 
+  // Reset cycle index whenever date offset changes
+  useEffect(() => {
+    setSpecialQuoteCycleIndex(0);
+  }, [persisted.dateOffset]);
+
   // Integrated useTodayQuote hook with quotes365.json dataset
   const {
     currentQuote,
@@ -222,6 +228,7 @@ export const App: React.FC = () => {
     isBirthday,
     canGoNext,
     canGoPrev,
+    specialEventResult,
   } = useTodayQuote({
     dateOffset: persisted.dateOffset,
     isPro,
@@ -231,6 +238,8 @@ export const App: React.FC = () => {
     roastResult: persisted.calendarConnected ? roastResult : null,
     selectedThemeFilter: persisted.selectedTheme,
     birthday: persisted.birthday || null,
+    calendarEvents: activeMeetings,
+    specialQuoteCycleIndex,
   });
 
   // Check for OTA Remote Content Updates in background on app start
@@ -432,6 +441,7 @@ export const App: React.FC = () => {
           onToggleFavorite={handleToggleFavorite}
           onBlockedTomorrow={handleBlockedTomorrow}
           onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
+          onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
         />
       </div>
     );
@@ -540,6 +550,7 @@ export const App: React.FC = () => {
               onToggleFavorite={handleToggleFavorite}
               onBlockedTomorrow={handleBlockedTomorrow}
               onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
+              onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
             />
 
             {/* Daily Agenda & Sarcastic Timeline Strip */}

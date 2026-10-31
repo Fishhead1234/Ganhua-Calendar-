@@ -9,6 +9,7 @@ import {
   Lock,
   Clock,
   Calendar,
+  RefreshCw,
 } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -31,6 +32,7 @@ interface DeskCalendarProps {
   onToggleFavorite: (id: string) => void;
   onBlockedTomorrow: () => void;
   onOpenMonthlyCalendar?: () => void;
+  onCycleSpecialQuote?: () => void;
 }
 
 export const DeskCalendar: React.FC<DeskCalendarProps> = ({
@@ -49,6 +51,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   onToggleFavorite,
   onBlockedTomorrow,
   onOpenMonthlyCalendar,
+  onCycleSpecialQuote,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [tearDirection, setTearDirection] = useState<'down' | 'left'>('left');
@@ -312,11 +315,34 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
         {/* Card Body */}
         <div className="p-5 sm:p-6 space-y-4">
-          {/* Top Brand Calligraphic Header */}
-          <div className="text-center pb-0.5">
+          {/* Top Brand Calligraphic Header & Special Event Pill Badge */}
+          <div className="flex flex-col items-center justify-center gap-1.5 pb-0.5">
             <div className="text-xl sm:text-2xl font-serif font-black tracking-[0.25em] text-[#2D2D2D]">
               幹話日曆
             </div>
+
+            {quote.eventLabel && (
+              <div className="flex items-center gap-1.5 flex-wrap justify-center animate-in fade-in">
+                <span className="px-3 py-0.5 rounded-full bg-[#C83E31] text-white text-[11px] font-serif font-black shadow-sm flex items-center gap-1 tracking-wider border border-[#C83E31]">
+                  {quote.eventLabel}
+                </span>
+
+                {onCycleSpecialQuote && (quote.specialEventCandidatesCount || 0) > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCycleSpecialQuote();
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F0] border border-[#C83E31] text-[#C83E31] hover:bg-[#C83E31] hover:text-white text-[10px] font-sans font-bold shadow-sm transition cursor-pointer active:scale-95"
+                    title="點擊換一句防禦幹話"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>換一句防禦幹話 ({(quote.specialEventIndex || 0) + 1}/{quote.specialEventCandidatesCount})</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Traditional Taiwanese Desk Calendar Date Header (Pixel-perfect to Mockup) */}

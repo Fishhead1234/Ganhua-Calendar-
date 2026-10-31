@@ -1,0 +1,566 @@
+[
+  {
+    "id": "evt_cny_01",
+    "eventType": "lunar_new_year",
+    "eventLabel": "🧨 春節親戚防禦模式",
+    "triggerKeywords": [
+      "過年",
+      "除夕",
+      "圍爐",
+      "初一",
+      "初二",
+      "回娘家",
+      "拜年",
+      "走春",
+      "親戚"
+    ],
+    "solarDates": [],
+    "lunarDates": [
+      "十二月廿八",
+      "十二月廿九",
+      "十二月三十",
+      "正月初一",
+      "正月初二",
+      "正月初三",
+      "正月初四",
+      "正月初五"
+    ],
+    "quote": "應付親戚盤問的終極奧義：嘴巴塞滿年菜，只能發出『嗯嗯啊啊』的聲音。",
+    "subtext": "只要我吃得夠快，問題就追不上我",
+    "yi": "埋頭夾菜、躲去洗碗、假裝去廁所回公司訊息",
+    "ji": "跟阿姨對到眼、主動提起自己的年終獎金",
+    "character": "ghost",
+    "sceneId": "ghost_umbrella_shield",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp"
+  },
+  {
+    "id": "evt_cny_02",
+    "eventType": "lunar_new_year",
+    "eventLabel": "🧨 春節親戚防禦模式",
+    "triggerKeywords": [
+      "過年",
+      "除夕",
+      "圍爐",
+      "紅包",
+      "壓歲錢",
+      "年終"
+    ],
+    "solarDates": [],
+    "lunarDates": [
+      "十二月廿九",
+      "十二月三十",
+      "正月初一",
+      "正月初二"
+    ],
+    "quote": "小時候過年是財富重分配的受益者，長大後過年直接變成散財童子本人。",
+    "subtext": "紅包袋是紅色的，因為裡面裝的都是我的血汗",
+    "yi": "準時睡到自然醒、跟家裡的貓狗玩一整天",
+    "ji": "打開網銀查看發完紅包後的帳戶餘額",
+    "character": "cat",
+    "sceneId": "cat_red_envelope",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp"
+  },
+  {
+    "id": "evt_cny_03",
+    "eventType": "lunar_new_year",
+    "eventLabel": "🧨 春節親戚防禦模式",
+    "triggerKeywords": [
+      "過年",
+      "親戚",
+      "結婚",
+      "買房",
+      "催婚",
+      "拜年"
+    ],
+    "solarDates": [],
+    "lunarDates": [
+      "正月初一",
+      "正月初二",
+      "正月初三",
+      "正月初四"
+    ],
+    "quote": "當親戚問你『什麼時候結婚買房』，請微笑反問：『阿姨您打算贊助頭期款嗎？』",
+    "subtext": "用魔法打敗魔法，全場瞬間安靜",
+    "yi": "戴上降噪耳機、先發制人問表弟考幾分",
+    "ji": "乖乖回答真實薪水、在客廳坐超過十分鐘",
+    "character": "cat",
+    "sceneId": "cat_fake_smile",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp"
+  },
+  {
+    "id": "evt_cny_04",
+    "eventType": "lunar_new_year",
+    "eventLabel": "🧨 春節躺平回血模式",
+    "triggerKeywords": [
+      "連假",
+      "初三",
+      "初四",
+      "初五",
+      "收假"
+    ],
+    "solarDates": [],
+    "lunarDates": [
+      "正月初三",
+      "正月初四",
+      "正月初五"
+    ],
+    "quote": "初一早、初二早、初三睡到飽；我決定把初三的精神貫徹整個春節連假。",
+    "subtext": "誰叫我起床出門走春，誰就是我的敵人",
+    "yi": "裹成棉被春捲、把年貨零食放在床頭櫃",
+    "ji": "去人擠人的觀光老街罰站兩小時",
+    "character": "capybara",
+    "sceneId": "capy_blanket_burrito",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 0%",
+    "assetPath": "/assets/scenes/capy_blanket_burrito.webp"
+  },
+  {
+    "id": "evt_family_01",
+    "eventType": "family_dinner",
+    "eventLabel": "🍲 家庭聚餐求生模式",
+    "triggerKeywords": [
+      "家庭聚餐",
+      "家聚",
+      "爸媽",
+      "回家吃飯",
+      "阿嬤",
+      "阿公",
+      "長輩",
+      "母親節",
+      "父親節",
+      "團聚"
+    ],
+    "solarDates": [
+      "05-10",
+      "05-11",
+      "08-08"
+    ],
+    "lunarDates": [],
+    "quote": "家庭聚餐的標準分工：長輩負責講古跟碎念，我負責低頭把桌上的蝦子全部剝完。",
+    "subtext": "手忙嘴也忙，就沒有空檔被唸了",
+    "yi": "專注吃甜點、主動幫忙去櫃檯結帳順便放風",
+    "ji": "在飯桌上滑手機被抓包、發表政治與感情意見",
+    "character": "capybara",
+    "sceneId": "capy_hotpot_feast",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "50% 50%",
+    "assetPath": "/assets/scenes/capy_hotpot_feast.webp"
+  },
+  {
+    "id": "evt_family_02",
+    "eventType": "family_dinner",
+    "eventLabel": "🍲 家庭聚餐求生模式",
+    "triggerKeywords": [
+      "家庭聚餐",
+      "家聚",
+      "回家",
+      "爸媽",
+      "親戚",
+      "家族"
+    ],
+    "solarDates": [],
+    "lunarDates": [
+      "五月初五",
+      "八月十五"
+    ],
+    "quote": "有一種餓叫做阿嬤覺得你餓，有一種累叫做『跟不熟的遠房親戚同桌吃合菜』。",
+    "subtext": "轉盤轉到我面前的菜，就是我今天唯一的安慰",
+    "yi": "保持禮貌性假笑、多喝熱茶少說話",
+    "ji": "坐在主桌長輩正隔壁的搖滾區座位",
+    "character": "ghost",
+    "sceneId": "ghost_night_market",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 100%",
+    "assetPath": "/assets/scenes/ghost_night_market.webp"
+  },
+  {
+    "id": "evt_family_03",
+    "eventType": "family_dinner",
+    "eventLabel": "🍲 家庭聚餐求生模式",
+    "triggerKeywords": [
+      "回家吃飯",
+      "家庭日",
+      "聚餐",
+      "家族旅遊",
+      "掃墓",
+      "清明"
+    ],
+    "solarDates": [
+      "04-04",
+      "04-05"
+    ],
+    "lunarDates": [],
+    "quote": "跟家人吃飯最神奇的地方：明明出門前說好要溫馨聊天，最後總是以互唸養生常識收場。",
+    "subtext": "左耳聽進長輩的關心，右耳自動轉換成背景白噪音",
+    "yi": "打包剩菜帶回家當明天便當、飯後散步逃離現場",
+    "ji": "跟長輩爭論網路謠言的真實性",
+    "character": "cat",
+    "sceneId": "cat_eye_roll",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "0% 50%",
+    "assetPath": "/assets/scenes/cat_eye_roll.webp"
+  },
+  {
+    "id": "evt_val_01",
+    "eventType": "valentines_single",
+    "eventLabel": "💘 情人節單身防禦模式",
+    "triggerKeywords": [
+      "情人節",
+      "七夕",
+      "單身",
+      "520",
+      "聖誕",
+      "跨年"
+    ],
+    "solarDates": [
+      "02-14",
+      "03-14",
+      "05-20"
+    ],
+    "lunarDates": [
+      "七月初七"
+    ],
+    "quote": "情人節街上都是成雙成對的情侶，還好我待在辦公室加班，這裡只有跟我一樣悲慘的社畜。",
+    "subtext": "沒有對象，就沒有買禮物的開銷，直接省下三千塊",
+    "yi": "點一份豪華炸雞桶獨享、早點關燈睡覺",
+    "ji": "晚上打開 IG 限時動態看別人放閃自虐",
+    "character": "ghost",
+    "sceneId": "ghost_delivery_bag",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "100% 0%",
+    "assetPath": "/assets/scenes/ghost_delivery_bag.webp"
+  },
+  {
+    "id": "evt_val_02",
+    "eventType": "valentines_couple",
+    "eventLabel": "💘 約會與紀念日求生模式",
+    "triggerKeywords": [
+      "約會",
+      "紀念日",
+      "週年",
+      "情人節大餐",
+      "男友",
+      "女友",
+      "老公",
+      "老婆",
+      "相親"
+    ],
+    "solarDates": [
+      "02-14",
+      "05-20"
+    ],
+    "lunarDates": [
+      "七月初七"
+    ],
+    "quote": "下班後還要打起精神去約會吃大餐，對社畜來說簡直是體力與錢包的雙重極限運動。",
+    "subtext": "不管吃多高級的餐廳，晚上十點過後我都只想回家躺平",
+    "yi": "提前訂好餐廳、把『隨便都可以』直接翻譯成火鍋",
+    "ji": "在約會時討論什麼都隨便、臨時才找餐廳排隊",
+    "character": "capybara",
+    "sceneId": "capy_fried_chicken",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%",
+    "assetPath": "/assets/scenes/capy_fried_chicken.webp"
+  },
+  {
+    "id": "evt_val_03",
+    "eventType": "valentines_single",
+    "eventLabel": "💘 戀愛絕緣體模式",
+    "triggerKeywords": [
+      "相親",
+      "聯誼",
+      "交友",
+      "脫單",
+      "拜月老"
+    ],
+    "solarDates": [
+      "11-11"
+    ],
+    "lunarDates": [
+      "七月初七"
+    ],
+    "quote": "月老廟的紅線可能已經缺貨了，建議改拜財神爺，畢竟有錢之後單身也超快樂。",
+    "subtext": "戀愛會讓人流淚，但存款只會讓人微笑",
+    "yi": "虔誠求暴富、買杯全糖珍奶寵愛自己",
+    "ji": "為了脫單去參加尷尬到腳趾抠地的破冰聯誼",
+    "character": "cat",
+    "sceneId": "cat_lottery_pray",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 50%",
+    "assetPath": "/assets/scenes/cat_lottery_pray.webp"
+  },
+  {
+    "id": "evt_wedding_01",
+    "eventType": "wedding_banquet",
+    "eventLabel": "💣 紅色炸彈失血模式",
+    "triggerKeywords": [
+      "婚禮",
+      "喜酒",
+      "喜宴",
+      "喝喜酒",
+      "結婚典禮",
+      "伴郎",
+      "伴娘",
+      "紅包"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "收到『好久不見最近好嗎』的訊息別高興得太早，通常下一句就是『我要結婚了來喝喜酒』。",
+    "subtext": "三千六百元的入場券，換來一頓跟陌生人乾瞪眼的合菜",
+    "yi": "專攻桌上的龍蝦與炸湯圓、上完水果立刻閃人",
+    "ji": "被抽上台搶捧花或被迫發表感言",
+    "character": "cat",
+    "sceneId": "cat_red_envelope",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "50% 100%",
+    "assetPath": "/assets/scenes/cat_red_envelope.webp"
+  },
+  {
+    "id": "evt_wedding_02",
+    "eventType": "wedding_banquet",
+    "eventLabel": "💣 喜宴社恐隱身模式",
+    "triggerKeywords": [
+      "婚禮",
+      "喜酒",
+      "喜宴",
+      "喝喜酒"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "參加喜宴最怕整桌都是不認識的人，我只能假裝自己是米其林秘密客，全程低頭認真吃菜。",
+    "subtext": "只要我夾菜的速度夠優雅，尷尬就追不上我",
+    "yi": "坐在離出菜口最近的位置、自備行動電源滑手機",
+    "ji": "跟同桌裝熟客套說『下次再約吃飯』",
+    "character": "ghost",
+    "sceneId": "ghost_hide_box",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "50% 50%",
+    "assetPath": "/assets/scenes/ghost_hide_box.webp"
+  },
+  {
+    "id": "evt_party_01",
+    "eventType": "company_party",
+    "eventLabel": "🍻 無薪應酬營業模式",
+    "triggerKeywords": [
+      "尾牙",
+      "春酒",
+      "部門聚餐",
+      "應酬",
+      "慶功宴",
+      "歡送會",
+      "迎新",
+      "KTV",
+      "唱歌"
+    ],
+    "solarDates": [
+      "01-15",
+      "01-20"
+    ],
+    "lunarDates": [
+      "十二月十六"
+    ],
+    "quote": "下班後的公司聚餐不叫福利，那叫換個有蝦子吃的地方繼續看老闆臉色的無薪加班。",
+    "subtext": "除非抽中頭獎現金，否則我的靈魂拒絕出席",
+    "yi": "坐在離主管最遠的邊疆地帶、吃完甜點立刻尿遁",
+    "ji": "喝醉酒跟主管講真心話、被抓去台上表演才藝",
+    "character": "ghost",
+    "sceneId": "ghost_soul_exit",
+    "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
+    "spritePosition": "0% 50%",
+    "assetPath": "/assets/scenes/ghost_soul_exit.webp"
+  },
+  {
+    "id": "evt_party_02",
+    "eventType": "company_party",
+    "eventLabel": "🍻 尾牙抽獎集氣模式",
+    "triggerKeywords": [
+      "尾牙",
+      "春酒",
+      "抽獎",
+      "聚餐"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "我在尾牙唯一的生存目標：安靜吃飽、抽中現金大獎、然後在沒人發現的時候光速回家。",
+    "subtext": "哈哈獎跟安慰獎請直接跳過我，謝謝",
+    "yi": "穿紅內褲集氣、在心裡默念財神爺名號",
+    "ji": "被拱上台喊『加碼』結果害自己要多留一小時",
+    "character": "cat",
+    "sceneId": "cat_payday_king",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 100%",
+    "assetPath": "/assets/scenes/cat_payday_king.webp"
+  },
+  {
+    "id": "evt_med_01",
+    "eventType": "medical_visit",
+    "eventLabel": "🏥 進廠維修保養模式",
+    "triggerKeywords": [
+      "牙醫",
+      "洗牙",
+      "看牙",
+      "健檢",
+      "體檢",
+      "健康檢查",
+      "看醫生",
+      "診所",
+      "醫院",
+      "復健",
+      "按摩",
+      "中醫"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "努力上班賺來的錢，最後都拿去繳給牙醫、中醫跟復健科了，這就是社畜的能量守恆定律。",
+    "subtext": "肉體進廠維修中，請溫柔對待這具脆弱的軀殼",
+    "yi": "看完醫生順便買杯飲料壓壓驚、今天提早十點上床睡覺",
+    "ji": "熬夜追劇、對著健檢報告上的紅字嘆氣",
+    "character": "cat",
+    "sceneId": "cat_office_cold",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 100%",
+    "assetPath": "/assets/scenes/cat_office_cold.webp"
+  },
+  {
+    "id": "evt_med_02",
+    "eventType": "medical_visit",
+    "eventLabel": "🏥 進廠維修保養模式",
+    "triggerKeywords": [
+      "按摩",
+      "推拿",
+      "SPA",
+      "針灸",
+      "拔罐",
+      "腰痠"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "按摩師傅按到我的肩膀時倒抽了一口氣說：『你這不是肩膀，這是兩塊花崗岩吧？』",
+    "subtext": "每一寸僵硬的肌肉，都是我對抗爛工作的勳章",
+    "yi": "全身放軟攤在按摩床上、做完熱敷直接回家冬眠",
+    "ji": "趴在按摩床上還拿手機回工作訊息",
+    "character": "capybara",
+    "sceneId": "capy_bubble_bath",
+    "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
+    "spritePosition": "100% 0%",
+    "assetPath": "/assets/scenes/capy_bubble_bath.webp"
+  },
+  {
+    "id": "evt_work_01",
+    "eventType": "heavy_meeting",
+    "eventLabel": "🔥 會議煉獄求生模式",
+    "triggerKeywords": [
+      "週會",
+      "月會",
+      "All Hands",
+      "全體大會",
+      "跨部門",
+      "同步",
+      "Sync",
+      "檢討會"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "這場會議其實可以用一封信解決，但大家還是決定聚在一起浪費彼此生命的一小時。",
+    "subtext": "已啟動『眼神專注但大腦正在放空想晚餐』的自動巡航模式",
+    "yi": "在筆記本上畫烏龜裝認真、適時發出『嗯～確實』的聲音",
+    "ji": "在會議結束前一分鐘舉手問『我有一個小問題』",
+    "character": "cat",
+    "sceneId": "cat_meeting_loading",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "100% 50%",
+    "assetPath": "/assets/scenes/cat_meeting_loading.webp"
+  },
+  {
+    "id": "evt_work_02",
+    "eventType": "performance_review",
+    "eventLabel": "📊 績效面談防禦模式",
+    "triggerKeywords": [
+      "Review",
+      "1-on-1",
+      "1 on 1",
+      "一對一",
+      "面談",
+      "績效",
+      "考核",
+      "KPI",
+      "OKR",
+      "提案",
+      "簡報",
+      "報告"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "又到了用精美簡報把『平常在摸魚』包裝成『跨維度策略思考與流程優化』的文學創作時刻。",
+    "subtext": "只要餅畫得比老闆還圓，就沒有人能扣我考績",
+    "yi": "敲木魚穩定心神、多聽少說微笑點頭",
+    "ji": "當真把心裡的離職原因講出來",
+    "character": "cat",
+    "sceneId": "cat_zen_woodfish",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 100%",
+    "assetPath": "/assets/scenes/cat_zen_woodfish.webp"
+  },
+  {
+    "id": "evt_work_03",
+    "eventType": "deadline_rush",
+    "eventLabel": "🚨 死線渡劫衝刺模式",
+    "triggerKeywords": [
+      "Deadline",
+      "死線",
+      "急件",
+      "上線",
+      "交稿",
+      "結案",
+      "測試",
+      "加班",
+      "趕工"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "人類歷史上最偉大的生產力，永遠誕生在死線截止前最後兩個小時的腎上腺素爆發。",
+    "subtext": "現在誰敢打斷我打字，誰就幫我把這份報告寫完",
+    "yi": "狂灌冰美式續命、每打三行字就按一次 Ctrl+S",
+    "ji": "在禮拜五下午四點半隨便亂改程式碼或版面",
+    "character": "cat",
+    "sceneId": "cat_laptop_rage",
+    "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
+    "spritePosition": "100% 0%",
+    "assetPath": "/assets/scenes/cat_laptop_rage.webp"
+  },
+  {
+    "id": "evt_pto_01",
+    "eventType": "vacation_day",
+    "eventLabel": "🏖️ 特休假結界模式",
+    "triggerKeywords": [
+      "特休",
+      "請假",
+      "休假",
+      "出國",
+      "旅遊",
+      "露營",
+      "飛機",
+      "高鐵",
+      "飯店",
+      "Staycation",
+      "補休"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "請特休假的那天，連呼吸到的空氣都是香甜的，前提是已經把公司群組全部設為靜音。",
+    "subtext": "今日誰在群組標記我，我一律視為網路訊號不好沒收到",
+    "yi": "開啟飛航模式、睡到中午自然醒、去平日不用排隊的咖啡廳",
+    "ji": "休假還偷看公司信箱自尋煩惱",
+    "character": "capybara",
+    "sceneId": "capy_daydream_beach",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "50% 100%",
+    "assetPath": "/assets/scenes/capy_daydream_beach.webp"
+  }
+]

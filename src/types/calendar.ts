@@ -18,6 +18,10 @@ export interface RawStaticQuote365 {
   assetPath?: string;
   spriteSheet?: string;
   spritePosition?: string;
+  eventLabel?: string;
+  eventType?: string;
+  specialEventCandidatesCount?: number;
+  specialEventIndex?: number;
 }
 
 export interface CalendarQuote {
@@ -37,6 +41,10 @@ export interface CalendarQuote {
   assetPath?: string;
   spriteSheet?: string;
   spritePosition?: string;
+  eventLabel?: string;
+  eventType?: string;
+  specialEventCandidatesCount?: number;
+  specialEventIndex?: number;
 }
 
 export interface CharacterMeta {
