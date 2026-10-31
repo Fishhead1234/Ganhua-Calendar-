@@ -20,6 +20,8 @@ import { AdminConsoleModal } from './components/AdminConsoleModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { BirthdayModal } from './components/BirthdayModal';
 import { FloatingVersionBar } from './components/FloatingVersionBar';
+import { DailyAgendaStrip } from './components/DailyAgendaStrip';
+import { MonthlyCalendarModal } from './components/MonthlyCalendarModal';
 import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
@@ -145,6 +147,7 @@ export const App: React.FC = () => {
   const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
   const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
+  const [isMonthlyCalendarOpen, setIsMonthlyCalendarOpen] = useState(false);
   const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
 
@@ -215,6 +218,7 @@ export const App: React.FC = () => {
     nextQuotePreview,
     isToday,
     isPastDate,
+    isFutureDate,
     isBirthday,
     canGoNext,
     canGoPrev,
@@ -335,7 +339,31 @@ export const App: React.FC = () => {
     if (isAdmin) {
       showToast('🔒 明天的事明天再煩惱；您亦可至管理員控制台開啟「解除未來鎖定」提前預覽。');
     } else {
-      showToast('🔒 明天的事明天再煩惱，先活過今天。');
+      showToast('🔮 明天的幹話還在封印中，先活過今天吧！');
+    }
+  };
+
+  const currentDateObj = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + persisted.dateOffset);
+    return d;
+  }, [persisted.dateOffset]);
+
+  const handleJumpToDate = (targetDate: Date) => {
+    const t = new Date();
+    const todayMidnight = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    const targetMidnight = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const diffDays = Math.round((targetMidnight.getTime() - todayMidnight.getTime()) / 86400000);
+    setPersisted((prev) => ({
+      ...prev,
+      dateOffset: diffDays,
+    }));
+    if (diffDays > 0) {
+      showToast('🔮 已檢視未來預排行程，幹話將於當日 00:00 解鎖！');
+    } else if (diffDays === 0) {
+      showToast('已返回今日日曆！');
+    } else {
+      showToast(`已翻閱至歷史存檔 (${targetDate.getMonth() + 1}/${targetDate.getDate()})`);
     }
   };
 
@@ -394,6 +422,7 @@ export const App: React.FC = () => {
           artStyle={persisted.artStyle}
           isSurvivedToday={persisted.survivedDates.includes(currentQuote.date)}
           isPastDate={isPastDate}
+          isFutureDate={isFutureDate}
           canGoNext={canGoNext}
           canGoPrev={canGoPrev}
           onTearOff={handleNextDay}
@@ -402,13 +431,17 @@ export const App: React.FC = () => {
           isFavorited={persisted.favoritedIds.includes(currentQuote.id)}
           onToggleFavorite={handleToggleFavorite}
           onBlockedTomorrow={handleBlockedTomorrow}
+          onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
         />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F6F0] text-[#2D2D2D] flex flex-col justify-between pb-12">
+    <div
+      style={{ paddingTop: 'max(env(safe-area-inset-top, 24px), 28px)' }}
+      className="min-h-screen bg-[#F9F6F0] text-[#2D2D2D] flex flex-col justify-between pb-12"
+    >
       {/* 1. Top Bar */}
       <TopBar
         selectedTheme={persisted.selectedTheme}
@@ -490,21 +523,32 @@ export const App: React.FC = () => {
             }}
           />
         ) : (
-          <DeskCalendar
-            quote={currentQuote}
-            nextQuotePreview={nextQuotePreview}
-            artStyle={persisted.artStyle}
-            isSurvivedToday={persisted.survivedDates.includes(currentQuote.date)}
-            isPastDate={isPastDate}
-            canGoNext={canGoNext}
-            canGoPrev={canGoPrev}
-            onTearOff={handleNextDay}
-            onPrevDay={handlePrevDay}
-            onNextDay={handleNextDay}
-            isFavorited={persisted.favoritedIds.includes(currentQuote.id)}
-            onToggleFavorite={handleToggleFavorite}
-            onBlockedTomorrow={handleBlockedTomorrow}
-          />
+          <>
+            <DeskCalendar
+              quote={currentQuote}
+              nextQuotePreview={nextQuotePreview}
+              artStyle={persisted.artStyle}
+              isSurvivedToday={persisted.survivedDates.includes(currentQuote.date)}
+              isPastDate={isPastDate}
+              isFutureDate={isFutureDate}
+              canGoNext={canGoNext}
+              canGoPrev={canGoPrev}
+              onTearOff={handleNextDay}
+              onPrevDay={handlePrevDay}
+              onNextDay={handleNextDay}
+              isFavorited={persisted.favoritedIds.includes(currentQuote.id)}
+              onToggleFavorite={handleToggleFavorite}
+              onBlockedTomorrow={handleBlockedTomorrow}
+              onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
+            />
+
+            {/* Daily Agenda & Sarcastic Timeline Strip */}
+            <DailyAgendaStrip
+              events={activeMeetings}
+              isFuture={isFutureDate}
+              onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
+            />
+          </>
         )}
 
         {/* C. Bottom Action Bar */}
@@ -616,6 +660,17 @@ export const App: React.FC = () => {
           setIsCalendarSyncModalOpen(false);
           setIsPaywallOpen(true);
         }}
+      />
+
+      {/* Monthly Desk Calendar Modal */}
+      <MonthlyCalendarModal
+        isOpen={isMonthlyCalendarOpen}
+        onClose={() => setIsMonthlyCalendarOpen(false)}
+        currentDate={currentDateObj}
+        today={new Date()}
+        survivedDates={persisted.survivedDates}
+        activeMeetings={activeMeetings}
+        onSelectDate={handleJumpToDate}
       />
 
       {/* Floating Version Quick-Switcher */}

@@ -6,12 +6,14 @@ import {
   Scissors,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert,
   Lock,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
 import { parseQuoteDateDisplay } from './DeskCalendarCard';
+import { getLunarDetails } from '../utils/lunarUtils';
 
 interface DeskCalendarProps {
   quote: CalendarQuote;
@@ -19,6 +21,7 @@ interface DeskCalendarProps {
   artStyle: 'original' | 'svg';
   isSurvivedToday: boolean;
   isPastDate: boolean;
+  isFutureDate?: boolean;
   canGoNext: boolean;
   canGoPrev: boolean;
   onTearOff: () => void;
@@ -27,6 +30,7 @@ interface DeskCalendarProps {
   isFavorited: boolean;
   onToggleFavorite: (id: string) => void;
   onBlockedTomorrow: () => void;
+  onOpenMonthlyCalendar?: () => void;
 }
 
 export const DeskCalendar: React.FC<DeskCalendarProps> = ({
@@ -35,6 +39,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   artStyle,
   isSurvivedToday,
   isPastDate,
+  isFutureDate = false,
   canGoNext,
   canGoPrev,
   onTearOff,
@@ -43,6 +48,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   isFavorited,
   onToggleFavorite,
   onBlockedTomorrow,
+  onOpenMonthlyCalendar,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [tearDirection, setTearDirection] = useState<'down' | 'left'>('left');
@@ -54,11 +60,16 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
   const dateInfo = parseQuoteDateDisplay(quote.date);
   const nextDateInfo = nextQuotePreview ? parseQuoteDateDisplay(nextQuotePreview.date) : dateInfo;
-  const charMeta = CHARACTER_META[quote.character];
+  const charMeta = CHARACTER_META[quote.character] || CHARACTER_META.cat;
+
+  // Real Taiwanese Lunar Calendar & 24 節氣
+  const [qYear, qMonth, qDay] = quote.date.split('-').map(Number);
+  const cardDate = new Date(qYear, (qMonth || 1) - 1, qDay || 1);
+  const lunarInfo = getLunarDetails(cardDate);
 
   const triggerTearAnimation = (direction: 'down' | 'left' = 'left') => {
     if (isTearing) return;
-    if (!canGoNext) {
+    if (!isPastDate) {
       onBlockedTomorrow();
       return;
     }
@@ -85,12 +96,20 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (dragStartX.current === null || dragStartY.current === null || isTearing) return;
-    const deltaX = e.clientX - dragStartX.current;
-    const deltaY = e.clientY - dragStartY.current;
+    const rawDeltaX = e.clientX - dragStartX.current;
+    const rawDeltaY = e.clientY - dragStartY.current;
 
-    setDragOffsetX(Math.max(-180, Math.min(180, deltaX)));
-    if (deltaY > 0) {
-      setDragOffsetY(Math.min(deltaY, 160));
+    if (!isPastDate) {
+      // Elastic rubber band tug on today or future: max 20px displacement
+      const elastic = 0.08;
+      setDragOffsetX(Math.max(-20, Math.min(20, rawDeltaX * elastic)));
+      setDragOffsetY(Math.max(0, Math.min(22, rawDeltaY * elastic)));
+    } else {
+      // Past date: allow full tear drag
+      setDragOffsetX(Math.max(-180, Math.min(180, rawDeltaX)));
+      if (rawDeltaY > 0) {
+        setDragOffsetY(Math.min(rawDeltaY, 160));
+      }
     }
   };
 
@@ -103,23 +122,32 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
       // ignore
     }
     if (dragStartX.current === null || dragStartY.current === null) return;
-    const finalX = dragOffsetX;
-    const finalY = dragOffsetY;
+    const rawDeltaX = e.clientX - dragStartX.current;
+    const rawDeltaY = e.clientY - dragStartY.current;
 
-    // Threshold: only trigger if clearly swiped or pulled (> 65px)
-    if (finalX < -65 || finalY > 65) {
-      triggerTearAnimation(finalX < -65 ? 'left' : 'down');
-    }
-    // Swipe Right (->) to Flip back to previous day!
-    else if (finalX > 65) {
-      if (canGoPrev) {
-        onPrevDay();
+    if (!isPastDate) {
+      // Snap back to origin immediately and toast if dragged
+      setDragOffsetX(0);
+      setDragOffsetY(0);
+      if (Math.abs(rawDeltaX) > 25 || rawDeltaY > 25) {
+        onBlockedTomorrow();
       }
-      setDragOffsetX(0);
-      setDragOffsetY(0);
     } else {
-      setDragOffsetX(0);
-      setDragOffsetY(0);
+      // Past date: Tear off forward if swiped left or pulled down
+      if (dragOffsetX < -65 || dragOffsetY > 65) {
+        triggerTearAnimation(dragOffsetX < -65 ? 'left' : 'down');
+      }
+      // Swipe Right (->) to Flip back to previous day
+      else if (dragOffsetX > 65) {
+        if (canGoPrev) {
+          onPrevDay();
+        }
+        setDragOffsetX(0);
+        setDragOffsetY(0);
+      } else {
+        setDragOffsetX(0);
+        setDragOffsetY(0);
+      }
     }
 
     dragStartX.current = null;
@@ -139,7 +167,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
   return (
     <div className="relative w-full max-w-[390px] mx-auto select-none pt-2 pb-4">
-      {/* Navigation Flip Bar (Backward Archive vs Blocked Tomorrow) */}
+      {/* Navigation Flip Bar */}
       <div className="flex items-center justify-between text-xs font-sans text-[#6E6A63] px-1 mb-2">
         <button
           type="button"
@@ -155,7 +183,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
         </button>
 
         <span className="font-mono font-bold text-[11px] text-[#2D2D2D]">
-          {isPastDate ? '📜 歷史生還存檔' : '📌 今日限定幹話'}
+          {isPastDate ? '📜 歷史生還存檔' : isFutureDate ? '🔮 未來日程預覽' : '📌 今日限定幹話'}
         </span>
 
         <button
@@ -182,7 +210,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
       <div className="absolute inset-x-1.5 top-11 bottom-2 rounded-[26px] bg-[#F2ECE1] border-2 border-[#2D2D2D]/80 translate-y-1 -rotate-[0.8deg] shadow-md pointer-events-none" />
 
       {/* Underneath Next Card Preview during tear */}
-      {nextQuotePreview && canGoNext && (
+      {nextQuotePreview && canGoNext && isPastDate && (
         <div className="absolute inset-x-0 top-8 bottom-4 rounded-[26px] paper-texture border-2 border-[#2D2D2D] p-6 flex flex-col justify-between opacity-90 pointer-events-none">
           <div className="pt-8 text-center">
             <div className="text-xs font-sans font-bold tracking-widest text-[#6E6A63]">
@@ -215,7 +243,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           (Math.abs(dragOffsetX) > 0 || dragOffsetY > 0) && !isTearing
             ? {
                 transform: `translate(${dragOffsetX * 0.9}px, ${Math.max(0, dragOffsetY) * 0.65}px) rotate(${dragOffsetX * 0.06 + dragOffsetY * 0.04}deg)`,
-                transition: 'none',
+                transition: isPastDate ? 'none' : 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
               }
             : undefined
         }
@@ -223,16 +251,16 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           isTearing ? (tearDirection === 'left' ? '-translate-x-full rotate-[-12deg] opacity-0 duration-500' : 'animate-tear-off pointer-events-none') : ''
         }`}
       >
-        {/* Top Tearing Handle: Only pressing & dragging from the top edge to the dotted line initiates tearing */}
+        {/* Top Tearing Handle */}
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
           className="touch-none cursor-grab active:cursor-grabbing select-none border-b border-[#2D2D2D]/15"
-          title="按住頂部撕頁區（木架至虛線處）可向左滑動或向下撕下日曆"
+          title={isPastDate ? '按住向左滑或下拉可撕頁' : '今日日曆不可撕頁，明天請待續'}
         >
-          {/* Top Calendar Stand Binding Block & Brass Rivets */}
+          {/* Top Calendar Stand Binding Block */}
           <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-2.5 flex items-center justify-between pointer-events-none">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner inline-block" />
@@ -248,13 +276,13 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
             </div>
           </div>
 
-          {/* Perforated Tear Line + Interactive Action */}
+          {/* Perforated Tear Line */}
           <div className="relative px-5 py-2 bg-[#F3EFE6] perforated-line flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63] pointer-events-none">
               <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
-              <span>{isPastDate ? '已存檔・按住頂部翻閱歷史' : '✂️ 撕頁區・按住頂部向左滑或下拉'}</span>
+              <span>{isPastDate ? '已存檔・可撕頁翻閱' : '✂️ 撕頁區・今日存活中'}</span>
             </div>
-            {canGoNext ? (
+            {isPastDate ? (
               <button
                 type="button"
                 onClick={(e) => {
@@ -282,34 +310,24 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           </div>
         </div>
 
-        {/* Card Body (Touches here scroll the page naturally!) */}
+        {/* Card Body */}
         <div className="p-5 sm:p-6 space-y-4">
           {/* Top Brand Calligraphic Header */}
-          <div className="text-center pb-1">
+          <div className="text-center pb-0.5">
             <div className="text-xl sm:text-2xl font-serif font-black tracking-[0.25em] text-[#2D2D2D]">
               幹話日曆
             </div>
           </div>
 
-          {/* Traditional Taiwanese Calendar Date Header */}
-          <div className="grid grid-cols-3 items-center border-y-2 border-[#2D2D2D] py-2.5 px-2 bg-[#F9F6F0]/60">
-            {/* Left: Month & Character Tag */}
-            <div className="text-left border-r border-[#2D2D2D]/25 pr-2">
-              <div className="font-mono font-extrabold text-xs tracking-widest text-[#6E6A63]">
-                {dateInfo.monthEn}
-              </div>
-              <div className="font-serif font-black text-lg text-[#2D2D2D] leading-tight">
+          {/* Traditional Taiwanese Desk Calendar Date Header (Pixel-perfect to Mockup) */}
+          <div className="border-y-2 border-[#2D2D2D] py-2 px-3 bg-[#F9F6F0]/80 flex items-center justify-between">
+            {/* Left: Month + Big Day Number */}
+            <div className="flex items-baseline gap-2.5">
+              <div className="text-left font-serif font-black text-lg text-[#2D2D2D] leading-none">
                 {dateInfo.monthZh}
               </div>
-              <div className="text-[11px] font-sans text-[#6E6A63] mt-0.5">
-                {quote.lunarDate}
-              </div>
-            </div>
-
-            {/* Center: Large Bold Serif Day Number */}
-            <div className="text-center px-1">
               <div
-                className={`font-serif font-black text-5xl sm:text-6xl leading-none tracking-tight ${
+                className={`font-serif font-black text-5xl leading-none tracking-tight ${
                   dateInfo.isWeekend ? 'text-[#C83E31]' : 'text-[#2D2D2D]'
                 }`}
               >
@@ -317,86 +335,137 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
               </div>
             </div>
 
-            {/* Right: Weekday & Category */}
-            <div className="text-right border-l border-[#2D2D2D]/25 pl-2">
-              <div className="font-mono font-extrabold text-xs tracking-widest text-[#6E6A63]">
-                {dateInfo.weekdayEn}
+            {/* Right: Weekday + Real Taiwanese Lunar & Solar Term + Expand Calendar Button */}
+            <div className="text-right flex flex-col items-end gap-1">
+              <div className="font-serif font-black text-xs text-[#2D2D2D] flex items-center gap-1">
+                <span className={dateInfo.isWeekend ? 'text-[#C83E31]' : 'text-[#2D2D2D]'}>
+                  {dateInfo.weekdayZh}
+                </span>
+                <span className="text-[#6E6A63] font-normal">|</span>
+                <span className="text-[#6E6A63] font-medium">
+                  {lunarInfo.fullDisplayText}
+                </span>
               </div>
-              <div
-                className={`font-serif font-black text-base leading-tight ${
-                  dateInfo.isWeekend ? 'text-[#C83E31]' : 'text-[#2D2D2D]'
-                }`}
-              >
-                {dateInfo.weekdayZh}
-              </div>
-              <div className="text-[11px] font-sans font-bold text-[#6E6A63] mt-0.5">
-                {quote.category === 'workplace'
-                  ? '職場生存'
-                  : quote.category === 'laziness'
-                  ? '躺平哲學'
-                  : '社交歸零'}
-              </div>
+
+              {onOpenMonthlyCalendar && (
+                <button
+                  type="button"
+                  onClick={onOpenMonthlyCalendar}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#2D2D2D]/10 hover:bg-[#2D2D2D]/20 text-[#2D2D2D] text-[11px] font-sans font-bold transition cursor-pointer"
+                  title="點擊展開桌上型農曆月曆"
+                >
+                  <Calendar className="w-3 h-3 text-[#C83E31]" />
+                  <span>[ 展開月曆 ▾ ]</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Illustration Window */}
-          <div className="relative rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20 py-2 px-3 flex flex-col items-center justify-center overflow-hidden">
-            <CharacterIllustration
-              character={quote.character}
-              variant={quote.illustrationSvg}
-              artStyle={artStyle}
-              spriteSheet={quote.spriteSheet}
-              spritePosition={quote.spritePosition}
-              sceneId={quote.sceneId}
-            />
+          {/* Future Date Talisman Seal Mode vs Normal Daily Quote Mode */}
+          {isFutureDate ? (
+            <div className="space-y-4">
+              {/* Taoist Talisman Card */}
+              <div className="rounded-2xl border-2 border-[#C83E31] bg-[#FFF8E7] p-6 text-center space-y-3 shadow-inner my-2">
+                <div className="w-20 h-24 mx-auto rounded-xl border-2 border-[#C83E31] bg-[#FCE8B2] flex flex-col items-center justify-between py-2 text-[#C83E31] shadow-sm select-none">
+                  <span className="text-xs font-serif font-black tracking-widest">敕令</span>
+                  <span className="text-xl font-serif font-black writing-vertical tracking-widest">幹話</span>
+                  <span className="text-[10px] font-sans font-bold">封印中</span>
+                </div>
+                <div className="font-serif font-black text-xl text-[#C83E31]">
+                  🔮 未來幹話封印中
+                </div>
+                <p className="text-xs font-sans text-[#6E6A63]">
+                  （當日 00:00 自動解鎖）
+                </p>
+                <p className="text-xs font-sans text-[#2D2D2D]/70 italic">
+                  「命運不可預支，未來的爛事請留到明天再承受。」
+                </p>
+              </div>
 
-            {/* Stamp: Today Survived Stamp OR Past Archive "已生還" Stamp */}
-            {(isSurvivedToday || isPastDate) && (
-              <div className="animate-stamp absolute right-3 bottom-3 pointer-events-none select-none">
-                <div className="w-24 h-24 rounded-full border-[3px] border-[#C83E31] bg-[#FAF7F0]/90 flex flex-col items-center justify-center text-[#C83E31] shadow-sm p-1">
-                  <div className="w-full h-full rounded-full border border-dashed border-[#C83E31] flex flex-col items-center justify-center text-center">
-                    <span className="text-[9px] font-sans font-extrabold tracking-widest">
-                      幹話日曆認證
-                    </span>
-                    <span className="font-serif font-black text-sm leading-tight my-0.5">
-                      {isPastDate ? '歷史存檔' : '今日已'}
-                      <br />
-                      已生還
-                    </span>
-                    <span className="text-[8px] font-mono font-bold">SURVIVED</span>
-                  </div>
+              {/* 社畜農民曆 */}
+              <div className="relative rounded-2xl bg-[#FBF8F2] border-2 border-[#C83E31]/40 p-3 pt-3.5 text-xs font-sans space-y-1.5 shadow-sm">
+                <div className="absolute -top-2.5 left-3 px-2 py-0.5 rounded-full bg-[#C83E31] text-white font-serif font-bold text-[10px] tracking-wider shadow-sm">
+                  社畜農民曆
+                </div>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="font-bold text-[#C83E31]">宜：</span>
+                  <span className="text-[#2D2D2D] font-medium">{quote.yi}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-[#6E6A63]">忌：</span>
+                  <span className="text-[#6E6A63] font-medium">{quote.ji}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[#785A3C] font-semibold text-[11px] pt-0.5 border-t border-[#2D2D2D]/10">
+                  <Clock className="w-3.5 h-3.5 text-[#C83E31]" />
+                  <span>摸魚吉時：{lunarInfo.luckySlackTime}</span>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Core Sarcastic Quote */}
-          <div className="text-center space-y-2 pt-1 px-1">
-            <blockquote className="font-serif font-black text-xl sm:text-2xl leading-snug text-[#2D2D2D] tracking-wide">
-              {quote.quote}
-            </blockquote>
-            <p className="text-xs font-sans text-[#6E6A63] leading-relaxed">
-              {quote.subtext}
-            </p>
-          </div>
-
-          {/* Sarcastic 宜 / 忌 Daily Office Almanac */}
-          <div className="rounded-xl bg-[#F3EFE6] border border-[#2D2D2D]/20 p-2.5 text-xs font-sans space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] font-serif font-bold text-[11px] flex items-center justify-center shrink-0">
-                宜
-              </span>
-              <span className="text-[#2D2D2D] font-medium truncate">{quote.yi}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#C83E31] text-white font-serif font-bold text-[11px] flex items-center justify-center shrink-0">
-                忌
-              </span>
-              <span className="text-[#6E6A63] truncate">{quote.ji}</span>
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* Illustration Window */}
+              <div className="relative rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20 py-2 px-3 flex flex-col items-center justify-center overflow-hidden">
+                <CharacterIllustration
+                  character={quote.character}
+                  variant={quote.illustrationSvg}
+                  artStyle={artStyle}
+                  spriteSheet={quote.spriteSheet}
+                  spritePosition={quote.spritePosition}
+                  sceneId={quote.sceneId}
+                />
 
-          {/* Card Footer: Watermark + Actions */}
+                {/* Stamp: Survived Stamp (Fix typo to "今日已生還") */}
+                {(isSurvivedToday || isPastDate) && (
+                  <div className="animate-stamp absolute right-3 bottom-3 pointer-events-none select-none">
+                    <div className="w-24 h-24 rounded-full border-[3px] border-[#C83E31] bg-[#FAF7F0]/90 flex flex-col items-center justify-center text-[#C83E31] shadow-sm p-1">
+                      <div className="w-full h-full rounded-full border border-dashed border-[#C83E31] flex flex-col items-center justify-center text-center">
+                        <span className="text-[9px] font-sans font-extrabold tracking-widest">
+                          幹話日曆認證
+                        </span>
+                        <span className="font-serif font-black text-sm leading-tight my-0.5">
+                          {isPastDate ? '歷史存檔' : '今日'}
+                          <br />
+                          已生還
+                        </span>
+                        <span className="text-[8px] font-mono font-bold">SURVIVED</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Core Sarcastic Quote */}
+              <div className="text-center space-y-2 pt-1 px-1">
+                <blockquote className="font-serif font-black text-xl sm:text-2xl leading-snug text-[#2D2D2D] tracking-wide">
+                  {quote.quote}
+                </blockquote>
+                <p className="text-xs font-sans text-[#6E6A63] leading-relaxed">
+                  {quote.subtext}
+                </p>
+              </div>
+
+              {/* 社畜農民曆 (with Real Lunar Lucky Slack Time) */}
+              <div className="relative rounded-2xl bg-[#FBF8F2] border-2 border-[#C83E31]/40 p-3 pt-3.5 text-xs font-sans space-y-1.5 shadow-sm">
+                <div className="absolute -top-2.5 left-3 px-2 py-0.5 rounded-full bg-[#C83E31] text-white font-serif font-bold text-[10px] tracking-wider shadow-sm">
+                  社畜農民曆
+                </div>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="font-bold text-[#C83E31]">宜：</span>
+                  <span className="text-[#2D2D2D] font-medium truncate">{quote.yi}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-[#6E6A63]">忌：</span>
+                  <span className="text-[#6E6A63] font-medium truncate">{quote.ji}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[#785A3C] font-semibold text-[11px] pt-0.5 border-t border-[#2D2D2D]/10">
+                  <Clock className="w-3.5 h-3.5 text-[#C83E31]" />
+                  <span className="truncate">摸魚吉時：{lunarInfo.luckySlackTime}</span>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Card Footer: Actions */}
           <div className="pt-1 flex items-center justify-between border-t border-[#2D2D2D]/15">
             <div className="flex items-center gap-1.5">
               <button
@@ -443,4 +512,3 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
     </div>
   );
 };
-

@@ -22,7 +22,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 266,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '300% 300%',
+    bgSize: '336% 336%',
   },
   capybara: {
     sx: 374,
@@ -30,7 +30,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 276,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '300% 300%',
+    bgSize: '336% 336%',
   },
   ghost: {
     sx: 696,
@@ -38,7 +38,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 266,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '300% 300%',
+    bgSize: '336% 336%',
   },
 };
 
@@ -67,7 +67,7 @@ export const CharacterIllustration: React.FC<CharacterIllustrationProps> = ({
           } mx-auto bg-no-repeat transition-all duration-300 overflow-hidden mix-blend-multiply`}
           style={{
             backgroundImage: `url(${sheet})`,
-            backgroundSize: '300% 300%',
+            backgroundSize: '336% 336%',
             backgroundPosition: position,
           }}
           aria-label={sceneId || `${character}_pose`}
