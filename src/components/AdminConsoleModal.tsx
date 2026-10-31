@@ -37,7 +37,7 @@ interface AdminConsoleModalProps {
   onSetStreakCount: (count: number) => void;
   isTodaySurvived: boolean;
   onToggleTodaySurvived: () => void;
-  onSelectMeetingPreset: (meetings: CalendarMeeting[]) => void;
+  onSelectMeetingPreset: (meetings: CalendarMeeting[], presetId?: string) => void;
   onOpenPaywall: () => void;
   onOpenIgModal: () => void;
   onResetApp: () => void;
@@ -336,7 +336,7 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
               <button
                 key={preset.id}
                 type="button"
-                onClick={() => onSelectMeetingPreset(preset.events)}
+                onClick={() => onSelectMeetingPreset(preset.events, preset.id)}
                 className="p-2.5 rounded-xl border border-[#2D2D2D]/20 hover:border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#D4B483]/20 transition text-left cursor-pointer flex flex-col justify-between"
               >
                 <span className="font-serif font-bold text-xs text-[#2D2D2D]">

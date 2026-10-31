@@ -156,9 +156,16 @@ export const App: React.FC = () => {
     }
     return MOCK_CALENDAR_PRESETS[0].events;
   });
+  const [activePresetId, setActivePresetId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('ganhua_active_preset_id');
+    } catch {
+      return null;
+    }
+  });
   const roastResult: CalendarRoastResult = useMemo(() => {
-    return analyzeCalendarEvents(activeMeetings);
-  }, [activeMeetings]);
+    return analyzeCalendarEvents(activeMeetings, activePresetId || undefined);
+  }, [activeMeetings, activePresetId]);
 
   const isEmbedMode = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -422,6 +429,9 @@ export const App: React.FC = () => {
             roastResult={persisted.calendarConnected ? roastResult : null}
             onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
             onOpenPaywall={() => setIsPaywallOpen(true)}
+            onToggleConnected={(connected) => {
+              setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
+            }}
           />
         )}
 
@@ -550,10 +560,17 @@ export const App: React.FC = () => {
         onClose={() => setIsCalendarSyncModalOpen(false)}
         isConnected={persisted.calendarConnected}
         activeMeetings={activeMeetings}
-        onUpdateMeetings={(meetings) => {
+        activePresetId={activePresetId}
+        onUpdateMeetings={(meetings, presetId = null) => {
           setActiveMeetings(meetings);
+          setActivePresetId(presetId);
           try {
             localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(meetings));
+            if (presetId) {
+              localStorage.setItem('ganhua_active_preset_id', presetId);
+            } else {
+              localStorage.removeItem('ganhua_active_preset_id');
+            }
           } catch {
             // ignore
           }
@@ -614,8 +631,9 @@ export const App: React.FC = () => {
         }}
         isTodaySurvived={persisted.survivedDates.includes(currentQuote.date)}
         onToggleTodaySurvived={handleStampSurvived}
-        onSelectMeetingPreset={(meetings) => {
+        onSelectMeetingPreset={(meetings, presetId) => {
           setActiveMeetings(meetings);
+          setActivePresetId(presetId || null);
           setPersisted((prev) => ({ ...prev, calendarConnected: true }));
           showToast('已切換會議行程，已為今日即時開酸！');
         }}

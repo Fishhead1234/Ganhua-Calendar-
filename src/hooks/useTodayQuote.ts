@@ -200,6 +200,10 @@ export function useTodayQuote({
         subtext: roastResult.roastSubtext,
         yi: roastResult.yi,
         ji: roastResult.ji,
+        character: roastResult.character || formatted.character,
+        sceneId: roastResult.sceneId || formatted.sceneId,
+        spriteSheet: roastResult.spriteSheet || formatted.spriteSheet,
+        spritePosition: roastResult.spritePosition || formatted.spritePosition,
       };
     }
 
