@@ -5,12 +5,13 @@
 
 export interface LunarInfo {
   lunarMonthName: string; // e.g. "九月"
+  lunarDayNum: number; // 1-30
   lunarDayName: string; // e.g. "廿二"
   lunarMonthDay: string; // e.g. "九月廿二"
   ganZhiYear: string; // e.g. "丙午"
   ganZhiDay: string; // e.g. "戊戌"
   ganZhi: string; // e.g. "丙午年 戊戌日"
-  solarTerm: string | null; // e.g. "霜降", "立冬"
+  solarTerm: string | null; // Exact single-day 24 節氣 (e.g. "霜降" on 10/23), otherwise null
   fullDisplayText: string; // e.g. "農曆九月廿二・霜降" or "農曆九月廿二"
   luckySlackTime: string; // e.g. "14:00 - 15:30"
   taiwanHoliday: string | null; // e.g. "國慶日", "中秋節"
@@ -68,9 +69,10 @@ const LUNAR_HOLIDAYS: Record<string, string> = {
 };
 
 /**
- * Approximate Solar Term calculator for year 2024-2030
+ * 24 節氣 start dates (approximate for 2024-2030)
+ * Only returns the solar term on the EXACT single date it occurs!
  */
-function getSolarTerm(date: Date): string | null {
+export function getExactSolarTerm(date: Date): string | null {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -93,17 +95,15 @@ function getSolarTerm(date: Date): string | null {
   const mData = SOLAR_TERMS_TABLE[month - 1];
   if (!mData) return null;
 
-  // Active solar term window (e.g. 霜降 begins around 10/23 and lasts until 立冬 around 11/7)
-  if (day >= mData.day2) {
-    return mData.term2;
-  }
-  if (day >= mData.day1) {
+  // ONLY return on the exact single date it occurs!
+  if (day === mData.day1) {
     return mData.term1;
   }
+  if (day === mData.day2) {
+    return mData.term2;
+  }
 
-  // Previous month's term2
-  const prevMonthIdx = (month - 2 + 12) % 12;
-  return SOLAR_TERMS_TABLE[prevMonthIdx].term2;
+  return null;
 }
 
 /**
@@ -145,16 +145,28 @@ export function getLunarDetails(date: Date = new Date()): LunarInfo {
     const parts = formatter.formatToParts(date);
     for (const p of parts) {
       if (p.type === 'month') {
-        const m = parseInt(p.value, 10);
-        if (!isNaN(m) && m >= 1 && m <= 12) {
-          lunarMonth = CHINESE_MONTH_NAMES[m - 1];
-        } else if (p.value.includes('月')) {
-          lunarMonth = p.value;
+        const isLeap = p.value.includes('閏') || p.value.includes('r') || p.value.includes('bis');
+        const digits = p.value.replace(/\D/g, '');
+        if (digits) {
+          const m = parseInt(digits, 10);
+          if (m >= 1 && m <= 12) {
+            lunarMonth = (isLeap ? '閏' : '') + CHINESE_MONTH_NAMES[m - 1];
+          }
+        } else {
+          for (let i = 0; i < CHINESE_MONTH_NAMES.length; i++) {
+            if (p.value.includes(CHINESE_MONTH_NAMES[i])) {
+              lunarMonth = (isLeap ? '閏' : '') + CHINESE_MONTH_NAMES[i];
+              break;
+            }
+          }
         }
       } else if (p.type === 'day') {
-        const parsed = parseInt(p.value, 10);
-        if (!isNaN(parsed) && parsed >= 1 && parsed <= 30) {
-          lunarDayNum = parsed;
+        const digits = p.value.replace(/\D/g, '');
+        if (digits) {
+          const parsed = parseInt(digits, 10);
+          if (parsed >= 1 && parsed <= 30) {
+            lunarDayNum = parsed;
+          }
         }
       }
     }
@@ -162,10 +174,30 @@ export function getLunarDetails(date: Date = new Date()): LunarInfo {
     console.warn('Intl Chinese calendar fallback used:', e);
   }
 
+  // Extra safeguard: remove any Arabic numerals (e.g. 09 or 9) and normalize to Chinese month name
+  lunarMonth = lunarMonth
+    .replace(/\b0?10\b/g, '十月')
+    .replace(/\b0?11\b/g, '十一月')
+    .replace(/\b0?12\b/g, '十二月')
+    .replace(/\b0?1\b/g, '正月')
+    .replace(/\b0?2\b/g, '二月')
+    .replace(/\b0?3\b/g, '三月')
+    .replace(/\b0?4\b/g, '四月')
+    .replace(/\b0?5\b/g, '五月')
+    .replace(/\b0?6\b/g, '六月')
+    .replace(/\b0?7\b/g, '七月')
+    .replace(/\b0?8\b/g, '八月')
+    .replace(/\b0?9\b/g, '九月');
+
+  if (!lunarMonth.endsWith('月')) {
+    lunarMonth += '月';
+  }
+
   const lunarDayName = CHINESE_DAY_NAMES[lunarDayNum - 1] || '廿二';
   const lunarMonthDay = `${lunarMonth}${lunarDayName}`;
 
-  const solarTerm = getSolarTerm(date);
+  // Only returns 24 節氣 on the exact single date it begins!
+  const solarTerm = getExactSolarTerm(date);
   const ganZhiYear = getYearGanZhi(date.getFullYear());
   const ganZhiDay = getDayGanZhi(date);
 
@@ -192,6 +224,7 @@ export function getLunarDetails(date: Date = new Date()): LunarInfo {
 
   return {
     lunarMonthName: lunarMonth,
+    lunarDayNum,
     lunarDayName,
     lunarMonthDay,
     ganZhiYear,

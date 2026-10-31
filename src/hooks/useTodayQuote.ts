@@ -259,6 +259,7 @@ export function useTodayQuote({
     }
 
     if (dateOffset === 0 && isPro && calendarConnected && roastResult) {
+      const activeSceneId = roastResult.sceneId || formatted.sceneId;
       return {
         ...formatted,
         quote: roastResult.roastQuote,
@@ -266,7 +267,8 @@ export function useTodayQuote({
         yi: roastResult.yi,
         ji: roastResult.ji,
         character: roastResult.character || formatted.character,
-        sceneId: roastResult.sceneId || formatted.sceneId,
+        sceneId: activeSceneId,
+        assetPath: activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : formatted.assetPath,
         spriteSheet: roastResult.spriteSheet || formatted.spriteSheet,
         spritePosition: roastResult.spritePosition || formatted.spritePosition,
         eventLabel: roastResult.summaryBadge,

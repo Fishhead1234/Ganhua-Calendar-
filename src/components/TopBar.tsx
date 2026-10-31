@@ -148,8 +148,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   return (
-    <header className="w-full border-b border-[#2D2D2D]/15 bg-[#F9F6F0]/95 backdrop-blur-sm sticky top-0 z-30 pt-[env(safe-area-inset-top,0px)]">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col gap-2.5">
+    <header className="w-full border-b border-[#2D2D2D]/15 bg-[#F9F6F0]/95 backdrop-blur-sm sticky top-0 z-30">
+      <div className="max-w-5xl mx-auto px-4 py-2 flex flex-col gap-2">
         {/* Row 1: Brand Title + Clock + Pro Badge + Survival Streak */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-3">

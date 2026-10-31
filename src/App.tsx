@@ -449,7 +449,7 @@ export const App: React.FC = () => {
 
   return (
     <div
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 24px), 28px)' }}
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
       className="min-h-screen bg-[#F9F6F0] text-[#2D2D2D] flex flex-col justify-between pb-12"
     >
       {/* 1. Top Bar */}
@@ -496,7 +496,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-5xl w-full mx-auto px-4 pt-4 space-y-4">
+      <main className="max-w-5xl w-full mx-auto px-4 pt-2 space-y-3">
         {/* A. Calendar Sync Module (Roast Engine) */}
         {viewMode === 'single' && (
           <CalendarSyncBar

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   X,
   ChevronLeft,
@@ -12,6 +12,9 @@ import {
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
 import { CalendarMeeting } from '../services/calendarService';
 import { generateMeetingRoastTag } from './DailyAgendaStrip';
+import quotes365Raw from '../data/quotes365.json';
+import { CharacterIllustration } from './CharacterIllustration';
+import { RawStaticQuote365, CharacterType } from '../types/calendar';
 
 interface MonthlyCalendarModalProps {
   isOpen: boolean;
@@ -42,6 +45,16 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   const pickedMidnight = new Date(pickedDate.getFullYear(), pickedDate.getMonth(), pickedDate.getDate());
   const isPickedFuture = pickedMidnight.getTime() > todayMidnight.getTime();
   const isPickedToday = pickedMidnight.getTime() === todayMidnight.getTime();
+
+  // Find Gàn-huà quote and illustration for selected date
+  const pickedMonth = pickedDate.getMonth() + 1;
+  const pickedDay = pickedDate.getDate();
+  const pickedQuote = useMemo(() => {
+    const list = quotes365Raw as RawStaticQuote365[];
+    const found = list.find((q) => q.month === pickedMonth && q.day === pickedDay);
+    if (found) return found;
+    return list[0];
+  }, [pickedMonth, pickedDay]);
 
   // Navigation handlers
   const handlePrevMonth = () => {
@@ -228,9 +241,22 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
               const hasSurvived = survivedDates.includes(cell.ymd);
               const isSunday = cell.date.getDay() === 0;
 
-              // Solar term or Taiwan Holiday in red
-              const lunarTag = cell.lunar.taiwanHoliday || cell.lunar.solarTerm || cell.lunar.lunarDayName;
-              const isRedLunar = Boolean(cell.lunar.taiwanHoliday || cell.lunar.solarTerm);
+              // Determine exact sub-label:
+              // 1. Holiday or 24 節氣 on exact single date (in red)
+              // 2. 初一 shows lunar month name (e.g. 九月, 十月)
+              // 3. Otherwise lunar day name (初二 ... 卅)
+              let lunarTag = cell.lunar.lunarDayName;
+              let isRedLunar = false;
+
+              if (cell.lunar.taiwanHoliday) {
+                lunarTag = cell.lunar.taiwanHoliday;
+                isRedLunar = true;
+              } else if (cell.lunar.solarTerm) {
+                lunarTag = cell.lunar.solarTerm;
+                isRedLunar = true;
+              } else if (cell.lunar.lunarDayNum === 1 || cell.lunar.lunarDayName === '初一') {
+                lunarTag = cell.lunar.lunarMonthName;
+              }
 
               return (
                 <button
@@ -311,53 +337,80 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
 
             {/* If Future Date: Vintage Talisman Seal Card! */}
             {isPickedFuture ? (
-              <div className="space-y-3">
-                <div className="rounded-xl border-2 border-[#C83E31] bg-[#FFF8E7] p-3 text-center space-y-2 shadow-inner">
-                  {/* Talisman Calligraphy Graphic */}
-                  <div className="w-16 h-20 mx-auto rounded-lg border-2 border-[#C83E31] bg-[#FCE8B2] flex flex-col items-center justify-between py-1.5 text-[#C83E31] shadow-sm select-none">
-                    <span className="text-[10px] font-serif font-black tracking-widest">
-                      敕令
-                    </span>
-                    <span className="text-sm font-serif font-black writing-vertical tracking-widest">
-                      幹話
-                    </span>
-                    <span className="text-[9px] font-sans font-bold">封印中</span>
+              <div className="space-y-2.5">
+                <div className="rounded-xl border-2 border-[#C83E31] bg-[#FFF8E7] p-3 text-center space-y-1.5 shadow-inner">
+                  <div className="font-serif font-black text-sm text-[#C83E31] flex items-center justify-center gap-1.5">
+                    <Lock className="w-4 h-4" />
+                    <span>🔮 未來幹話封印中（當日 00:00 解鎖）</span>
                   </div>
-
-                  <div className="font-serif font-black text-base text-[#C83E31]">
-                    🔮 未來幹話封印中
-                  </div>
-                  <p className="text-xs font-sans text-[#6E6A63]">
-                    （將於當日 00:00 自動解鎖）
-                  </p>
                   <p className="text-[11px] font-sans text-[#2D2D2D]/70 italic">
                     「命運不可預支，未來的爛事請留到明天再承受。」
                   </p>
                 </div>
 
-                {/* Future Schedule Preview (Planner Mode) */}
-                <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
-                  <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
-                    <span className="flex items-center gap-1">
-                      <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
-                      <span>預排行程 (Planner)</span>
-                    </span>
-                    <span className="text-[10px] text-[#6E6A63]">
-                      {isPickedToday ? activeMeetings.length : 1} 場行程
-                    </span>
+                {/* Future Date 宜 / 忌 Preview */}
+                <div className="text-xs font-sans bg-[#F3EFE6] rounded-xl p-2.5 text-[#2D2D2D] space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-[#C83E31]">宜：</span>
+                    <span>{pickedQuote.yi}</span>
                   </div>
-                  <div className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-1">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#6E6A63]" />
-                      <span>09:30 週一早會</span>
-                    </span>
-                    <Lock className="w-3 h-3 text-[#6E6A63]" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-[#6E6A63]">忌：</span>
+                    <span>{pickedQuote.ji}</span>
                   </div>
                 </div>
+
+                {/* Future Schedule Preview (Planner Mode) */}
+                {activeMeetings.length > 0 && (
+                  <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
+                    <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
+                      <span className="flex items-center gap-1">
+                        <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
+                        <span>預排行程</span>
+                      </span>
+                      <span className="text-[10px] text-[#6E6A63]">
+                        {activeMeetings.length} 場行程
+                      </span>
+                    </div>
+                    {activeMeetings.map((m, idx) => (
+                      <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
+                        <span className="flex items-center gap-1.5 truncate">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#6E6A63] shrink-0" />
+                          <span className="truncate">{m.title}</span>
+                        </span>
+                        <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
+                          {String(m.startHour).padStart(2, '0')}:{String(m.startMinute).padStart(2, '0')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
-              /* Past or Today Preview */
+              /* Past or Today Preview: Mini Character Thumbnail + Main Quote + Subtext + 宜/忌 + Synced Events */
               <div className="space-y-2.5">
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#FAF7F0] border border-[#2D2D2D]/20">
+                  <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-[#2D2D2D]/15 bg-[#F3EFE6] flex items-center justify-center">
+                    <CharacterIllustration
+                      character={pickedQuote.character as CharacterType}
+                      sceneId={pickedQuote.sceneId}
+                      assetPath={pickedQuote.assetPath}
+                      spriteSheet={pickedQuote.spriteSheet}
+                      spritePosition={pickedQuote.spritePosition}
+                      compact
+                      className="w-14 h-14"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-0.5">
+                    <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
+                      {pickedQuote.quote}
+                    </p>
+                    <p className="text-[11px] font-sans text-[#6E6A63] truncate">
+                      {pickedQuote.subtext}
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between text-xs font-sans">
                   <span className="text-[#6E6A63]">
                     生還狀態：
@@ -373,13 +426,39 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 <div className="text-xs font-sans bg-[#F3EFE6] rounded-xl p-2.5 text-[#2D2D2D] space-y-1">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#C83E31]">宜：</span>
-                    <span>帶薪拉屎、準時閃人</span>
+                    <span>{pickedQuote.yi}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#6E6A63]">忌：</span>
-                    <span>主動問老闆還有沒有事</span>
+                    <span>{pickedQuote.ji}</span>
                   </div>
                 </div>
+
+                {/* Synced meetings for today */}
+                {isPickedToday && activeMeetings.length > 0 && (
+                  <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
+                    <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
+                      <span className="flex items-center gap-1">
+                        <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
+                        <span>今日已連動行程</span>
+                      </span>
+                      <span className="text-[10px] text-[#6E6A63]">
+                        {activeMeetings.length} 場行程
+                      </span>
+                    </div>
+                    {activeMeetings.map((m, idx) => (
+                      <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
+                        <span className="flex items-center gap-1.5 truncate">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#C83E31] shrink-0" />
+                          <span className="truncate">{m.title}</span>
+                        </span>
+                        <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
+                          {String(m.startHour).padStart(2, '0')}:{String(m.startMinute).padStart(2, '0')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
