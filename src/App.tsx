@@ -31,7 +31,9 @@ import {
   CalendarRoastResult,
   MOCK_CALENDAR_PRESETS,
   analyzeCalendarEvents,
-} from './services/calendarRoastService';
+  fetchNativeDeviceCalendarEvents,
+  fetchLiveJsonCalendarEvents,
+} from './services/calendarService';
 
 const STORAGE_KEY = 'ganhua_calendar_state_v3';
 
@@ -234,6 +236,37 @@ export const App: React.FC = () => {
         showToast(`✨ 日曆內容已自動更新至最新版本 (v${res.version})！`);
       }
     });
+
+    // Auto-sync calendar events on app start if calendar connected
+    if (persisted.calendarConnected) {
+      const isNative =
+        typeof window !== 'undefined' &&
+        (window as any).Capacitor &&
+        (window as any).Capacitor.isNativePlatform();
+
+      if (isNative) {
+        fetchNativeDeviceCalendarEvents()
+          .then((events) => {
+            if (events && events.length > 0) {
+              setActiveMeetings(events);
+              setActivePresetId(null);
+            }
+          })
+          .catch(() => {});
+      } else {
+        const savedLiveUrl = localStorage.getItem('live_calendar_url');
+        if (savedLiveUrl) {
+          fetchLiveJsonCalendarEvents(savedLiveUrl)
+            .then((events) => {
+              if (events && events.length > 0) {
+                setActiveMeetings(events);
+                setActivePresetId(null);
+              }
+            })
+            .catch(() => {});
+        }
+      }
+    }
   }, []);
 
   // Confetti celebration if today is user's birthday

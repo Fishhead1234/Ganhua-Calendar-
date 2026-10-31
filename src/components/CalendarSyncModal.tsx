@@ -1,32 +1,29 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Calendar as CalendarIcon,
   Sparkles,
-  Link as LinkIcon,
+  Smartphone,
+  Globe,
   Plus,
   Trash2,
-  HelpCircle,
   CheckCircle2,
-  Flame,
-  Coffee,
   AlertTriangle,
   RotateCcw,
-  Upload,
   Zap,
-  ShieldCheck,
-  ChevronDown,
-  ChevronUp,
+  Copy,
+  Check,
+  RefreshCw,
+  ExternalLink,
 } from 'lucide-react';
 import {
   CalendarMeeting,
   CalendarRoastResult,
   SCENARIO_PRESETS,
+  GOOGLE_APPS_SCRIPT_SAMPLE,
   analyzeCalendarEvents,
-  fetchIcsWithCorsFallback,
-  parseIcsFile,
-  requestGoogleCalendarAccessToken,
-  fetchGoogleCalendarEvents,
+  fetchNativeDeviceCalendarEvents,
+  fetchLiveJsonCalendarEvents,
 } from '../services/calendarService';
 
 interface CalendarSyncModalProps {
@@ -52,23 +49,26 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   onOpenPaywall,
   activePresetId,
 }) => {
-  const [activeTab, setActiveTab] = useState<'presets' | 'ical' | 'google' | 'custom'>('presets');
-  const [icalUrl, setIcalUrl] = useState(() => {
-    return (typeof window !== 'undefined' ? localStorage.getItem('ganhua_ical_url') : '') || '';
+  const isNative =
+    typeof window !== 'undefined' &&
+    (window as any).Capacitor &&
+    (window as any).Capacitor.isNativePlatform();
+
+  // Default to native tab if running on APK, otherwise presets or live JSON
+  const [activeTab, setActiveTab] = useState<'presets' | 'native' | 'live_json' | 'custom'>(() => {
+    return isNative ? 'native' : 'presets';
   });
-  const [customClientId, setCustomClientId] = useState(() => {
-    return (typeof window !== 'undefined' ? localStorage.getItem('ganhua_google_client_id') : '') || '';
+
+  const [liveJsonUrl, setLiveJsonUrl] = useState(() => {
+    return (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : '') || '';
   });
-  const [showClientIdInput, setShowClientIdInput] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [showGuide, setShowGuide] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // New Custom Meeting Form State
+  // Custom Meeting Form State
   const [newTitle, setNewTitle] = useState('');
   const [newHour, setNewHour] = useState(14);
   const [newMinute, setNewMinute] = useState(0);
@@ -78,58 +78,28 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
   const currentRoast: CalendarRoastResult = analyzeCalendarEvents(activeMeetings, activePresetId || undefined);
 
-  // --- Mode A: iCal (.ics) Fetch with CORS-safe proxy fallback ---
-  const handleSyncIcs = async () => {
-    if (!icalUrl.trim()) {
-      setErrorMsg('請先輸入或貼上 iCal / .ics 網址');
-      return;
-    }
+  // --- Method 1: Native Phone Calendar Sync (Capacitor APK) ---
+  const handleNativeCalendarSync = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsLoading(true);
 
     try {
-      localStorage.setItem('ganhua_ical_url', icalUrl.trim());
-      const parsedMeetings = await fetchIcsWithCorsFallback(icalUrl.trim());
-      onUpdateMeetings(parsedMeetings, null);
+      const meetings = await fetchNativeDeviceCalendarEvents();
+      onUpdateMeetings(meetings, null);
       onToggleConnected(true);
-      setSuccessMsg(`🎉 同步成功！今日偵測到 ${parsedMeetings.length} 場會議，專屬吐槽已即時更新。`);
+      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場會議行程。`);
     } catch (err: any) {
-      setErrorMsg(err.message || '同步失敗，請確認網址是否包含公開或私人 ics 權限。');
+      setErrorMsg(err.message || '讀取手機行事曆失敗，請確認已授權日曆讀取權限。');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- Mode A: Local .ics File Upload ---
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    setIsLoading(true);
-
-    try {
-      const parsedMeetings = await parseIcsFile(file);
-      onUpdateMeetings(parsedMeetings, null);
-      onToggleConnected(true);
-      setSuccessMsg(`📂 檔案解析成功！已載入今日 ${parsedMeetings.length} 場會議。`);
-    } catch (err: any) {
-      setErrorMsg(err.message || '讀取 .ics 檔案失敗');
-    } finally {
-      setIsLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  // --- Mode B: 1-Click Google Calendar OAuth Flow ---
-  const handleGoogleCalendarAuth = async () => {
-    if (!customClientId.trim()) {
-      setShowClientIdInput(true);
-      setErrorMsg(
-        'Google 官方要求提供有效的 Google Cloud Client ID。若您尚未在 Google Cloud 建立專案，建議直接切換到上方「🔗 iCal 訂閱連結」（無需任何開發者設定，貼上網址即可立即連動！）。'
-      );
+  // --- Method 2: Live Google Apps Script JSON Sync (Web Browser) ---
+  const handleLiveJsonSync = async () => {
+    if (!liveJsonUrl.trim()) {
+      setErrorMsg('請先輸入 Google Apps Script 部署的 Web App URL 網址');
       return;
     }
 
@@ -138,20 +108,19 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     setIsLoading(true);
 
     try {
-      localStorage.setItem('ganhua_google_client_id', customClientId.trim());
-      const token = await requestGoogleCalendarAccessToken(customClientId.trim());
-      const events = await fetchGoogleCalendarEvents(token);
-      onUpdateMeetings(events, null);
+      localStorage.setItem('live_calendar_url', liveJsonUrl.trim());
+      const meetings = await fetchLiveJsonCalendarEvents(liveJsonUrl.trim());
+      onUpdateMeetings(meetings, null);
       onToggleConnected(true);
-      setSuccessMsg(`🎉 Google 日曆授權成功！已同步今日 ${events.length} 場會議行程。`);
+      setSuccessMsg(`🌐 即時行程連線成功！今日偵測到 ${meetings.length} 場會議。`);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Google 授權或同步失敗，請確認 Client ID 或網路設定。');
+      setErrorMsg(err.message || '連線失敗，請確認 Apps Script 網址是否正確部署且權限為「任何人」。');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- Mode C: 1-Click Test Scenario Presets ---
+  // --- Method 3: 1-Click Test Scenario Presets ---
   const handleApplyPreset = (presetId: string) => {
     const preset = SCENARIO_PRESETS.find((p) => p.id === presetId);
     if (!preset) return;
@@ -160,6 +129,13 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     onToggleConnected(true);
     setSuccessMsg(`⚡ 已切換為【${preset.label}】情境！`);
     setTimeout(() => setSuccessMsg(null), 2500);
+  };
+
+  // Copy sample GAS script to clipboard
+  const handleCopyGasSample = () => {
+    navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_SAMPLE);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   // --- Custom Meeting Handlers ---
@@ -218,7 +194,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                 </span>
               </div>
               <p className="text-xs font-sans text-[#6E6A63]">
-                支援 iCal 訂閱、Google 官方授權與 5 大職場情境模擬
+                原生手機日曆零登入同步・網頁即時 JSON 串接・5 大情境模擬
               </p>
             </div>
           </div>
@@ -266,28 +242,31 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
           <button
             type="button"
-            onClick={() => setActiveTab('ical')}
-            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 ${
-              activeTab === 'ical'
+            onClick={() => setActiveTab('native')}
+            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 relative ${
+              activeTab === 'native'
                 ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
                 : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
             }`}
           >
-            <span>🔗 iCal 訂閱</span>
-            <span className="text-[9px] opacity-75">(跨平台)</span>
+            <span>📱 手機同步</span>
+            <span className="text-[9px] opacity-75">(APK 推薦)</span>
+            {isNative && (
+              <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            )}
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveTab('google')}
+            onClick={() => setActiveTab('live_json')}
             className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 ${
-              activeTab === 'google'
+              activeTab === 'live_json'
                 ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
                 : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
             }`}
           >
-            <span>🔐 Google 連動</span>
-            <span className="text-[9px] opacity-75">(OAuth)</span>
+            <span>🌐 即時 JSON</span>
+            <span className="text-[9px] opacity-75">(網頁測試)</span>
           </button>
 
           <button
@@ -321,7 +300,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 1: Mode C - 5 Quick Test Presets */}
+          {/* TAB 1: 5 Quick Test Presets (Mode C) */}
           {activeTab === 'presets' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -377,174 +356,125 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: Mode A - iCal (.ics) with CORS Proxy & File Upload */}
-          {activeTab === 'ical' && (
+          {/* TAB 2: Native Android/iOS Phone Calendar Sync (Method 1) */}
+          {activeTab === 'native' && (
+            <div className="space-y-4">
+              <div className="bg-white p-5 rounded-2xl border border-[#2D2D2D]/20 space-y-4 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20 mx-auto flex items-center justify-center shadow-xs">
+                  <Smartphone className="w-6 h-6 text-[#C83E31]" />
+                </div>
+
+                <div className="space-y-1">
+                  <h4 className="font-serif font-black text-base text-[#2D2D2D]">
+                    手機系統行事曆一鍵直連
+                  </h4>
+                  <p className="text-xs font-sans text-[#6E6A63] max-w-sm mx-auto leading-relaxed">
+                    透過手機作業系統原生權限，直接讀取您手機中已同步的 <strong>Google 日曆、Outlook、三星日曆與 iCloud</strong> 行程。
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-left text-xs space-y-1 text-emerald-900">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>免登入・免帳密・零 OAuth 繁瑣設定</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 leading-relaxed pl-5">
+                    只要您的手機已登入 Google 帳號，點擊即可直接抓取今日會議，絕不上傳任何個人資料至外部伺服器。
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNativeCalendarSync}
+                  disabled={isLoading}
+                  className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#2D2D2D] hover:bg-[#C83E31] text-[#FAF7F0] font-sans font-bold text-xs transition cursor-pointer shadow-md disabled:opacity-50"
+                >
+                  <Smartphone className="w-4 h-4 text-[#D4B483]" />
+                  <span>{isLoading ? '讀取行事曆中...' : '一鍵同步手機行事曆'}</span>
+                </button>
+
+                {!isNative && (
+                  <p className="text-[11px] font-sans text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200">
+                    ⚠️ 偵測到您目前在電腦瀏覽器環境中。若要在電腦測試，建議切換至「🌐 即時 JSON」或「⚡ 模擬情境」分頁！
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Live Google Apps Script JSON Sync (Method 2) */}
+          {activeTab === 'live_json' && (
             <div className="space-y-4">
               <div className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-sans font-bold text-[#2D2D2D] flex items-center gap-1.5">
-                    <LinkIcon className="w-3.5 h-3.5 text-[#C83E31]" />
-                    <span>貼上私人 iCal / .ics 網址 (CORS 安全代理)</span>
+                    <Globe className="w-3.5 h-3.5 text-[#C83E31]" />
+                    <span>貼上 Google Apps Script 部署網址 (Web App URL)</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowGuide(!showGuide)}
-                    className="text-[11px] font-sans text-[#6E6A63] hover:text-[#2D2D2D] flex items-center gap-1 cursor-pointer"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    <span>如何取得？</span>
-                  </button>
+                  <span className="text-[10px] font-sans text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-bold">
+                    零 CORS 阻擋
+                  </span>
                 </div>
 
                 <div className="flex gap-2">
                   <input
                     type="url"
-                    value={icalUrl}
-                    onChange={(e) => setIcalUrl(e.target.value)}
-                    placeholder="https://calendar.google.com/calendar/ical/.../basic.ics"
+                    value={liveJsonUrl}
+                    onChange={(e) => setLiveJsonUrl(e.target.value)}
+                    placeholder="https://script.google.com/macros/s/.../exec"
                     className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31]"
                   />
                   <button
                     type="button"
-                    onClick={handleSyncIcs}
+                    onClick={handleLiveJsonSync}
                     disabled={isLoading}
-                    className="px-4 py-2 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer disabled:opacity-50 shrink-0 shadow-xs"
+                    className="px-4 py-2 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer disabled:opacity-50 shrink-0 shadow-xs flex items-center gap-1"
                   >
-                    {isLoading ? '同步中...' : '立即同步'}
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                    <span>重新整理行程</span>
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-[#2D2D2D]/15 flex items-center justify-between flex-wrap gap-2">
-                  <div className="text-[11px] font-sans text-[#6E6A63]">
-                    或直接上傳本機已下載的 <strong>.ics</strong> 行事曆檔案：
-                  </div>
-                  <div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".ics,text/calendar"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="ics-file-input"
-                    />
-                    <label
-                      htmlFor="ics-file-input"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#2D2D2D]/30 text-[#2D2D2D] text-xs font-sans font-bold hover:border-[#2D2D2D] hover:bg-[#F3EFE6] transition cursor-pointer shadow-xs"
+                {/* 3-Step Setup Instructions */}
+                <div className="pt-2 border-t border-[#2D2D2D]/15 space-y-2 text-xs font-sans text-[#6E6A63]">
+                  <div className="font-bold text-[#2D2D2D]">💡 3 步架設專屬 Google 日曆即時 JSON 串流：</div>
+                  <ol className="list-decimal list-inside space-y-1.5 leading-relaxed text-[11px]">
+                    <li>
+                      打開 <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-[#C83E31] underline font-bold inline-flex items-center gap-0.5">Google Apps Script <ExternalLink className="w-2.5 h-2.5" /></a> 點擊「新專案」。
+                    </li>
+                    <li>
+                      貼上下方範本程式碼 ➔ 點擊右上角「部署」➔「新增部署作業」➔ 類型選「網路應用程式」。
+                    </li>
+                    <li>
+                      存取權限選「所有人 (Anyone)」➔ 點擊部署並複製網址貼進上方輸入框！
+                    </li>
+                  </ol>
+
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={handleCopyGasSample}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#2D2D2D]/30 text-[#2D2D2D] text-xs font-bold hover:bg-[#EAE3D5] transition cursor-pointer shadow-xs"
                     >
-                      <Upload className="w-3.5 h-3.5 text-[#C83E31]" />
-                      <span>選擇 .ics 檔案</span>
-                    </label>
+                      {copiedCode ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700">已複製 Apps Script 範本程式碼！</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-[#C83E31]" />
+                          <span>複製 Google Apps Script 範本程式碼</span>
+                        </>
+                      )}
+                    </button>
                   </div>
-                </div>
-              </div>
-
-              {/* Accordion Guide on how to find iCal links */}
-              {showGuide && (
-                <div className="bg-[#F3EFE6] p-4 rounded-2xl border border-[#2D2D2D]/20 text-xs font-sans text-[#6E6A63] space-y-2">
-                  <div className="font-bold text-[#2D2D2D]">💡 各大日曆取得「iCal 私人網址」步驟：</div>
-                  <ul className="list-disc list-inside space-y-1.5 pl-1 leading-relaxed">
-                    <li>
-                      <strong className="text-[#2D2D2D]">Google 日曆</strong>：電腦網頁開啟 Google 日曆 ➔ 右上齒輪「設定」 ➔ 左欄點選您的日曆 ➔ 滾動到「整合日曆」 ➔ 複製<span className="text-[#C83E31] font-semibold">「iCal 格式的私人地址」</span>。
-                    </li>
-                    <li>
-                      <strong className="text-[#2D2D2D]">Outlook 365</strong>：網頁版設定 ➔ 行事曆 ➔ 共用行事曆 ➔ 發布行事曆 ➔ 複製 <span className="text-[#C83E31] font-semibold">ICS 連結</span>。
-                    </li>
-                    <li>
-                      <strong className="text-[#2D2D2D]">Apple 日曆 / iCloud</strong>：分享日曆 ➔ 複製 webcal 訂閱網址。
-                    </li>
-                  </ul>
-                  <p className="text-[11px] text-[#6E6A63]/80 italic pt-1">
-                    * 採用 CORS-Safe 安全反向代理封裝，並僅在您本機解析今日行程，絕不上傳雲端。
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 3: Mode B - 1-Click Google Calendar OAuth */}
-          {activeTab === 'google' && (
-            <div className="space-y-4">
-              <div className="bg-white p-5 rounded-2xl border border-[#2D2D2D]/20 space-y-4 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20 mx-auto flex items-center justify-center shadow-xs">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                    />
-                  </svg>
-                </div>
-
-                <div className="space-y-1">
-                  <h4 className="font-serif font-black text-base text-[#2D2D2D]">
-                    Google 官方日曆 OAuth 授權
-                  </h4>
-                  <p className="text-xs font-sans text-[#6E6A63] max-w-sm mx-auto leading-relaxed">
-                    透過 Google Identity Services 唯讀授權讀取今日主日曆會議。
-                  </p>
-                </div>
-
-                {/* Notice: Recommend iCal if no Client ID */}
-                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-left text-xs space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-amber-900">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>沒有 Google Cloud Client ID？</span>
-                  </div>
-                  <p className="text-amber-800 leading-relaxed text-[11px]">
-                    Google 官方規定 OAuth 授權必須先在 Google Cloud Console 註冊 Web Client ID。若您沒有開發者帳號，<strong>強烈建議改用「🔗 iCal 訂閱連結」</strong>，直接貼上 Google 日曆的私人 iCal 網址即可連動，零設定秒搞定！
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('ical')}
-                    className="w-full py-2 px-3 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-sans font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
-                  >
-                    <LinkIcon className="w-3.5 h-3.5" />
-                    <span>前往「iCal 訂閱連結」分頁 (推薦・免設定)</span>
-                  </button>
-                </div>
-
-                {/* Google Client ID Input Field */}
-                <div className="text-left space-y-2 p-3.5 rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20">
-                  <label className="text-xs font-sans font-bold text-[#2D2D2D] block">
-                    Google Cloud OAuth Client ID：
-                  </label>
-                  <input
-                    type="text"
-                    value={customClientId}
-                    onChange={(e) => setCustomClientId(e.target.value)}
-                    placeholder="xxxx.apps.googleusercontent.com"
-                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31]"
-                  />
-                  <p className="text-[10px] text-[#6E6A63]">
-                    * 在 Google Cloud Console 建立 OAuth 2.0 Web Client ID 並填入此處即可啟用一鍵連動。
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={handleGoogleCalendarAuth}
-                    disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#2D2D2D] hover:bg-[#C83E31] text-[#FAF7F0] font-sans font-bold text-xs transition cursor-pointer shadow-xs disabled:opacity-50 mt-2"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>{isLoading ? 'Google 驗證中...' : '使用 Client ID 授權連動'}</span>
-                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: Custom Meetings List & Editor */}
+          {/* TAB 4: Custom Today's Meetings */}
           {activeTab === 'custom' && (
             <div className="space-y-4">
               <form

@@ -1,17 +1,37 @@
 package com.ganhuacalendar.app;
 
+import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.util.Base64;
+import androidx.core.content.ContextCompat;
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Calendar;
 
-@CapacitorPlugin(name = "GanhuaWidgetBridge")
+@CapacitorPlugin(
+    name = "GanhuaWidgetBridge",
+    permissions = {
+        @Permission(
+            alias = "calendar",
+            strings = { Manifest.permission.READ_CALENDAR }
+        )
+    }
+)
 public class GanhuaWidgetBridgePlugin extends Plugin {
 
     @PluginMethod
@@ -73,6 +93,122 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             call.resolve(res);
         } catch (Exception e) {
             call.reject("Failed to update widget: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
+    public void requestCalendarPermission(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            JSObject res = new JSObject();
+            res.put("granted", true);
+            call.resolve(res);
+        } else {
+            requestPermissionForAlias("calendar", call, "calendarPermCallback");
+        }
+    }
+
+    @PermissionCallback
+    private void calendarPermCallback(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            JSObject res = new JSObject();
+            res.put("granted", true);
+            call.resolve(res);
+        } else {
+            call.reject("Calendar permission denied");
+        }
+    }
+
+    @PluginMethod
+    public void readDeviceCalendarEvents(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionForAlias("calendar", call, "readEventsCallback");
+            return;
+        }
+        executeReadEvents(call);
+    }
+
+    @PermissionCallback
+    private void readEventsCallback(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            executeReadEvents(call);
+        } else {
+            call.reject("Calendar permission denied");
+        }
+    }
+
+    private void executeReadEvents(PluginCall call) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            long startMs = cal.getTimeInMillis();
+
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 999);
+            long endMs = cal.getTimeInMillis();
+
+            Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
+            ContentUris.appendId(builder, startMs);
+            ContentUris.appendId(builder, endMs);
+
+            String[] projection = new String[]{
+                CalendarContract.Instances.EVENT_ID,
+                CalendarContract.Instances.TITLE,
+                CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.END,
+                CalendarContract.Instances.ALL_DAY
+            };
+
+            ContentResolver resolver = getContext().getContentResolver();
+            Cursor cursor = resolver.query(builder.build(), projection, null, null, CalendarContract.Instances.BEGIN + " ASC");
+
+            JSArray eventsArray = new JSArray();
+            if (cursor != null) {
+                try {
+                    int titleIdx = cursor.getColumnIndex(CalendarContract.Instances.TITLE);
+                    int beginIdx = cursor.getColumnIndex(CalendarContract.Instances.BEGIN);
+                    int endIdx = cursor.getColumnIndex(CalendarContract.Instances.END);
+                    int allDayIdx = cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY);
+
+                    while (cursor.moveToNext()) {
+                        String title = cursor.getString(titleIdx);
+                        if (title == null || title.trim().isEmpty()) {
+                            title = "未命名會議";
+                        }
+                        long begin = cursor.getLong(beginIdx);
+                        long end = cursor.getLong(endIdx);
+                        boolean isAllDay = cursor.getInt(allDayIdx) != 0;
+
+                        Calendar eventCal = Calendar.getInstance();
+                        eventCal.setTimeInMillis(begin);
+                        int startHour = eventCal.get(Calendar.HOUR_OF_DAY);
+                        int startMinute = eventCal.get(Calendar.MINUTE);
+                        int durationMinutes = isAllDay ? 480 : (int) Math.max(15, (end - begin) / (1000 * 60));
+
+                        JSObject ev = new JSObject();
+                        ev.put("title", title);
+                        ev.put("startHour", startHour);
+                        ev.put("startMinute", startMinute);
+                        ev.put("durationMinutes", durationMinutes);
+                        ev.put("isAllDay", isAllDay);
+                        ev.put("beginMs", begin);
+                        ev.put("endMs", end);
+                        eventsArray.put(ev);
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+
+            JSObject result = new JSObject();
+            result.put("events", eventsArray);
+            call.resolve(result);
+        } catch (Exception e) {
+            call.reject("Failed to query calendar: " + e.getMessage(), e);
         }
     }
 }
