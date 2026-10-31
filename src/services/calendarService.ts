@@ -548,8 +548,13 @@ export async function requestGoogleCalendarAccessToken(
 ): Promise<string> {
   const clientId =
     customClientId?.trim() ||
-    (typeof window !== 'undefined' ? localStorage.getItem('ganhua_google_client_id') : null) ||
-    '1084293922312-ganhuatest.apps.googleusercontent.com'; // Default client ID placeholder
+    (typeof window !== 'undefined' ? localStorage.getItem('ganhua_google_client_id') : null);
+
+  if (!clientId) {
+    throw new Error(
+      '請先輸入有效的 Google Cloud OAuth Client ID，或改用免設定的「🔗 iCal 訂閱連結」進行連動。'
+    );
+  }
 
   // 1. Ensure Google Identity Services SDK is loaded
   if (typeof window !== 'undefined' && !window.google?.accounts?.oauth2) {
@@ -653,3 +658,4 @@ export async function fetchGoogleCalendarEvents(
 
   return meetings;
 }
+

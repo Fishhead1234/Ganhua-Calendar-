@@ -125,15 +125,21 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
   // --- Mode B: 1-Click Google Calendar OAuth Flow ---
   const handleGoogleCalendarAuth = async () => {
+    if (!customClientId.trim()) {
+      setShowClientIdInput(true);
+      setErrorMsg(
+        'Google 官方要求提供有效的 Google Cloud Client ID。若您尚未在 Google Cloud 建立專案，建議直接切換到上方「🔗 iCal 訂閱連結」（無需任何開發者設定，貼上網址即可立即連動！）。'
+      );
+      return;
+    }
+
     setErrorMsg(null);
     setSuccessMsg(null);
     setIsLoading(true);
 
     try {
-      if (customClientId.trim()) {
-        localStorage.setItem('ganhua_google_client_id', customClientId.trim());
-      }
-      const token = await requestGoogleCalendarAccessToken(customClientId);
+      localStorage.setItem('ganhua_google_client_id', customClientId.trim());
+      const token = await requestGoogleCalendarAccessToken(customClientId.trim());
       const events = await fetchGoogleCalendarEvents(token);
       onUpdateMeetings(events, null);
       onToggleConnected(true);
@@ -482,55 +488,57 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
                 <div className="space-y-1">
                   <h4 className="font-serif font-black text-base text-[#2D2D2D]">
-                    Google 官方日曆一鍵授權
+                    Google 官方日曆 OAuth 授權
                   </h4>
                   <p className="text-xs font-sans text-[#6E6A63] max-w-sm mx-auto leading-relaxed">
-                    透過 Google Identity Services 安全彈窗，一鍵讀取今日主日曆會議（僅限今日唯讀權限，不保存任何活動資料）。
+                    透過 Google Identity Services 唯讀授權讀取今日主日曆會議。
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleGoogleCalendarAuth}
-                  disabled={isLoading}
-                  className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#2D2D2D] hover:bg-[#C83E31] text-[#FAF7F0] font-sans font-bold text-xs transition cursor-pointer shadow-md disabled:opacity-50"
-                >
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>{isLoading ? 'Google 驗證中...' : '使用 Google 帳號一鍵連動'}</span>
-                </button>
-
-                {/* Optional Custom Google Client ID Setting */}
-                <div className="pt-2 text-left">
+                {/* Notice: Recommend iCal if no Client ID */}
+                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-left text-xs space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>沒有 Google Cloud Client ID？</span>
+                  </div>
+                  <p className="text-amber-800 leading-relaxed text-[11px]">
+                    Google 官方規定 OAuth 授權必須先在 Google Cloud Console 註冊 Web Client ID。若您沒有開發者帳號，<strong>強烈建議改用「🔗 iCal 訂閱連結」</strong>，直接貼上 Google 日曆的私人 iCal 網址即可連動，零設定秒搞定！
+                  </p>
                   <button
                     type="button"
-                    onClick={() => setShowClientIdInput(!showClientIdInput)}
-                    className="text-[11px] font-sans text-[#6E6A63] hover:text-[#2D2D2D] flex items-center gap-1 cursor-pointer mx-auto"
+                    onClick={() => setActiveTab('ical')}
+                    className="w-full py-2 px-3 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-sans font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                   >
-                    <span>進階設定：自訂 Google OAuth Client ID</span>
-                    {showClientIdInput ? (
-                      <ChevronUp className="w-3 h-3" />
-                    ) : (
-                      <ChevronDown className="w-3 h-3" />
-                    )}
+                    <LinkIcon className="w-3.5 h-3.5" />
+                    <span>前往「iCal 訂閱連結」分頁 (推薦・免設定)</span>
                   </button>
+                </div>
 
-                  {showClientIdInput && (
-                    <div className="mt-2 p-3 rounded-xl bg-[#FAF7F0] border border-[#2D2D2D]/20 space-y-2 text-xs">
-                      <label className="font-bold text-[#2D2D2D] block">
-                        輸入您的 Google Cloud OAuth Client ID：
-                      </label>
-                      <input
-                        type="text"
-                        value={customClientId}
-                        onChange={(e) => setCustomClientId(e.target.value)}
-                        placeholder="例如: 12345678-xxx.apps.googleusercontent.com"
-                        className="w-full px-3 py-1.5 bg-white border border-[#2D2D2D]/30 rounded-lg text-xs font-mono"
-                      />
-                      <p className="text-[10px] text-[#6E6A63]">
-                        * 若您有自己的 GCP 專案，可填入啟用 Calendar API 的 Web Client ID。未填寫則採用本機預設驗證。
-                      </p>
-                    </div>
-                  )}
+                {/* Google Client ID Input Field */}
+                <div className="text-left space-y-2 p-3.5 rounded-2xl bg-[#FAF7F0] border border-[#2D2D2D]/20">
+                  <label className="text-xs font-sans font-bold text-[#2D2D2D] block">
+                    Google Cloud OAuth Client ID：
+                  </label>
+                  <input
+                    type="text"
+                    value={customClientId}
+                    onChange={(e) => setCustomClientId(e.target.value)}
+                    placeholder="xxxx.apps.googleusercontent.com"
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31]"
+                  />
+                  <p className="text-[10px] text-[#6E6A63]">
+                    * 在 Google Cloud Console 建立 OAuth 2.0 Web Client ID 並填入此處即可啟用一鍵連動。
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleGoogleCalendarAuth}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#2D2D2D] hover:bg-[#C83E31] text-[#FAF7F0] font-sans font-bold text-xs transition cursor-pointer shadow-xs disabled:opacity-50 mt-2"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{isLoading ? 'Google 驗證中...' : '使用 Client ID 授權連動'}</span>
+                  </button>
                 </div>
               </div>
             </div>
