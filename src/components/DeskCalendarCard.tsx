@@ -126,6 +126,7 @@ export const DeskCalendarCard: React.FC<DeskCalendarCardProps> = ({
               spriteSheet={nextQuotePreview.spriteSheet}
               spritePosition={nextQuotePreview.spritePosition}
               sceneId={nextQuotePreview.sceneId}
+              assetPath={nextQuotePreview.assetPath}
             />
           </div>
           <div className="text-center pb-4">
@@ -252,6 +253,7 @@ export const DeskCalendarCard: React.FC<DeskCalendarCardProps> = ({
               spriteSheet={quote.spriteSheet}
               spritePosition={quote.spritePosition}
               sceneId={quote.sceneId}
+              assetPath={quote.assetPath}
             />
 
             {/* Red "Survived Today" Stamp Seal Overlay */}

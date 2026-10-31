@@ -50,6 +50,7 @@ export const TrioDeskShowcase: React.FC<TrioDeskShowcaseProps> = ({
                   spriteSheet={card.spriteSheet}
                   spritePosition={card.spritePosition}
                   sceneId={card.sceneId}
+                  assetPath={card.assetPath}
                 />
               </div>
 

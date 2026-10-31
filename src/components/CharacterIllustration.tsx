@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CharacterType } from '../types/calendar';
 
 export interface CharacterIllustrationProps {
@@ -10,6 +10,7 @@ export interface CharacterIllustrationProps {
   spriteSheet?: string;
   spritePosition?: string;
   sceneId?: string;
+  assetPath?: string;
 }
 
 export const REFERENCE_CROP_MAP: Record<
@@ -22,7 +23,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 266,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '336% 336%',
+    bgSize: '300% 300%',
   },
   capybara: {
     sx: 374,
@@ -30,7 +31,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 276,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '336% 336%',
+    bgSize: '300% 300%',
   },
   ghost: {
     sx: 696,
@@ -38,7 +39,7 @@ export const REFERENCE_CROP_MAP: Record<
     sw: 266,
     sh: 256,
     bgPos: '0% 0%',
-    bgSize: '336% 336%',
+    bgSize: '300% 300%',
   },
 };
 
@@ -50,8 +51,39 @@ export const CharacterIllustration: React.FC<CharacterIllustrationProps> = ({
   spriteSheet,
   spritePosition,
   sceneId,
+  assetPath,
 }) => {
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [sceneId, assetPath]);
+
   if (artStyle === 'original') {
+    // Priority 1: High-res perfectly centered, isolated scene image (WebP or PNG)
+    const sceneFile = assetPath || (sceneId ? `/assets/scenes/${sceneId}.webp` : null);
+
+    if (sceneFile && !imgError) {
+      return (
+        <div
+          className={`relative overflow-hidden select-none flex items-center justify-center ${
+            compact ? 'w-20 h-20' : 'w-full'
+          } ${className}`}
+        >
+          <img
+            src={sceneFile}
+            alt={sceneId || `${character}_scene`}
+            className={`${
+              compact ? 'w-16 h-16 rounded-lg' : 'w-56 h-56 rounded-xl'
+            } mx-auto object-contain mix-blend-multiply transition-all duration-300 drop-shadow-sm`}
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
+        </div>
+      );
+    }
+
+    // Fallback: 3x3 Sprite Sheet
     const sheet = spriteSheet || `/assets/sheets/${character}_sheet.jpg`;
     const position = spritePosition || '0% 0%';
 
@@ -67,7 +99,7 @@ export const CharacterIllustration: React.FC<CharacterIllustrationProps> = ({
           } mx-auto bg-no-repeat transition-all duration-300 overflow-hidden mix-blend-multiply`}
           style={{
             backgroundImage: `url(${sheet})`,
-            backgroundSize: '336% 336%',
+            backgroundSize: '300% 300%',
             backgroundPosition: position,
           }}
           aria-label={sceneId || `${character}_pose`}

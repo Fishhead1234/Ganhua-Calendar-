@@ -217,3 +217,4 @@ export function applySpecialEventToQuote(
     specialEventIndex: selectedIndex,
   };
 }
+

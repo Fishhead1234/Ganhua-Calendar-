@@ -197,6 +197,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                         spriteSheet={quote.spriteSheet}
                         spritePosition={quote.spritePosition}
                         sceneId={quote.sceneId}
+                        assetPath={quote.assetPath}
                         compact
                       />
                     </div>
@@ -275,6 +276,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                           spriteSheet={quote.spriteSheet}
                           spritePosition={quote.spritePosition}
                           sceneId={quote.sceneId}
+                          assetPath={quote.assetPath}
                           className="!h-28"
                         />
                       </div>

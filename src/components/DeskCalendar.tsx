@@ -230,6 +230,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
               spriteSheet={nextQuotePreview.spriteSheet}
               spritePosition={nextQuotePreview.spritePosition}
               sceneId={nextQuotePreview.sceneId}
+              assetPath={nextQuotePreview.assetPath}
             />
           </div>
           <div className="text-center pb-4">
@@ -347,13 +348,13 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
 
           {/* Traditional Taiwanese Desk Calendar Date Header (Pixel-perfect to Mockup) */}
           <div className="border-y-2 border-[#2D2D2D] py-2 px-3 bg-[#F9F6F0]/80 flex items-center justify-between">
-            {/* Left: Month + Big Day Number */}
-            <div className="flex items-baseline gap-2.5">
-              <div className="text-left font-serif font-black text-lg text-[#2D2D2D] leading-none">
+            {/* Left: Month stacked above Big Day Number with right vertical divider */}
+            <div className="flex flex-col items-center justify-center pr-3.5 border-r-2 border-[#2D2D2D]/20 min-w-[68px]">
+              <div className="font-serif font-black text-sm text-[#2D2D2D] tracking-wider leading-none">
                 {dateInfo.monthZh}
               </div>
               <div
-                className={`font-serif font-black text-5xl leading-none tracking-tight ${
+                className={`font-serif font-black text-4xl leading-none tracking-tight mt-1 ${
                   dateInfo.isWeekend ? 'text-[#C83E31]' : 'text-[#2D2D2D]'
                 }`}
               >
@@ -362,12 +363,12 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
             </div>
 
             {/* Right: Weekday + Real Taiwanese Lunar & Solar Term + Expand Calendar Button */}
-            <div className="text-right flex flex-col items-end gap-1">
-              <div className="font-serif font-black text-xs text-[#2D2D2D] flex items-center gap-1">
+            <div className="flex-1 pl-3 text-right flex flex-col items-end justify-center gap-1.5">
+              <div className="font-serif font-black text-xs text-[#2D2D2D] flex items-center gap-1.5 flex-wrap justify-end">
                 <span className={dateInfo.isWeekend ? 'text-[#C83E31]' : 'text-[#2D2D2D]'}>
                   {dateInfo.weekdayZh}
                 </span>
-                <span className="text-[#6E6A63] font-normal">|</span>
+                <span className="text-[#6E6A63]/50 font-normal">|</span>
                 <span className="text-[#6E6A63] font-medium">
                   {lunarInfo.fullDisplayText}
                 </span>
@@ -377,7 +378,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenMonthlyCalendar}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#2D2D2D]/10 hover:bg-[#2D2D2D]/20 text-[#2D2D2D] text-[11px] font-sans font-bold transition cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#2D2D2D]/10 hover:bg-[#2D2D2D]/20 text-[#2D2D2D] text-[11px] font-sans font-bold transition cursor-pointer"
                   title="點擊展開桌上型農曆月曆"
                 >
                   <Calendar className="w-3 h-3 text-[#C83E31]" />
@@ -438,6 +439,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                   spriteSheet={quote.spriteSheet}
                   spritePosition={quote.spritePosition}
                   sceneId={quote.sceneId}
+                  assetPath={quote.assetPath}
                 />
 
                 {/* Stamp: Survived Stamp (Fix typo to "今日已生還") */}

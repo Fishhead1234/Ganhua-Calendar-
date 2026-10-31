@@ -139,3 +139,4 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
     </div>
   );
 };
+
