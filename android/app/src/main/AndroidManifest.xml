@@ -67,6 +67,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ganhuacalendar.app.ACTION_WIDGET_PREV_MONTH" />
+                <action android:name="com.ganhuacalendar.app.ACTION_WIDGET_NEXT_MONTH" />
+                <action android:name="com.ganhuacalendar.app.ACTION_WIDGET_TODAY" />
+                <action android:name="com.ganhuacalendar.app.ACTION_WIDGET_SELECT_DATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

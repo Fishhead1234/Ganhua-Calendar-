@@ -53,6 +53,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             String avatarBase64 = call.getString("avatarBase64", "");
             int meetingCount = call.getInt("meetingCount", 0);
             String survivedDatesJson = call.getString("survivedDatesJson", "[]");
+            String eventsJson = call.getString("eventsJson", "[]");
 
             SharedPreferences prefs = getContext().getSharedPreferences(
                     GanhuaWidgetProvider.PREFS_NAME,
@@ -74,6 +75,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             if (!characterKey.isEmpty()) editor.putString("character_key", characterKey);
             editor.putInt("meeting_count", meetingCount);
             if (!survivedDatesJson.isEmpty()) editor.putString("survived_dates_json", survivedDatesJson);
+            if (eventsJson != null && !eventsJson.isEmpty()) editor.putString("events_json", eventsJson);
 
             // If an avatar image is supplied, save to internal files dir
             if (avatarBase64 != null && !avatarBase64.isEmpty()) {

@@ -145,6 +145,7 @@ export async function syncNativeWidgetData(
     streakStr: `🔥 連續生還 ${streakCount} 天`,
     meetingCount: activeMeetings?.length || 0,
     survivedDatesJson: JSON.stringify(survivedDates || []),
+    eventsJson: JSON.stringify(activeMeetings || []),
     avatarBase64: avatarBase64 || '',
   };
 

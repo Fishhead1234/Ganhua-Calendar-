@@ -116,7 +116,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                 title="新增自訂行程與社畜吐槽"
               >
                 <Plus className="w-3 h-3 text-[#D4B483]" />
-                <span>+ 新增行程</span>
+                <span>新增行程</span>
               </button>
             )}
 

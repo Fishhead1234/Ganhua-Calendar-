@@ -160,6 +160,13 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     setPickedDate(t);
   };
 
+  const formatEventTime = (m: CalendarMeeting) => {
+    if (m?.isAllDay) return '全天';
+    const hourStr = String(m?.startHour ?? 9).padStart(2, '0');
+    const minStr = String(m?.startMinute ?? 0).padStart(2, '0');
+    return `${hourStr}:${minStr}`;
+  };
+
   // Generate 7-column calendar matrix safely
   const calendarCells = useMemo(() => {
     const cells: {
@@ -444,7 +451,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                   title="為此日新增行程"
                 >
                   <Plus className="w-3 h-3 text-[#D4B483]" />
-                  <span>+ 新增行程</span>
+                  <span>新增行程</span>
                 </button>
               )}
             </div>
@@ -496,27 +503,27 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                               onEditEvent(m);
                             }
                           }}
-                          className={`text-xs font-sans text-[#6E6A63] flex items-center justify-between py-1 px-1 rounded-md transition ${
+                          className={`text-xs font-sans text-[#2D2D2D] flex items-center justify-between py-1 px-1.5 rounded-md transition ${
                             isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
                           }`}
                           title={isCustom ? '點擊編輯此行程' : undefined}
                         >
-                          <span className="flex items-center gap-1.5 truncate">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
                             <span
                               className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                                 isCustom ? 'bg-[#D4B483]' : 'bg-[#6E6A63]'
                               }`}
                             />
-                            <span className="truncate font-medium">{m?.title || '未命名行程'}</span>
+                            <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
+                              {formatEventTime(m)}
+                            </span>
+                            <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
                                 <Edit2 className="w-2.5 h-2.5" /> 自訂
                               </span>
                             )}
-                          </span>
-                          <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2 font-mono">
-                            {m.isAllDay ? '全天' : `${String(m?.startHour ?? 9).padStart(2, '0')}:${String(m?.startMinute ?? 0).padStart(2, '0')}`}
-                          </span>
+                          </div>
                         </div>
                       );
                     })}
@@ -593,27 +600,27 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                               onEditEvent(m);
                             }
                           }}
-                          className={`text-xs font-sans text-[#6E6A63] flex items-center justify-between py-1 px-1 rounded-md transition ${
+                          className={`text-xs font-sans text-[#2D2D2D] flex items-center justify-between py-1 px-1.5 rounded-md transition ${
                             isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
                           }`}
                           title={isCustom ? '點擊編輯此行程' : undefined}
                         >
-                          <span className="flex items-center gap-1.5 truncate">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
                             <span
                               className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                                 isCustom ? 'bg-[#D4B483]' : 'bg-[#C83E31]'
                               }`}
                             />
-                            <span className="truncate font-medium">{m?.title || '未命名行程'}</span>
+                            <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
+                              {formatEventTime(m)}
+                            </span>
+                            <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
                                 <Edit2 className="w-2.5 h-2.5" /> 自訂
                               </span>
                             )}
-                          </span>
-                          <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2 font-mono">
-                            {m.isAllDay ? '全天' : `${String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}`}
-                          </span>
+                          </div>
                         </div>
                       );
                     })}
