@@ -24,6 +24,8 @@ import {
   analyzeCalendarEvents,
   fetchNativeDeviceCalendarEvents,
   fetchLiveJsonCalendarEvents,
+  saveCustomEvent,
+  deleteCustomEvent,
 } from '../services/calendarService';
 
 interface CalendarSyncModalProps {
@@ -143,17 +145,36 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     e.preventDefault();
     if (!newTitle.trim()) return;
 
+    const todayStr = new Date().toISOString().split('T')[0];
     const isFridayAfterFour =
       new Date().getDay() === 5 && (newHour >= 16 || (newHour === 15 && newMinute >= 45));
+
+    const sH = Number(newHour);
+    const sM = Number(newMinute);
+    const dur = Number(newDuration);
 
     const newMeeting: CalendarMeeting = {
       id: `custom-${Date.now()}`,
       title: newTitle.trim(),
-      startHour: Number(newHour),
-      startMinute: Number(newMinute),
-      durationMinutes: Number(newDuration),
+      startHour: sH,
+      startMinute: sM,
+      durationMinutes: dur,
       isFridayAfterFour,
+      dateKey: todayStr,
+      source: 'local',
     };
+
+    saveCustomEvent({
+      id: newMeeting.id,
+      title: newMeeting.title,
+      dateKey: todayStr,
+      startHour: sH,
+      startMinute: sM,
+      durationMinutes: dur,
+      isAllDay: false,
+      source: 'local',
+      createdAt: Date.now(),
+    });
 
     onUpdateMeetings([...activeMeetings, newMeeting], null);
     onToggleConnected(true);
@@ -163,6 +184,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   };
 
   const handleDeleteMeeting = (id: string) => {
+    deleteCustomEvent(id);
     onUpdateMeetings(
       activeMeetings.filter((m) => m.id !== id),
       null

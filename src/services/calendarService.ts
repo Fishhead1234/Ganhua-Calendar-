@@ -678,6 +678,8 @@ export interface CustomCalendarEvent {
   id: string;
   title: string;
   dateKey: string; // YYYY-MM-DD
+  start?: string; // ISO 8601 string
+  end?: string; // ISO 8601 string
   startHour: number; // 0-23
   startMinute: number; // 0-59
   durationMinutes: number;
@@ -693,14 +695,27 @@ export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
   const [y, m, d] = e.dateKey.split('-').map(Number);
   const dateObj = new Date(y, (m || 1) - 1, d || 1);
   const isFriday = dateObj.getDay() === 5;
-  const isFridayAfterFour = isFriday && (e.startHour >= 16 || (e.startHour === 15 && e.startMinute >= 45));
+
+  let sHour = e.startHour !== undefined ? e.startHour : 9;
+  let sMin = e.startMinute !== undefined ? e.startMinute : 0;
+  let dur = e.durationMinutes !== undefined ? e.durationMinutes : 60;
+
+  if (e.start && !e.startHour) {
+    const parsed = new Date(e.start);
+    if (!isNaN(parsed.getTime())) {
+      sHour = parsed.getHours();
+      sMin = parsed.getMinutes();
+    }
+  }
+
+  const isFridayAfterFour = isFriday && (sHour >= 16 || (sHour === 15 && sMin >= 45));
 
   return {
     id: e.id,
     title: e.title,
-    startHour: e.startHour,
-    startMinute: e.startMinute,
-    durationMinutes: e.isAllDay ? 480 : e.durationMinutes,
+    startHour: sHour,
+    startMinute: sMin,
+    durationMinutes: e.isAllDay ? 480 : dur,
     isFridayAfterFour,
     dateKey: e.dateKey,
     notes: e.notes,

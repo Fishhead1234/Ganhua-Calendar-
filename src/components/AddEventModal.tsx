@@ -147,10 +147,18 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       durationMinutes = 60; // minimum fallback
     }
 
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const startDateObj = new Date(y, (m || 1) - 1, d || 1, isAllDay ? 0 : startHour, isAllDay ? 0 : startMinute, 0);
+    const endDateObj = isAllDay
+      ? new Date(y, (m || 1) - 1, d || 1, 23, 59, 59)
+      : new Date(startDateObj.getTime() + durationMinutes * 60 * 1000);
+
     const newEvent: CustomCalendarEvent = {
       id: editingEvent ? editingEvent.id : `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       title: title.trim(),
       dateKey,
+      start: startDateObj.toISOString(),
+      end: endDateObj.toISOString(),
       startHour: isAllDay ? 9 : startHour,
       startMinute: isAllDay ? 0 : startMinute,
       durationMinutes: isAllDay ? 480 : durationMinutes,
@@ -390,3 +398,4 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
     </div>
   );
 };
+
