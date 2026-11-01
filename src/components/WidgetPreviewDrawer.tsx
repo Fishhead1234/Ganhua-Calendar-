@@ -11,6 +11,7 @@ import {
   Check,
   Lock,
   Calendar,
+  RotateCcw,
 } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -50,6 +51,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
   const [isOpen, setIsOpen] = useState(true);
   const [activeWidget, setActiveWidget] = useState<WidgetSizeTab>('monthly_split');
   const [copiedEmbed, setCopiedEmbed] = useState(false);
+  const [selectedLargeWidgetDate, setSelectedLargeWidgetDate] = useState<string>('');
 
   const dateInfo = parseQuoteDateDisplay(quote.date);
   const charMeta = CHARACTER_META[quote.character];
@@ -349,144 +351,220 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
               )}
 
               {/* 2. Large 4x4 Full Monthly + Gàn-huà Widget (MonthlyLargeWidget) */}
-              {activeWidget === 'monthly_large' && (
-                <div className="w-full max-w-[370px] space-y-3">
-                  <div className="rounded-3xl bg-[#F9F6F0] overflow-hidden shadow-lg border border-[#2D2D2D]/15 flex flex-col select-none">
-                    {/* Top Bar */}
-                    <div className="bg-[#2D2D2D] text-[#F9F6F0] px-4 py-2.5 flex justify-between items-center shrink-0">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#D4B483]" />
-                        <span className="font-serif font-black text-xs sm:text-sm tracking-wide text-[#F9F6F0]">
-                          {viewYear}年 {viewMonth + 1}月 {monthEn}
-                        </span>
-                      </div>
-                      <span className="font-serif text-[11px] text-[#D4B483] tracking-tight">
-                        {getLunarDetails(baseDate).fullDisplayText}
-                      </span>
-                    </div>
+              {activeWidget === 'monthly_large' && (() => {
+                const effectiveSelectedYmd = selectedLargeWidgetDate || todayYmd;
+                const activeSelectedCell = calendarCells.find((c) => c.ymd === effectiveSelectedYmd) || calendarCells.find((c) => c.isToday) || calendarCells[0];
+                const isSelectedCellToday = activeSelectedCell.ymd === todayYmd;
+                const isSelectedCellFuture = activeSelectedCell.date.getTime() > baseDate.getTime();
 
-                    {/* Center Section: 7-Column Lunar Monthly Grid */}
-                    <div className="p-3 bg-[#FAF7F0]">
-                      {/* Weekday Header */}
-                      <div className="grid grid-cols-7 text-center font-serif font-black text-[10px] pb-1.5 border-b border-[#2D2D2D]/10">
-                        <span className="text-[#C83E31]">日</span>
-                        <span className="text-[#2D2D2D]">一</span>
-                        <span className="text-[#2D2D2D]">二</span>
-                        <span className="text-[#2D2D2D]">三</span>
-                        <span className="text-[#2D2D2D]">四</span>
-                        <span className="text-[#2D2D2D]">五</span>
-                        <span className="text-[#6E6A63]">六</span>
-                      </div>
+                // Appointments on selected day: if today, show activeMeetings; otherwise if past/future, display scheduled list or clear status
+                const dayMeetings = isSelectedCellToday ? activeMeetings : [];
 
-                      {/* 7-Column Matrix */}
-                      <div className="grid grid-cols-7 gap-1 pt-1.5">
-                        {calendarCells.slice(0, 35).map((cell, idx) => {
-                          const isSunday = cell.date.getDay() === 0;
-                          const hasSurvived = survivedDates.includes(cell.ymd);
-
-                          // Sub-label logic: Holiday / 節氣 > 初一 > 農曆日
-                          let subText = cell.lunar.lunarDayName;
-                          let isHighlight = false;
-                          if (cell.lunar.taiwanHoliday) {
-                            subText = cell.lunar.taiwanHoliday.slice(0, 2);
-                            isHighlight = true;
-                          } else if (cell.lunar.solarTerm) {
-                            subText = cell.lunar.solarTerm;
-                            isHighlight = true;
-                          } else if (cell.lunar.lunarDayNum === 1 || cell.lunar.lunarDayName === '初一') {
-                            subText = cell.lunar.lunarMonthName;
-                          }
-
-                          return (
-                            <div
-                              key={idx}
-                              className={`relative flex flex-col items-center justify-center py-1 rounded-lg transition ${
-                                cell.isToday
-                                  ? 'bg-[#2D2D2D] text-white font-bold shadow-xs'
-                                  : !cell.isCurrentMonth
-                                  ? 'text-[#6E6A63]/30'
-                                  : 'text-[#2D2D2D]'
-                              }`}
-                            >
-                              {/* Tiny survived watermark stamp */}
-                              {hasSurvived && !cell.isToday && cell.isCurrentMonth && (
-                                <span className="absolute -top-1 -right-0.5 text-[7px] font-serif font-black text-[#C83E31] scale-75 border border-[#C83E31]/60 rounded px-0.5 leading-none bg-white/70">
-                                  生還
-                                </span>
-                              )}
-
-                              {/* Solar Day Number */}
-                              <span
-                                className={`font-serif font-black text-xs leading-none ${
-                                  cell.isToday
-                                    ? 'text-white'
-                                    : isSunday
-                                    ? 'text-[#C83E31]'
-                                    : 'text-[#2D2D2D]'
-                                }`}
-                              >
-                                {cell.dayNum}
-                              </span>
-
-                              {/* Lunar / Solar Term Sub-label */}
-                              <span
-                                className={`text-[8px] font-sans truncate max-w-full scale-90 leading-tight mt-0.5 ${
-                                  cell.isToday
-                                    ? 'text-[#D4B483]'
-                                    : isHighlight
-                                    ? 'text-[#C83E31] font-bold'
-                                    : 'text-[#6E6A63]'
-                                }`}
-                              >
-                                {subText}
-                              </span>
-
-                              {/* Today Meeting Dot Indicator */}
-                              {cell.isToday && (
-                                <span className="w-1 h-1 rounded-full bg-[#C83E31] mt-0.5" />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Bottom Footer Strip */}
-                    <div className="border-t border-stone-300/80 p-2.5 px-3 flex items-center gap-3 bg-[#F5F0E6] shrink-0">
-                      <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-white/60 border border-[#2D2D2D]/15 flex items-center justify-center p-1">
-                        <CharacterIllustration
-                          character={quote.character}
-                          artStyle={artStyle}
-                          spriteSheet={quote.spriteSheet}
-                          spritePosition={quote.spritePosition}
-                          sceneId={quote.sceneId}
-                          assetPath={quote.assetPath}
-                          compact
-                          className="!w-14 !h-14"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
-                          「{quote.quote}」
-                        </p>
-
-                        <div className="flex items-center gap-2 flex-wrap text-[10px] font-sans pt-0.5">
-                          <span className="text-[#C83E31] font-bold truncate">
-                            宜：{quote.yi ? quote.yi.split('・')[0] : '帶薪拉屎'}
+                return (
+                  <div className="w-full max-w-[370px] space-y-3">
+                    <div className="rounded-3xl bg-[#F9F6F0] overflow-hidden shadow-lg border border-[#2D2D2D]/15 flex flex-col select-none">
+                      {/* Top Bar */}
+                      <div className="bg-[#2D2D2D] text-[#F9F6F0] px-4 py-2.5 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#D4B483]" />
+                          <span className="font-serif font-black text-xs sm:text-sm tracking-wide text-[#F9F6F0]">
+                            {viewYear}年 {viewMonth + 1}月 {monthEn}
                           </span>
-                          <span className="text-[#6E6A63] font-medium flex items-center gap-1 shrink-0">
-                            <span>📅 今日 {activeMeetings.length} 場會議</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!isSelectedCellToday && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedLargeWidgetDate(todayYmd)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4B483] hover:bg-[#c2a270] text-[#2D2D2D] text-[10px] font-sans font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                              title="重設回今日"
+                            >
+                              <RotateCcw className="w-2.5 h-2.5" />
+                              <span>回今日</span>
+                            </button>
+                          )}
+                          <span className="font-serif text-[11px] text-[#D4B483] tracking-tight">
+                            {getLunarDetails(baseDate).fullDisplayText}
                           </span>
                         </div>
                       </div>
+
+                      {/* Center Section: 7-Column Lunar Monthly Grid (Interactive Date Picker) */}
+                      <div className="p-3 bg-[#FAF7F0]">
+                        {/* Weekday Header */}
+                        <div className="grid grid-cols-7 text-center font-serif font-black text-[10px] pb-1.5 border-b border-[#2D2D2D]/10">
+                          <span className="text-[#C83E31]">日</span>
+                          <span className="text-[#2D2D2D]">一</span>
+                          <span className="text-[#2D2D2D]">二</span>
+                          <span className="text-[#2D2D2D]">三</span>
+                          <span className="text-[#2D2D2D]">四</span>
+                          <span className="text-[#2D2D2D]">五</span>
+                          <span className="text-[#6E6A63]">六</span>
+                        </div>
+
+                        {/* 7-Column Matrix */}
+                        <div className="grid grid-cols-7 gap-1 pt-1.5">
+                          {calendarCells.slice(0, 35).map((cell, idx) => {
+                            const isSunday = cell.date.getDay() === 0;
+                            const hasSurvived = survivedDates.includes(cell.ymd);
+                            const isCellSelected = cell.ymd === effectiveSelectedYmd;
+
+                            // Sub-label logic: Holiday / 節氣 > 初一 > 農曆日
+                            let subText = cell.lunar.lunarDayName;
+                            let isHighlight = false;
+                            if (cell.lunar.taiwanHoliday) {
+                              subText = cell.lunar.taiwanHoliday.slice(0, 2);
+                              isHighlight = true;
+                            } else if (cell.lunar.solarTerm) {
+                              subText = cell.lunar.solarTerm;
+                              isHighlight = true;
+                            } else if (cell.lunar.lunarDayNum === 1 || cell.lunar.lunarDayName === '初一') {
+                              subText = cell.lunar.lunarMonthName;
+                            }
+
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setSelectedLargeWidgetDate(cell.ymd)}
+                                className={`relative flex flex-col items-center justify-center py-1 rounded-lg transition cursor-pointer ${
+                                  isCellSelected
+                                    ? 'bg-[#2D2D2D] text-white font-bold ring-2 ring-[#D4B483] shadow-md scale-105 z-10'
+                                    : cell.isToday
+                                    ? 'bg-[#D4B483]/30 border border-[#D4B483] text-[#2D2D2D]'
+                                    : !cell.isCurrentMonth
+                                    ? 'text-[#6E6A63]/30 hover:bg-[#EAE3D5]/40'
+                                    : 'text-[#2D2D2D] hover:bg-[#EAE3D5]/60'
+                                }`}
+                                title={`點擊查看 ${cell.ymd} 行程與農曆`}
+                              >
+                                {/* Tiny survived watermark stamp */}
+                                {hasSurvived && !cell.isToday && cell.isCurrentMonth && (
+                                  <span className="absolute -top-1 -right-0.5 text-[7px] font-serif font-black text-[#C83E31] scale-75 border border-[#C83E31]/60 rounded px-0.5 leading-none bg-white/70">
+                                    生還
+                                  </span>
+                                )}
+
+                                {/* Solar Day Number */}
+                                <span
+                                  className={`font-serif font-black text-xs leading-none ${
+                                    isCellSelected
+                                      ? 'text-white'
+                                      : cell.isToday
+                                      ? 'text-[#2D2D2D]'
+                                      : isSunday
+                                      ? 'text-[#C83E31]'
+                                      : 'text-[#2D2D2D]'
+                                  }`}
+                                >
+                                  {cell.dayNum}
+                                </span>
+
+                                {/* Lunar / Solar Term Sub-label */}
+                                <span
+                                  className={`text-[8px] font-sans truncate max-w-full scale-90 leading-tight mt-0.5 ${
+                                    isCellSelected
+                                      ? 'text-[#D4B483]'
+                                      : cell.isToday
+                                      ? 'text-[#8C6D37] font-bold'
+                                      : isHighlight
+                                      ? 'text-[#C83E31] font-bold'
+                                      : 'text-[#6E6A63]'
+                                  }`}
+                                >
+                                  {subText}
+                                </span>
+
+                                {/* Today Meeting Dot Indicator */}
+                                {cell.isToday && (
+                                  <span className="w-1 h-1 rounded-full bg-[#C83E31] mt-0.5" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Bottom Footer Strip: Displays Appointments & Info for Selected Date */}
+                      <div className="border-t border-stone-300/80 p-2.5 px-3 flex items-center gap-3 bg-[#F5F0E6] shrink-0 min-h-[96px]">
+                        <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-white/60 border border-[#2D2D2D]/15 flex items-center justify-center p-1">
+                          <CharacterIllustration
+                            character={quote.character}
+                            artStyle={artStyle}
+                            spriteSheet={quote.spriteSheet}
+                            spritePosition={quote.spritePosition}
+                            sceneId={quote.sceneId}
+                            assetPath={quote.assetPath}
+                            compact
+                            className="!w-14 !h-14"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0 space-y-1">
+                          {isSelectedCellToday ? (
+                            <>
+                              <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
+                                「{quote.quote}」
+                              </p>
+
+                              <div className="flex items-center gap-2 flex-wrap text-[10px] font-sans pt-0.5">
+                                <span className="text-[#C83E31] font-bold truncate">
+                                  宜：{quote.yi ? quote.yi.split('・')[0] : '帶薪拉屎'}
+                                </span>
+                                <span className="text-[#6E6A63] font-medium flex items-center gap-1 shrink-0">
+                                  <span>📅 今日 {activeMeetings.length} 場會議</span>
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between">
+                                <div className="font-serif font-bold text-xs text-[#2D2D2D]">
+                                  📅 {activeSelectedCell.date.getMonth() + 1}月{activeSelectedCell.dayNum}日
+                                  <span className="text-[#6E6A63] text-[10px] ml-1">
+                                    ({activeSelectedCell.lunar.lunarMonthDay})
+                                  </span>
+                                </div>
+                                <span className="text-[10px] font-sans font-bold text-[#C83E31]">
+                                  {dayMeetings.length > 0 ? `${dayMeetings.length} 場行程` : '無預約會議'}
+                                </span>
+                              </div>
+
+                              {dayMeetings.length > 0 ? (
+                                <div className="space-y-0.5">
+                                  {dayMeetings.slice(0, 2).map((m, mIdx) => (
+                                    <div key={mIdx} className="text-[10px] font-sans text-[#2D2D2D] flex items-center justify-between">
+                                      <span className="truncate max-w-[150px] font-medium">• {m.title}</span>
+                                      <span className="text-[#6E6A63] font-mono text-[9px] shrink-0">
+                                        {String(m.startHour).padStart(2, '0')}:{String(m.startMinute).padStart(2, '0')}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-[11px] font-sans text-[#6E6A63] leading-tight">
+                                  {isSelectedCellFuture
+                                    ? '當日目前一片淨土，尚未有連動會議打擾。'
+                                    : '當日已平安度過，無排定行程。'}
+                                </p>
+                              )}
+
+                              <div className="flex items-center gap-2 text-[10px] font-sans text-[#6E6A63] pt-0.5">
+                                <span className="text-[#C83E31] font-medium">
+                                  宜：{isSelectedCellFuture ? '繼續保持空檔・裝忙' : '帶薪冥想'}
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
+                    <p className="text-center text-xs font-sans text-[#6E6A63]">
+                      4×4 大型全月農曆桌面小工具預覽 (點擊上方任一日期可檢視當日預約行程)
+                    </p>
                   </div>
-                  <p className="text-center text-xs font-sans text-[#6E6A63]">
-                    4×4 大型全月農曆桌面小工具預覽 (iOS / Android)
-                  </p>
-                </div>
-              )}
+                );
+              })()}
 
               {/* 3. Medium Home Screen Widget (Date + Mini doodle + Quote) */}
               {activeWidget === 'home_medium' && (

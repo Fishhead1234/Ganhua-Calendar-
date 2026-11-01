@@ -10,6 +10,7 @@ import {
   Clock,
   Calendar,
   RefreshCw,
+  RotateCcw,
 } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -33,6 +34,7 @@ interface DeskCalendarProps {
   onBlockedTomorrow: () => void;
   onOpenMonthlyCalendar?: () => void;
   onCycleSpecialQuote?: () => void;
+  onBackToToday?: () => void;
 }
 
 export const DeskCalendar: React.FC<DeskCalendarProps> = ({
@@ -52,6 +54,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   onBlockedTomorrow,
   onOpenMonthlyCalendar,
   onCycleSpecialQuote,
+  onBackToToday,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [tearDirection, setTearDirection] = useState<'down' | 'left'>('left');
@@ -185,9 +188,21 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           <span>前一日 (生存存檔)</span>
         </button>
 
-        <span className="font-mono font-bold text-[11px] text-[#2D2D2D]">
-          {isPastDate ? '📜 歷史生還存檔' : isFutureDate ? '🔮 未來日程預覽' : '📌 今日限定幹話'}
-        </span>
+        {isPastDate || isFutureDate ? (
+          <button
+            type="button"
+            onClick={onBackToToday}
+            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] hover:bg-[#1a1a1a] text-[11px] font-sans font-bold transition active:scale-95 cursor-pointer shadow-xs border border-[#D4B483]/50"
+            title="點擊立即回到今日"
+          >
+            <RotateCcw className="w-3 h-3 text-[#D4B483]" />
+            <span>{isFutureDate ? '未來日程 (回到今天)' : '歷史存檔 (回到今天)'}</span>
+          </button>
+        ) : (
+          <span className="font-mono font-bold text-[11px] text-[#2D2D2D]">
+            📌 今日限定幹話
+          </span>
+        )}
 
         <button
           type="button"

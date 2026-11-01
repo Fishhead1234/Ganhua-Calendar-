@@ -13,3 +13,4 @@
         android:scaleType="fitCenter"
         android:contentDescription="@string/widget_label_monthly_large" />
 </FrameLayout>
+

@@ -305,3 +305,4 @@ public class MonthlySplitWidgetProvider extends AppWidgetProvider {
         return output;
     }
 }
+

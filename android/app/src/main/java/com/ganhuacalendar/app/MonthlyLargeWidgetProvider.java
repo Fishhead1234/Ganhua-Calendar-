@@ -25,9 +25,27 @@ import android.widget.RemoteViews;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
-import org.json.JSONArray;
 
 public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
+
+    public static final String ACTION_SELECT_LARGE_DATE = "com.ganhuacalendar.app.ACTION_SELECT_LARGE_DATE";
+    public static final String ACTION_RESET_LARGE_TODAY = "com.ganhuacalendar.app.ACTION_RESET_LARGE_TODAY";
+    public static final String EXTRA_TARGET_DAY = "target_day";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        if (ACTION_SELECT_LARGE_DATE.equals(intent.getAction())) {
+            int targetDay = intent.getIntExtra(EXTRA_TARGET_DAY, -1);
+            SharedPreferences prefs = context.getSharedPreferences(GanhuaWidgetProvider.PREFS_NAME, Context.MODE_PRIVATE);
+            prefs.edit().putInt("selected_large_widget_day", targetDay).apply();
+            updateAllWidgets(context);
+        } else if (ACTION_RESET_LARGE_TODAY.equals(intent.getAction())) {
+            SharedPreferences prefs = context.getSharedPreferences(GanhuaWidgetProvider.PREFS_NAME, Context.MODE_PRIVATE);
+            prefs.edit().remove("selected_large_widget_day").apply();
+            updateAllWidgets(context);
+        }
+    }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -55,6 +73,9 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             int month = cal.get(Calendar.MONTH); // 0-indexed
             int todayDay = cal.get(Calendar.DAY_OF_MONTH);
 
+            int selectedDay = prefs.getInt("selected_large_widget_day", todayDay);
+            boolean isSelectedToday = (selectedDay == todayDay);
+
             String monthEn = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.ENGLISH).toUpperCase();
             String quoteStr = prefs.getString("quote_str", "今天行事曆一片淨土，適合安靜當個薪水小偷。");
             String fullLunarStr = prefs.getString("full_lunar_str", "農曆九月廿二・霜降");
@@ -80,7 +101,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             bgPaint.setColor(Color.parseColor("#FAF7F0"));
             canvas.drawRect(cardRect, bgPaint);
 
-            // 1. Top Header Bar (height = 80px, #2D2D2D charcoal)
+            // 1. Top Header Bar (height = 82px, #2D2D2D charcoal)
             float headerHeight = 82;
             Paint topBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             topBarPaint.setColor(Color.parseColor("#2D2D2D"));
@@ -97,13 +118,28 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             headerTextPaint.setColor(Color.parseColor("#F9F6F0"));
             canvas.drawText(year + "年 " + (month + 1) + "月 " + monthEn, 56, 52, headerTextPaint);
 
-            // Right: Full Lunar Details (e.g. 農曆九月廿二・霜降)
+            // Right: Lunar Details or Return Today Chip
+            if (!isSelectedToday) {
+                // Draw "⚡ 回今日" button pill
+                Paint returnBtnPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                returnBtnPaint.setColor(Color.parseColor("#D4B483"));
+                RectF returnBox = new RectF(width - 240, 24, width - 150, 60);
+                canvas.drawRoundRect(returnBox, 18, 18, returnBtnPaint);
+
+                Paint returnTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                returnTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+                returnTextPaint.setTextSize(17);
+                returnTextPaint.setColor(Color.parseColor("#2D2D2D"));
+                returnTextPaint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("回今日", returnBox.centerX(), 48, returnTextPaint);
+            }
+
             Paint lunarHeaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             lunarHeaderPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.NORMAL));
-            lunarHeaderPaint.setTextSize(20);
+            lunarHeaderPaint.setTextSize(19);
             lunarHeaderPaint.setColor(Color.parseColor("#D4B483"));
             lunarHeaderPaint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(fullLunarStr, width - 30, 52, lunarHeaderPaint);
+            canvas.drawText(fullLunarStr, width - 25, 52, lunarHeaderPaint);
 
             // 2. Weekday Header Row
             float gridMargin = 24;
@@ -170,15 +206,25 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                     } else if (dayCounter <= daysInMonth) {
                         // Current Month Days
                         boolean isToday = (dayCounter == todayDay);
+                        boolean isSelected = (dayCounter == selectedDay);
                         String dayYmd = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayCounter);
                         boolean hasSurvived = survivedJson.contains(dayYmd);
 
-                        if (isToday) {
-                            // Dark highlight square for Today
-                            RectF todayBox = new RectF(cx - 30, cy + 2, cx + 30, cy + 64);
-                            Paint todayBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                            todayBoxPaint.setColor(Color.parseColor("#2D2D2D"));
-                            canvas.drawRoundRect(todayBox, 14, 14, todayBoxPaint);
+                        if (isSelected) {
+                            // Dark highlight box for selected day
+                            RectF selectBox = new RectF(cx - 30, cy + 2, cx + 30, cy + 64);
+                            Paint selectBoxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                            selectBoxPaint.setColor(Color.parseColor("#2D2D2D"));
+                            canvas.drawRoundRect(selectBox, 14, 14, selectBoxPaint);
+
+                            if (isToday) {
+                                // Gold border ring for today
+                                Paint ringPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                                ringPaint.setStyle(Paint.Style.STROKE);
+                                ringPaint.setStrokeWidth(2.5f);
+                                ringPaint.setColor(Color.parseColor("#D4B483"));
+                                canvas.drawRoundRect(selectBox, 14, 14, ringPaint);
+                            }
 
                             numPaint.setColor(Color.WHITE);
                             numPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
@@ -186,15 +232,25 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                             canvas.drawText(String.valueOf(dayCounter), cx, cy + 28, numPaint);
 
                             lunarSubPaint.setColor(Color.parseColor("#D4B483"));
-                            canvas.drawText("今日", cx, cy + 50, lunarSubPaint);
+                            canvas.drawText(isToday ? "今日" : "選取", cx, cy + 50, lunarSubPaint);
 
-                            // Today meeting dot indicator
-                            if (meetingCount > 0) {
+                            // Meeting indicator dot
+                            if (isToday && meetingCount > 0) {
                                 Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                                 dotPaint.setColor(Color.parseColor("#C83E31"));
                                 canvas.drawCircle(cx, cy + 58, 3.5f, dotPaint);
                             }
                         } else {
+                            if (isToday) {
+                                // Subtle border around today when another date is selected
+                                RectF todayBorder = new RectF(cx - 28, cy + 4, cx + 28, cy + 62);
+                                Paint tBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                                tBorderPaint.setStyle(Paint.Style.STROKE);
+                                tBorderPaint.setStrokeWidth(2.0f);
+                                tBorderPaint.setColor(Color.parseColor("#D4B483"));
+                                canvas.drawRoundRect(todayBorder, 12, 12, tBorderPaint);
+                            }
+
                             if (hasSurvived && dayCounter < todayDay) {
                                 // Tiny survived stamp badge
                                 Paint stampTagPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -287,39 +343,80 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             float footerTextX = 236;
             float footerTextW = width - footerTextX - 30;
 
-            TextPaint quotePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            quotePaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-            quotePaint.setTextSize(24);
-            quotePaint.setColor(Color.parseColor("#2D2D2D"));
+            if (isSelectedToday) {
+                // Today view: quote + yi + meeting count
+                TextPaint quotePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+                quotePaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+                quotePaint.setTextSize(24);
+                quotePaint.setColor(Color.parseColor("#2D2D2D"));
 
-            String displayQuote = "「" + quoteStr + "」";
-            StaticLayout quoteLayout = new StaticLayout(
-                    displayQuote,
-                    quotePaint,
-                    (int) footerTextW,
-                    Layout.Alignment.ALIGN_NORMAL,
-                    1.2f,
-                    0.0f,
-                    false
-            );
+                String displayQuote = "「" + quoteStr + "」";
+                StaticLayout quoteLayout = new StaticLayout(
+                        displayQuote,
+                        quotePaint,
+                        (int) footerTextW,
+                        Layout.Alignment.ALIGN_NORMAL,
+                        1.2f,
+                        0.0f,
+                        false
+                );
 
-            canvas.save();
-            canvas.translate(footerTextX, footerY + 36);
-            quoteLayout.draw(canvas);
-            canvas.restore();
+                canvas.save();
+                canvas.translate(footerTextX, footerY + 36);
+                quoteLayout.draw(canvas);
+                canvas.restore();
 
-            // 宜 & 会议 Tag Bar
-            Paint yiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            yiPaint.setTypeface(Typeface.DEFAULT_BOLD);
-            yiPaint.setTextSize(17);
-            yiPaint.setColor(Color.parseColor("#C83E31"));
-            String shortYi = yiStr.length() > 16 ? yiStr.substring(0, 16) + "…" : yiStr;
-            canvas.drawText("宜：" + shortYi, footerTextX, footerY + 185, yiPaint);
+                Paint yiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                yiPaint.setTypeface(Typeface.DEFAULT_BOLD);
+                yiPaint.setTextSize(17);
+                yiPaint.setColor(Color.parseColor("#C83E31"));
+                String shortYi = yiStr.length() > 16 ? yiStr.substring(0, 16) + "…" : yiStr;
+                canvas.drawText("宜：" + shortYi, footerTextX, footerY + 185, yiPaint);
 
-            Paint meetingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            meetingPaint.setTextSize(16);
-            meetingPaint.setColor(Color.parseColor("#6E6A63"));
-            canvas.drawText("📅 今日 " + meetingCount + " 場會議", footerTextX, footerY + 215, meetingPaint);
+                Paint meetingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                meetingPaint.setTextSize(16);
+                meetingPaint.setColor(Color.parseColor("#6E6A63"));
+                canvas.drawText("📅 今日 " + meetingCount + " 場會議", footerTextX, footerY + 215, meetingPaint);
+            } else {
+                // Other selected date view: appointment summary
+                Paint dateHeaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                dateHeaderPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+                dateHeaderPaint.setTextSize(23);
+                dateHeaderPaint.setColor(Color.parseColor("#2D2D2D"));
+                canvas.drawText("📅 " + (month + 1) + "月" + selectedDay + "日 排定行程", footerTextX, footerY + 54, dateHeaderPaint);
+
+                TextPaint descPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+                descPaint.setTextSize(19);
+                descPaint.setColor(Color.parseColor("#6E6A63"));
+
+                String statusMsg = (selectedDay > todayDay)
+                        ? "「當日目前無預約會議打擾，享受寧靜摸魚吉時。」"
+                        : "「當日行程已平安生還，無殘留工作事項。」";
+                StaticLayout descLayout = new StaticLayout(
+                        statusMsg,
+                        descPaint,
+                        (int) footerTextW,
+                        Layout.Alignment.ALIGN_NORMAL,
+                        1.25f,
+                        0.0f,
+                        false
+                );
+                canvas.save();
+                canvas.translate(footerTextX, footerY + 80);
+                descLayout.draw(canvas);
+                canvas.restore();
+
+                Paint yiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                yiPaint.setTypeface(Typeface.DEFAULT_BOLD);
+                yiPaint.setTextSize(17);
+                yiPaint.setColor(Color.parseColor("#C83E31"));
+                canvas.drawText("宜：繼續保持空檔・點擊開啟 App", footerTextX, footerY + 185, yiPaint);
+
+                Paint hintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                hintPaint.setTextSize(15);
+                hintPaint.setColor(Color.parseColor("#6E6A63"));
+                canvas.drawText("📌 點擊小工具可直接跳轉至此日行事曆", footerTextX, footerY + 215, hintPaint);
+            }
 
             // Card outer stroke
             canvas.drawRoundRect(cardRect, 36, 36, dividerPaint);
@@ -328,9 +425,14 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_monthly_large);
             views.setImageViewBitmap(R.id.iv_monthly_large_canvas, bitmap);
 
-            // Tap to open App
+            // Tap to open App (passing selected date)
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("jumpToDay", selectedDay);
+            intent.putExtra("jumpToMonth", month + 1);
+            intent.putExtra("jumpToYear", year);
+            intent.putExtra("jumpToYmd", String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, selectedDay));
+
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     context,
                     0,

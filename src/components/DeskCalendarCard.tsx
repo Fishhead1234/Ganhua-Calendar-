@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Heart, Copy, Check, Scissors, Sparkles } from 'lucide-react';
+import { Heart, Copy, Check, Scissors, Sparkles, RotateCcw } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
 
@@ -9,8 +9,10 @@ interface DeskCalendarCardProps {
   artStyle: 'original' | 'svg';
   isSurvivedToday: boolean;
   isFavorited: boolean;
+  isFutureDate?: boolean;
   onToggleFavorite: (id: string) => void;
   onTearOff: () => void;
+  onBackToToday?: () => void;
 }
 
 const MONTH_EN_NAMES = [
@@ -45,8 +47,10 @@ export const DeskCalendarCard: React.FC<DeskCalendarCardProps> = ({
   artStyle,
   isSurvivedToday,
   isFavorited,
+  isFutureDate = false,
   onToggleFavorite,
   onTearOff,
+  onBackToToday,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [dragOffsetY, setDragOffsetY] = useState(0);
@@ -275,6 +279,31 @@ export const DeskCalendarCard: React.FC<DeskCalendarCardProps> = ({
               </div>
             )}
           </div>
+
+          {/* Future Date Lock Alert with Quick Return Button */}
+          {isFutureDate && (
+            <div className="rounded-xl border border-[#D4B483] bg-[#FFF8E7] p-2.5 text-center space-y-1.5 shadow-xs">
+              <div className="text-xs font-serif font-black text-[#C83E31] flex items-center justify-center gap-1.5">
+                <span>🔮 未來幹話封印中（當日 00:00 解鎖）</span>
+              </div>
+              <p className="text-[11px] font-sans text-[#2D2D2D]/70 italic">
+                「已為您預覽當日排程，先專注過好今天吧！」
+              </p>
+              {onBackToToday && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBackToToday();
+                  }}
+                  className="mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#F9F6F0] text-xs font-sans font-bold transition active:scale-95 cursor-pointer shadow-sm border border-[#D4B483]/40"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[#D4B483]" />
+                  <span>立即返回今日日曆</span>
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Core Sarcastic Quote */}
           <div className="text-center space-y-2 pt-1 px-1">

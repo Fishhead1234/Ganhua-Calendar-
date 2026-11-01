@@ -5,6 +5,7 @@ import {
   Share2,
   Sparkles,
   Calendar as CalendarIcon,
+  RotateCcw,
 } from 'lucide-react';
 import quotesData from './data/quotes.json';
 import { CalendarQuote, CharacterType } from './types/calendar';
@@ -382,6 +383,11 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleBackToToday = () => {
+    setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
+    showToast('已返回今日日曆！');
+  };
+
   // Stamp Survived
   const handleStampSurvived = () => {
     playStampSound();
@@ -540,6 +546,26 @@ export const App: React.FC = () => {
           />
         ) : (
           <>
+            {/* Quick Return to Today Floating Banner when viewing future or past date */}
+            {persisted.dateOffset !== 0 && (
+              <div className="max-w-[390px] mx-auto flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#2D2D2D] text-[#F9F6F0] border border-[#D4B483] shadow-lg animate-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{isFutureDate ? '🔮' : '📜'}</span>
+                  <span className="text-xs font-sans font-bold">
+                    {isFutureDate ? '未來預約日程' : '歷史存檔'}：{currentDateObj.getMonth() + 1}月{currentDateObj.getDate()}日
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleBackToToday}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#D4B483] hover:bg-[#c2a270] text-[#2D2D2D] text-xs font-sans font-black transition active:scale-95 cursor-pointer shadow-xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>返回今日</span>
+                </button>
+              </div>
+            )}
+
             <DeskCalendar
               quote={currentQuote}
               nextQuotePreview={nextQuotePreview}
@@ -557,6 +583,7 @@ export const App: React.FC = () => {
               onBlockedTomorrow={handleBlockedTomorrow}
               onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
               onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
+              onBackToToday={handleBackToToday}
             />
 
             {/* Daily Agenda & Sarcastic Timeline Strip */}
@@ -598,14 +625,7 @@ export const App: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => {
-              if (persisted.dateOffset < 0) {
-                setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
-                showToast('已返回今日日曆！');
-              } else {
-                handleBlockedTomorrow();
-              }
-            }}
+            onClick={handleBackToToday}
             className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border-2 border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#EAE3D5] text-[#2D2D2D] font-sans font-extrabold text-xs sm:text-sm transition active:scale-95 cursor-pointer shadow-[0_4px_0_#2D2D2D]"
           >
             <CalendarIcon className="w-4 h-4 shrink-0" />

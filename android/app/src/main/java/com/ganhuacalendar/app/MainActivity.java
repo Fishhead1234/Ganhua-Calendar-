@@ -8,17 +8,20 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(GanhuaWidgetBridgePlugin.class);
         super.onCreate(savedInstanceState);
-        try {
-            GanhuaWidgetProvider.updateAllWidgets(this);
-        } catch (Exception ignored) {
-        }
+        refreshWidgets();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        refreshWidgets();
+    }
+
+    private void refreshWidgets() {
         try {
             GanhuaWidgetProvider.updateAllWidgets(this);
+            MonthlySplitWidgetProvider.updateAllWidgets(this);
+            MonthlyLargeWidgetProvider.updateAllWidgets(this);
         } catch (Exception ignored) {
         }
     }
