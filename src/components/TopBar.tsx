@@ -3,8 +3,6 @@ import {
   Clock,
   Sparkles,
   Flame,
-  LayoutGrid,
-  Square,
   Brush,
   Heart,
   Crown,
@@ -25,8 +23,8 @@ interface TopBarProps {
   streakCount: number;
   offWorkHour: number;
   onChangeOffWorkHour: (hour: number) => void;
-  viewMode: 'single' | 'trio';
-  onToggleViewMode: (mode: 'single' | 'trio') => void;
+  viewMode?: 'single' | 'trio';
+  onToggleViewMode?: (mode: 'single' | 'trio') => void;
   artStyle: 'original' | 'svg';
   onToggleArtStyle: () => void;
   favoritesCount: number;
@@ -312,29 +310,6 @@ export const TopBar: React.FC<TopBarProps> = ({
               title={soundOn ? '撕曆擬真音效已開啟 (點擊靜音)' : '撕曆音效已靜音 (點擊開啟)'}
             >
               {soundOn ? <Volume2 className="w-3.5 h-3.5 text-[#2D2D2D]" /> : <VolumeX className="w-3.5 h-3.5 text-[#6E6A63]" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onToggleViewMode(viewMode === 'single' ? 'trio' : 'single')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-sans font-bold transition cursor-pointer ${
-                viewMode === 'trio'
-                  ? 'bg-[#2D2D2D] text-[#F9F6F0] border-[#2D2D2D]'
-                  : 'bg-[#FAF7F0] text-[#2D2D2D] border-[#2D2D2D]/30 hover:border-[#2D2D2D]'
-              }`}
-              title="切換「單張撕頁日曆」或「三角色木桌並排預覽」"
-            >
-              {viewMode === 'trio' ? (
-                <>
-                  <Square className="w-3.5 h-3.5" />
-                  <span>單張日曆</span>
-                </>
-              ) : (
-                <>
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                  <span>三張並排</span>
-                </>
-              )}
             </button>
           </div>
         </div>

@@ -11,7 +11,6 @@ import quotesData from './data/quotes.json';
 import { CalendarQuote, CharacterType } from './types/calendar';
 import { TopBar } from './components/TopBar';
 import { DeskCalendar } from './components/DeskCalendar';
-import { TrioDeskShowcase } from './components/TrioDeskShowcase';
 import { IgStoryModal } from './components/IgStoryModal';
 import { PaywallModal } from './components/PaywallModal';
 import { CalendarSyncBar } from './components/CalendarSyncBar';
@@ -149,7 +148,6 @@ export const App: React.FC = () => {
   } = useSubscription();
 
   const [persisted, setPersisted] = useState<PersistedState>(() => loadPersistedState());
-  const [viewMode, setViewMode] = useState<'single' | 'trio'>('single');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isIgModalOpen, setIsIgModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
@@ -570,8 +568,6 @@ export const App: React.FC = () => {
         streakCount={persisted.streakCount}
         offWorkHour={persisted.offWorkHour}
         onChangeOffWorkHour={(hr) => setPersisted((prev) => ({ ...prev, offWorkHour: hr }))}
-        viewMode={viewMode}
-        onToggleViewMode={setViewMode}
         artStyle={persisted.artStyle}
         onToggleArtStyle={() =>
           setPersisted((prev) => ({
@@ -603,44 +599,20 @@ export const App: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-5xl w-full mx-auto px-4 pt-2 space-y-3">
         {/* A. Calendar Sync Module (Roast Engine) */}
-        {viewMode === 'single' && (
-          <CalendarSyncBar
-            isPro={isPro || isAdmin}
-            isConnected={persisted.calendarConnected}
-            roastResult={persisted.calendarConnected ? roastResult : null}
-            onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
-            onOpenPaywall={() => setIsPaywallOpen(true)}
-            onToggleConnected={(connected) => {
-              setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
-            }}
-            onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
-          />
-        )}
+        <CalendarSyncBar
+          isPro={isPro || isAdmin}
+          isConnected={persisted.calendarConnected}
+          roastResult={persisted.calendarConnected ? roastResult : null}
+          onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
+          onOpenPaywall={() => setIsPaywallOpen(true)}
+          onToggleConnected={(connected) => {
+            setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
+          }}
+          onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
+        />
 
-        {/* B. Center Stage: Desk Calendar or 3-Card Showcase */}
-        {viewMode === 'trio' ? (
-          <TrioDeskShowcase
-            quotes={allQuotes}
-            artStyle={persisted.artStyle}
-            onSelectCard={(quoteId) => {
-              const clicked = allQuotes.find((q) => q.id === quoteId);
-              if (clicked) {
-                if (!isPro && !isAdmin && (clicked.character === 'capybara' || clicked.character === 'ghost')) {
-                  setIsPaywallOpen(true);
-                  return;
-                }
-                setPersisted((prev) => ({
-                  ...prev,
-                  selectedTheme: clicked.character,
-                  dateOffset: 0,
-                }));
-              }
-              setViewMode('single');
-            }}
-          />
-        ) : (
-          <>
-            {/* Quick Return to Today Floating Banner when viewing future or past date */}
+        {/* B. Center Stage: Desk Calendar Card */}
+        {/* Quick Return to Today Floating Banner when viewing future or past date */}
             {persisted.dateOffset !== 0 && (
               <div className="max-w-[390px] mx-auto flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#2D2D2D] text-[#F9F6F0] border border-[#D4B483] shadow-lg animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2">
@@ -688,8 +660,6 @@ export const App: React.FC = () => {
               onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
               onEditEvent={handleEditMeeting}
             />
-          </>
-        )}
 
         {/* C. Bottom Action Bar */}
         <div className="max-w-xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-2.5">
