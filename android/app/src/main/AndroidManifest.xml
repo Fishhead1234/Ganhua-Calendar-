@@ -34,9 +34,10 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
 
-        <!-- Native Android Desk Calendar Widget Provider -->
+        <!-- Native Android Desk Calendar Widget Provider (4x2 Daily) -->
         <receiver
             android:name=".GanhuaWidgetProvider"
+            android:label="@string/widget_label_daily"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -44,6 +45,32 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_ganhua_info" />
+        </receiver>
+
+        <!-- Native Android Monthly Split Widget Provider (4x2 Split) -->
+        <receiver
+            android:name=".MonthlySplitWidgetProvider"
+            android:label="@string/widget_label_monthly_split"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_monthly_split_info" />
+        </receiver>
+
+        <!-- Native Android Monthly Large Widget Provider (4x4 Full Month) -->
+        <receiver
+            android:name=".MonthlyLargeWidgetProvider"
+            android:label="@string/widget_label_monthly_large"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_monthly_large_info" />
         </receiver>
     </application>
 

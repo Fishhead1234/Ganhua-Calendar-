@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   X,
   ChevronLeft,
@@ -11,50 +11,99 @@ import {
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
 import { CalendarMeeting } from '../services/calendarService';
-import { generateMeetingRoastTag } from './DailyAgendaStrip';
 import quotes365Raw from '../data/quotes365.json';
+import { formatQuoteFrom365 } from '../hooks/useTodayQuote';
 import { CharacterIllustration } from './CharacterIllustration';
-import { RawStaticQuote365, CharacterType } from '../types/calendar';
+import { RawStaticQuote365, CharacterType, CalendarQuote } from '../types/calendar';
 
 interface MonthlyCalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentDate: Date;
+  currentDate?: Date;
   today?: Date;
-  survivedDates: string[];
+  survivedDates?: string[];
   activeMeetings?: CalendarMeeting[];
+  quotes?: RawStaticQuote365[];
   onSelectDate: (targetDate: Date) => void;
 }
 
 export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   isOpen,
   onClose,
-  currentDate,
+  currentDate = new Date(),
   today = new Date(),
-  survivedDates,
+  survivedDates = [],
   activeMeetings = [],
+  quotes,
   onSelectDate,
 }) => {
-  const [viewYear, setViewYear] = useState<number>(currentDate.getFullYear());
-  const [viewMonth, setViewMonth] = useState<number>(currentDate.getMonth()); // 0-11
-  const [pickedDate, setPickedDate] = useState<Date>(currentDate);
+  // Validate and sanitize dates
+  const safeCurrentDate = useMemo(() => {
+    return currentDate instanceof Date && !isNaN(currentDate.getTime()) ? currentDate : new Date();
+  }, [currentDate]);
 
-  if (!isOpen) return null;
+  const safeToday = useMemo(() => {
+    return today instanceof Date && !isNaN(today.getTime()) ? today : new Date();
+  }, [today]);
 
-  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const pickedMidnight = new Date(pickedDate.getFullYear(), pickedDate.getMonth(), pickedDate.getDate());
+  const [viewYear, setViewYear] = useState<number>(() => safeCurrentDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState<number>(() => safeCurrentDate.getMonth()); // 0-11
+  const [pickedDate, setPickedDate] = useState<Date>(() => safeCurrentDate);
+
+  // Sync state when opening with updated currentDate
+  useEffect(() => {
+    if (isOpen) {
+      const valid = safeCurrentDate;
+      setViewYear(valid.getFullYear());
+      setViewMonth(valid.getMonth());
+      setPickedDate(valid);
+    }
+  }, [isOpen, safeCurrentDate]);
+
+  const todayMidnight = useMemo(() => {
+    return new Date(safeToday.getFullYear(), safeToday.getMonth(), safeToday.getDate());
+  }, [safeToday]);
+
+  const pickedMidnight = useMemo(() => {
+    return new Date(pickedDate.getFullYear(), pickedDate.getMonth(), pickedDate.getDate());
+  }, [pickedDate]);
+
   const isPickedFuture = pickedMidnight.getTime() > todayMidnight.getTime();
   const isPickedToday = pickedMidnight.getTime() === todayMidnight.getTime();
 
-  // Find Gàn-huà quote and illustration for selected date
+  // Find Gàn-huà quote and illustration for selected date with strict fallback
   const pickedMonth = pickedDate.getMonth() + 1;
   const pickedDay = pickedDate.getDate();
-  const pickedQuote = useMemo(() => {
-    const list = quotes365Raw as RawStaticQuote365[];
-    const found = list.find((q) => q.month === pickedMonth && q.day === pickedDay);
-    if (found) return found;
-    return list[0];
-  }, [pickedMonth, pickedDay]);
+  const pickedQuote = useMemo<CalendarQuote>(() => {
+    try {
+      const list = (quotes && quotes.length > 0 ? quotes : (quotes365Raw as RawStaticQuote365[])) || [];
+      const found = list.find((q) => q && q.month === pickedMonth && q.day === pickedDay) || list[0];
+      if (found) {
+        return formatQuoteFrom365(found, pickedDate);
+      }
+    } catch (err) {
+      console.warn('Error resolving picked quote in MonthlyCalendarModal:', err);
+    }
+
+    return {
+      id: `fallback-${pickedMonth}-${pickedDay}`,
+      date: `${pickedDate.getFullYear()}-${String(pickedMonth).padStart(2, '0')}-${String(pickedDay).padStart(2, '0')}`,
+      month: pickedMonth,
+      day: pickedDay,
+      quote: '今天行事曆一片淨土，適合安靜當個薪水小偷。',
+      subtext: '沒有會議就是最好的會議，趁主管沒發現前靜靜地把薪水領走。',
+      character: 'cat',
+      category: 'workplace',
+      lunarDate: '農曆九月廿二',
+      yi: '帶薪上廁所・安靜地當一塊沒用的爛泥',
+      ji: '在群組問「今天大家好像很閒」',
+      illustrationSvg: 'cat_svg',
+      sceneId: 'cat_coffee',
+      assetPath: '/assets/scenes/cat_coffee.webp',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '0% 0%',
+    };
+  }, [quotes, pickedMonth, pickedDay, pickedDate]);
 
   // Navigation handlers
   const handlePrevMonth = () => {
@@ -82,83 +131,92 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     setPickedDate(t);
   };
 
-  // Generate 7-column calendar matrix
-  const firstDayOfMonth = new Date(viewYear, viewMonth, 1);
-  const startDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday, ...
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+  // Generate 7-column calendar matrix safely
+  const calendarCells = useMemo(() => {
+    const cells: {
+      date: Date;
+      dayNum: number;
+      isCurrentMonth: boolean;
+      ymd: string;
+      isToday: boolean;
+      isPast: boolean;
+      isFuture: boolean;
+      lunar: LunarInfo;
+    }[] = [];
 
-  // Calendar cells
-  const calendarCells: {
-    date: Date;
-    dayNum: number;
-    isCurrentMonth: boolean;
-    ymd: string;
-    isToday: boolean;
-    isPast: boolean;
-    isFuture: boolean;
-    lunar: LunarInfo;
-  }[] = [];
+    try {
+      const firstDayOfMonth = new Date(viewYear, viewMonth, 1);
+      const startDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
 
-  // Previous month padding
-  for (let i = startDayOfWeek - 1; i >= 0; i--) {
-    const d = new Date(viewYear, viewMonth - 1, daysInPrevMonth - i);
-    const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    calendarCells.push({
-      date: d,
-      dayNum: d.getDate(),
-      isCurrentMonth: false,
-      ymd,
-      isToday: false,
-      isPast: d.getTime() < todayMidnight.getTime(),
-      isFuture: d.getTime() > todayMidnight.getTime(),
-      lunar: getLunarDetails(d),
-    });
-  }
+      // Previous month padding
+      for (let i = startDayOfWeek - 1; i >= 0; i--) {
+        const d = new Date(viewYear, viewMonth - 1, daysInPrevMonth - i);
+        const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        cells.push({
+          date: d,
+          dayNum: d.getDate(),
+          isCurrentMonth: false,
+          ymd,
+          isToday: false,
+          isPast: d.getTime() < todayMidnight.getTime(),
+          isFuture: d.getTime() > todayMidnight.getTime(),
+          lunar: getLunarDetails(d),
+        });
+      }
 
-  // Current month days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateObj = new Date(viewYear, viewMonth, d);
-    const ymd = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const isToday = dateObj.getTime() === todayMidnight.getTime();
-    calendarCells.push({
-      date: dateObj,
-      dayNum: d,
-      isCurrentMonth: true,
-      ymd,
-      isToday,
-      isPast: dateObj.getTime() < todayMidnight.getTime(),
-      isFuture: dateObj.getTime() > todayMidnight.getTime(),
-      lunar: getLunarDetails(dateObj),
-    });
-  }
+      // Current month days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(viewYear, viewMonth, d);
+        const ymd = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isToday = dateObj.getTime() === todayMidnight.getTime();
+        cells.push({
+          date: dateObj,
+          dayNum: d,
+          isCurrentMonth: true,
+          ymd,
+          isToday,
+          isPast: dateObj.getTime() < todayMidnight.getTime(),
+          isFuture: dateObj.getTime() > todayMidnight.getTime(),
+          lunar: getLunarDetails(dateObj),
+        });
+      }
 
-  // Next month padding to complete row of 7
-  const remaining = (7 - (calendarCells.length % 7)) % 7;
-  for (let i = 1; i <= remaining; i++) {
-    const d = new Date(viewYear, viewMonth + 1, i);
-    const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    calendarCells.push({
-      date: d,
-      dayNum: d.getDate(),
-      isCurrentMonth: false,
-      ymd,
-      isToday: false,
-      isPast: d.getTime() < todayMidnight.getTime(),
-      isFuture: d.getTime() > todayMidnight.getTime(),
-      lunar: getLunarDetails(d),
-    });
-  }
+      // Next month padding to complete row of 7
+      const remaining = (7 - (cells.length % 7)) % 7;
+      for (let i = 1; i <= remaining; i++) {
+        const d = new Date(viewYear, viewMonth + 1, i);
+        const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        cells.push({
+          date: d,
+          dayNum: d.getDate(),
+          isCurrentMonth: false,
+          ymd,
+          isToday: false,
+          isPast: d.getTime() < todayMidnight.getTime(),
+          isFuture: d.getTime() > todayMidnight.getTime(),
+          lunar: getLunarDetails(d),
+        });
+      }
+    } catch (err) {
+      console.warn('Error generating calendar cells in MonthlyCalendarModal:', err);
+    }
 
-  const pickedLunar = getLunarDetails(pickedDate);
-  const pickedWeekdayZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][pickedDate.getDay()];
+    return cells;
+  }, [viewYear, viewMonth, todayMidnight]);
+
+  const pickedLunar = useMemo(() => getLunarDetails(pickedDate), [pickedDate]);
+  const pickedWeekdayZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][pickedDate.getDay()] || '星期六';
   const pickedYmd = `${pickedDate.getFullYear()}-${String(pickedDate.getMonth() + 1).padStart(2, '0')}-${String(pickedDate.getDate()).padStart(2, '0')}`;
-  const isPickedSurvived = survivedDates.includes(pickedYmd);
+  const isPickedSurvived = Boolean(survivedDates && survivedDates.includes(pickedYmd));
 
   const handleConfirmSelect = () => {
     onSelectDate(pickedDate);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
@@ -238,24 +296,24 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 cell.date.getMonth() === pickedDate.getMonth() &&
                 cell.date.getDate() === pickedDate.getDate();
 
-              const hasSurvived = survivedDates.includes(cell.ymd);
+              const hasSurvived = Boolean(survivedDates && survivedDates.includes(cell.ymd));
               const isSunday = cell.date.getDay() === 0;
 
               // Determine exact sub-label:
               // 1. Holiday or 24 節氣 on exact single date (in red)
               // 2. 初一 shows lunar month name (e.g. 九月, 十月)
               // 3. Otherwise lunar day name (初二 ... 卅)
-              let lunarTag = cell.lunar.lunarDayName;
+              let lunarTag = cell.lunar?.lunarDayName || '初一';
               let isRedLunar = false;
 
-              if (cell.lunar.taiwanHoliday) {
+              if (cell.lunar?.taiwanHoliday) {
                 lunarTag = cell.lunar.taiwanHoliday;
                 isRedLunar = true;
-              } else if (cell.lunar.solarTerm) {
+              } else if (cell.lunar?.solarTerm) {
                 lunarTag = cell.lunar.solarTerm;
                 isRedLunar = true;
-              } else if (cell.lunar.lunarDayNum === 1 || cell.lunar.lunarDayName === '初一') {
-                lunarTag = cell.lunar.lunarMonthName;
+              } else if (cell.lunar?.lunarDayNum === 1 || cell.lunar?.lunarDayName === '初一') {
+                lunarTag = cell.lunar.lunarMonthName || '正月';
               }
 
               return (
@@ -325,7 +383,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                   {pickedDate.getMonth() + 1}月 {pickedDate.getDate()}日
                 </span>
                 <span className="text-xs font-sans text-[#6E6A63] font-bold">
-                  {pickedWeekdayZh} | {pickedLunar.fullDisplayText}
+                  {pickedWeekdayZh} | {pickedLunar?.fullDisplayText || '農曆九月廿二'}
                 </span>
               </div>
               {isPickedToday && (
@@ -352,16 +410,16 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 <div className="text-xs font-sans bg-[#F3EFE6] rounded-xl p-2.5 text-[#2D2D2D] space-y-1">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#C83E31]">宜：</span>
-                    <span>{pickedQuote.yi}</span>
+                    <span>{pickedQuote?.yi || '帶薪拉屎・安靜耍廢'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#6E6A63]">忌：</span>
-                    <span>{pickedQuote.ji}</span>
+                    <span>{pickedQuote?.ji || '主動問老闆還有沒有事'}</span>
                   </div>
                 </div>
 
                 {/* Future Schedule Preview (Planner Mode) */}
-                {activeMeetings.length > 0 && (
+                {activeMeetings && activeMeetings.length > 0 && (
                   <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
                     <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
                       <span className="flex items-center gap-1">
@@ -376,10 +434,10 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                       <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
                         <span className="flex items-center gap-1.5 truncate">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#6E6A63] shrink-0" />
-                          <span className="truncate">{m.title}</span>
+                          <span className="truncate">{m?.title || '未命名行程'}</span>
                         </span>
                         <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
-                          {String(m.startHour).padStart(2, '0')}:{String(m.startMinute).padStart(2, '0')}
+                          {String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}
                         </span>
                       </div>
                     ))}
@@ -392,21 +450,21 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#FAF7F0] border border-[#2D2D2D]/20">
                   <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-[#2D2D2D]/15 bg-[#F3EFE6] flex items-center justify-center">
                     <CharacterIllustration
-                      character={pickedQuote.character as CharacterType}
-                      sceneId={pickedQuote.sceneId}
-                      assetPath={pickedQuote.assetPath}
-                      spriteSheet={pickedQuote.spriteSheet}
-                      spritePosition={pickedQuote.spritePosition}
+                      character={(pickedQuote?.character as CharacterType) || 'cat'}
+                      sceneId={pickedQuote?.sceneId}
+                      assetPath={pickedQuote?.assetPath}
+                      spriteSheet={pickedQuote?.spriteSheet}
+                      spritePosition={pickedQuote?.spritePosition}
                       compact
                       className="w-14 h-14"
                     />
                   </div>
                   <div className="flex-1 min-w-0 space-y-0.5">
                     <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
-                      {pickedQuote.quote}
+                      {pickedQuote?.quote || '今天行事曆一片淨土，適合安靜當個薪水小偷。'}
                     </p>
                     <p className="text-[11px] font-sans text-[#6E6A63] truncate">
-                      {pickedQuote.subtext}
+                      {pickedQuote?.subtext || '沒有會議就是最好的會議'}
                     </p>
                   </div>
                 </div>
@@ -419,23 +477,23 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     </span>
                   </span>
                   <span className="text-[11px] text-[#6E6A63]">
-                    摸魚吉時：{pickedLunar.luckySlackTime.split(' ')[0]}
+                    摸魚吉時：{pickedLunar?.luckySlackTime ? pickedLunar.luckySlackTime.split(' ')[0] : '14:00 - 15:30'}
                   </span>
                 </div>
 
                 <div className="text-xs font-sans bg-[#F3EFE6] rounded-xl p-2.5 text-[#2D2D2D] space-y-1">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#C83E31]">宜：</span>
-                    <span>{pickedQuote.yi}</span>
+                    <span>{pickedQuote?.yi || '帶薪拉屎・準時閃人'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#6E6A63]">忌：</span>
-                    <span>{pickedQuote.ji}</span>
+                    <span>{pickedQuote?.ji || '主動問老闆還有沒有事'}</span>
                   </div>
                 </div>
 
                 {/* Synced meetings for today */}
-                {isPickedToday && activeMeetings.length > 0 && (
+                {isPickedToday && activeMeetings && activeMeetings.length > 0 && (
                   <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
                     <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
                       <span className="flex items-center gap-1">
@@ -450,10 +508,10 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                       <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
                         <span className="flex items-center gap-1.5 truncate">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#C83E31] shrink-0" />
-                          <span className="truncate">{m.title}</span>
+                          <span className="truncate">{m?.title || '未命名行程'}</span>
                         </span>
                         <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
-                          {String(m.startHour).padStart(2, '0')}:{String(m.startMinute).padStart(2, '0')}
+                          {String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}
                         </span>
                       </div>
                     ))}
@@ -483,4 +541,3 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     </div>
   );
 };
-

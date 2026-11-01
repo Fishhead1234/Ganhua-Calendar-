@@ -301,7 +301,13 @@ export const App: React.FC = () => {
   // Sync to native Android widget whenever quote or streak updates
   useEffect(() => {
     if (currentQuote) {
-      syncNativeWidgetData(currentQuote, persisted.streakCount, persisted.offWorkHour);
+      syncNativeWidgetData(
+        currentQuote,
+        persisted.streakCount,
+        persisted.offWorkHour,
+        persisted.survivedDates,
+        activeMeetings
+      );
       // Advance lastOpenedDateStr whenever user tears forward / views a newer date
       setPersisted((prev) => {
         if (!prev.lastOpenedDateStr || currentQuote.date > prev.lastOpenedDateStr) {
@@ -681,8 +687,9 @@ export const App: React.FC = () => {
         onClose={() => setIsMonthlyCalendarOpen(false)}
         currentDate={currentDateObj}
         today={new Date()}
-        survivedDates={persisted.survivedDates}
-        activeMeetings={activeMeetings}
+        survivedDates={persisted.survivedDates || []}
+        activeMeetings={activeMeetings || []}
+        quotes={contentSyncService.getQuotes365()}
         onSelectDate={handleJumpToDate}
       />
 

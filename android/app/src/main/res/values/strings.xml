@@ -5,4 +5,9 @@
     <string name="package_name">com.ganhuacalendar.app</string>
     <string name="custom_url_scheme">com.ganhuacalendar.app</string>
     <string name="widget_description">幹話日曆桌面小工具，每日自動更換毒舌職場生存金句</string>
+    <string name="widget_label_daily">幹話日曆 (4×2 每日幹話)</string>
+    <string name="widget_label_monthly_split">幹話日曆 (4×2 月曆分割)</string>
+    <string name="widget_label_monthly_large">幹話日曆 (4×4 全月農曆)</string>
+    <string name="widget_monthly_split_description">左側當月精簡月曆與右側每日毒舌金句及角色插畫</string>
+    <string name="widget_monthly_large_description">全版 7 欄農民曆月曆、節氣標記與底部毒舌金句</string>
 </resources>

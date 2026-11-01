@@ -1,5 +1,7 @@
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { parseQuoteDateDisplay } from '../components/DeskCalendarCard';
+import { getLunarDetails } from '../utils/lunarUtils';
+import { CalendarMeeting } from './calendarService';
 
 async function extractSpriteAvatarBase64(
   spriteSheetUrl?: string,
@@ -100,7 +102,9 @@ async function extractSpriteAvatarBase64(
 export async function syncNativeWidgetData(
   quote: CalendarQuote,
   streakCount: number = 3,
-  offWorkHour: number = 18
+  offWorkHour: number = 18,
+  survivedDates: string[] = [],
+  activeMeetings: CalendarMeeting[] = []
 ): Promise<boolean> {
   const isNative =
     typeof window !== 'undefined' &&
@@ -110,18 +114,37 @@ export async function syncNativeWidgetData(
   const dateInfo = parseQuoteDateDisplay(quote.date);
   const charMeta = CHARACTER_META[quote.character];
 
+  let quoteDate = new Date();
+  try {
+    const parts = quote.date.split('-');
+    if (parts.length === 3) {
+      quoteDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+  } catch {
+    // ignore
+  }
+
+  const lunar = getLunarDetails(quoteDate);
+
   // Dynamically crop the exact scene illustration for today's quote
   const avatarBase64 = await extractSpriteAvatarBase64(quote.spriteSheet, quote.spritePosition);
 
   const payload = {
     monthStr: `${dateInfo.monthEn} • ${dateInfo.weekdayEn}`,
     dayStr: String(dateInfo.dayNumber),
+    lunarStr: lunar.lunarMonthDay,
+    fullLunarStr: lunar.fullDisplayText,
+    solarTerm: lunar.solarTerm || '',
     characterStr: charMeta?.badge || '🐱 厭世社畜貓',
     characterKey: quote.character || 'cat',
     quoteStr: quote.quote,
-    yijiStr: `宜：${quote.yi}`,
+    yijiStr: `宜：${quote.yi || '帶薪拉屎'}`,
+    yiStr: quote.yi || '',
+    jiStr: quote.ji || '',
     offworkStr: `目標 ${offWorkHour}:00 下班`,
     streakStr: `🔥 連續生還 ${streakCount} 天`,
+    meetingCount: activeMeetings?.length || 0,
+    survivedDatesJson: JSON.stringify(survivedDates || []),
     avatarBase64: avatarBase64 || '',
   };
 
