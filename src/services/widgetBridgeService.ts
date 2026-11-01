@@ -104,7 +104,8 @@ export async function syncNativeWidgetData(
   streakCount: number = 3,
   offWorkHour: number = 18,
   survivedDates: string[] = [],
-  activeMeetings: CalendarMeeting[] = []
+  activeMeetings: CalendarMeeting[] = [],
+  allMeetings?: CalendarMeeting[]
 ): Promise<boolean> {
   const isNative =
     typeof window !== 'undefined' &&
@@ -145,7 +146,7 @@ export async function syncNativeWidgetData(
     streakStr: `🔥 連續生還 ${streakCount} 天`,
     meetingCount: activeMeetings?.length || 0,
     survivedDatesJson: JSON.stringify(survivedDates || []),
-    eventsJson: JSON.stringify(activeMeetings || []),
+    eventsJson: JSON.stringify(allMeetings && allMeetings.length > 0 ? allMeetings : (activeMeetings || [])),
     avatarBase64: avatarBase64 || '',
   };
 

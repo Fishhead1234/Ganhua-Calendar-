@@ -30,43 +30,48 @@
             android:weightSum="800">
 
             <!-- Title touch area (tap to open app) -->
-            <View
+            <FrameLayout
                 android:id="@+id/header_title_touch"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="480"
-                android:clickable="true" />
+                android:clickable="true"
+                android:background="@android:color/transparent" />
 
             <!-- Prev Month Button '<' -->
-            <View
+            <FrameLayout
                 android:id="@+id/btn_widget_prev_month"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="100"
-                android:clickable="true" />
+                android:clickable="true"
+                android:background="@android:color/transparent" />
 
             <!-- Today Button '今日' -->
-            <View
+            <FrameLayout
                 android:id="@+id/btn_widget_today"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="120"
-                android:clickable="true" />
+                android:clickable="true"
+                android:background="@android:color/transparent" />
 
             <!-- Next Month Button '>' -->
-            <View
+            <FrameLayout
                 android:id="@+id/btn_widget_next_month"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="100"
-                android:clickable="true" />
+                android:clickable="true"
+                android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Weekday Row Spacer (Height 58 / 800) -->
-        <View
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="58" />
+            android:layout_weight="58"
+            android:background="@android:color/transparent" />
 
         <!-- 6-Row Grid of 42 Cells (Height 68 * 6 = 408 / 800) -->
         <!-- Row 0 -->
@@ -76,13 +81,13 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Row 1 -->
@@ -92,13 +97,13 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_7" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_8" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_9" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_10" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_11" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_12" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_13" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_7" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_8" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_9" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_10" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_11" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_12" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_13" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Row 2 -->
@@ -108,13 +113,13 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_14" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_15" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_16" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_17" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_18" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_19" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_20" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_14" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_15" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_16" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_17" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_18" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_19" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_20" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Row 3 -->
@@ -124,13 +129,13 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_21" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_22" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_23" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_24" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_25" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_26" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_27" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_21" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_22" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_23" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_24" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_25" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_26" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_27" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Row 4 -->
@@ -140,13 +145,13 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_28" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_29" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_30" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_31" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_32" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_33" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_34" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_28" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_29" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_30" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_31" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_32" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_33" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_34" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Row 5 -->
@@ -156,21 +161,22 @@
             android:layout_weight="68"
             android:orientation="horizontal"
             android:weightSum="700">
-            <View android:id="@+id/cell_35" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_36" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_37" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_38" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_39" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_40" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
-            <View android:id="@+id/cell_41" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" />
+            <FrameLayout android:id="@+id/cell_35" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_36" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_37" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_38" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_39" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_40" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
+            <FrameLayout android:id="@+id/cell_41" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="100" android:clickable="true" android:background="@android:color/transparent" />
         </LinearLayout>
 
         <!-- Bottom Detail Panel (Height 252 / 800) -->
-        <View
+        <FrameLayout
             android:id="@+id/widget_bottom_panel"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="252"
-            android:clickable="true" />
+            android:clickable="true"
+            android:background="@android:color/transparent" />
     </LinearLayout>
 </FrameLayout>

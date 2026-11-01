@@ -204,6 +204,22 @@ export const App: React.FC = () => {
     return getMergedEvents(activeMeetings, currentDateKey);
   }, [activeMeetings, customEvents, currentDateKey]);
 
+  // All merged meetings across all dates for month widget
+  const allAppointments = useMemo(() => {
+    const customAsMeetings: CalendarMeeting[] = (customEvents || []).map((e) => ({
+      id: e.id,
+      title: e.title,
+      startHour: e.startHour,
+      startMinute: e.startMinute,
+      durationMinutes: e.durationMinutes,
+      isAllDay: e.isAllDay,
+      dateKey: e.dateKey,
+      notes: e.notes,
+      source: 'local',
+    }));
+    return [...activeMeetings, ...customAsMeetings];
+  }, [activeMeetings, customEvents]);
+
   const roastResult: CalendarRoastResult = useMemo(() => {
     return analyzeCalendarEvents(effectiveMeetings, activePresetId || undefined);
   }, [effectiveMeetings, activePresetId]);
@@ -341,7 +357,8 @@ export const App: React.FC = () => {
         persisted.streakCount,
         persisted.offWorkHour,
         persisted.survivedDates,
-        effectiveMeetings
+        effectiveMeetings,
+        allAppointments
       );
       // Advance lastOpenedDateStr whenever user tears forward / views a newer date
       setPersisted((prev) => {
@@ -354,7 +371,7 @@ export const App: React.FC = () => {
         return prev;
       });
     }
-  }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings]);
+  }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings, allAppointments]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
