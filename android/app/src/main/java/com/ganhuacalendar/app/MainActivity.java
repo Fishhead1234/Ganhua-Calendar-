@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(GanhuaWidgetBridgePlugin.class);
         super.onCreate(savedInstanceState);
         handleWidgetSelectDate(getIntent());
+        syncSurvivedDatesToWebView();
         refreshWidgets();
     }
 
@@ -20,6 +21,7 @@ public class MainActivity extends BridgeActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleWidgetSelectDate(intent);
+        syncSurvivedDatesToWebView();
         refreshWidgets();
     }
 
@@ -48,9 +50,35 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    private void syncSurvivedDatesToWebView() {
+        try {
+            SharedPreferences prefs = getSharedPreferences(GanhuaWidgetProvider.PREFS_NAME, Context.MODE_PRIVATE);
+            boolean hasPending = prefs.getBoolean("has_pending_survived_sync", false);
+            final String survivedJson = prefs.getString("survived_dates_json", "[]");
+            final int streakCount = prefs.getInt("streak_count", 3);
+
+            if (hasPending) {
+                prefs.edit().putBoolean("has_pending_survived_sync", false).apply();
+            }
+
+            if (bridge != null && bridge.getWebView() != null) {
+                bridge.getWebView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String js = "window.dispatchEvent(new CustomEvent('widgetSurvivedSync', { detail: { survivedDates: " + survivedJson + ", streakCount: " + streakCount + " } }));";
+                            bridge.getWebView().evaluateJavascript(js, null);
+                        } catch (Exception ignored) {}
+                    }
+                });
+            }
+        } catch (Exception ignored) {}
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        syncSurvivedDatesToWebView();
         refreshWidgets();
     }
 
@@ -59,6 +87,7 @@ public class MainActivity extends BridgeActivity {
             GanhuaWidgetProvider.updateAllWidgets(this);
             MonthlySplitWidgetProvider.updateAllWidgets(this);
             MonthlyLargeWidgetProvider.updateAllWidgets(this);
+            SurvivalStampWidgetProvider.updateAllWidgets(this);
         } catch (Exception ignored) {
         }
     }

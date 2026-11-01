@@ -11,6 +11,7 @@ export interface CalendarMeeting {
   notes?: string;
   isAllDay?: boolean;
   source?: 'local' | 'synced' | 'preset';
+  calendarId?: string;
   calendarName?: string;
   calendarColor?: string;
 }
@@ -458,6 +459,90 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
   };
 }
 
+export interface DeviceCalendarSource {
+  id: string;
+  name: string;
+  accountName?: string;
+  color?: string;
+  isPrimary?: boolean;
+}
+
+const ENABLED_CALENDARS_STORAGE_KEY = 'enabled_calendar_ids';
+
+export function getEnabledCalendarIds(): string[] | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(ENABLED_CALENDARS_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveEnabledCalendarIds(ids: string[]): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(ENABLED_CALENDARS_STORAGE_KEY, JSON.stringify(ids));
+}
+
+export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
+  const win = typeof window !== 'undefined' ? (window as any) : {};
+  let calendars: DeviceCalendarSource[] = [];
+
+  // 1. Try CapacitorCalendar if available
+  if (win.Capacitor?.Plugins?.CapacitorCalendar?.listCalendars) {
+    try {
+      const res = await win.Capacitor.Plugins.CapacitorCalendar.listCalendars();
+      const list = res.result || res.calendars || [];
+      calendars = list.map((c: any) => ({
+        id: String(c.id),
+        name: c.name || c.title || '未命名日曆',
+        accountName: c.accountName || c.source || '',
+        color: c.color || '#2D2D2D',
+        isPrimary: Boolean(c.isPrimary),
+      }));
+    } catch (e) {
+      console.warn('CapacitorCalendar.listCalendars error:', e);
+    }
+  }
+
+  // 2. Try GanhuaWidgetBridge
+  if (calendars.length === 0 && win.Capacitor?.Plugins?.GanhuaWidgetBridge?.listCalendars) {
+    try {
+      const res = await win.Capacitor.Plugins.GanhuaWidgetBridge.listCalendars();
+      const list = res.calendars || [];
+      calendars = list.map((c: any) => ({
+        id: String(c.id),
+        name: c.name || c.title || '未命名日曆',
+        accountName: c.accountName || '',
+        color: c.color || '#2D2D2D',
+        isPrimary: Boolean(c.isPrimary),
+      }));
+    } catch (e) {
+      console.warn('GanhuaWidgetBridge.listCalendars error:', e);
+    }
+  }
+
+  // 3. Fallback for Web browser preview / test
+  if (calendars.length === 0) {
+    calendars = [
+      { id: 'cal_work', name: '工作會議 (Google Calendar)', accountName: 'work@corp.com', color: '#4285F4', isPrimary: true },
+      { id: 'cal_parent', name: '學校與家長聯絡簿 (SchoolsBuddy)', accountName: 'parents@school.edu', color: '#0F9D58' },
+      { id: 'cal_family', name: '家庭日曆 (Family)', accountName: 'home@family.net', color: '#EA4335' },
+      { id: 'cal_personal', name: '個人行程 (Personal)', accountName: 'me@gmail.com', color: '#FBBC05' },
+    ];
+  }
+
+  // Auto-activate all discovered calendars if not set yet
+  const savedEnabled = getEnabledCalendarIds();
+  if (!savedEnabled || savedEnabled.length === 0) {
+    saveEnabledCalendarIds(calendars.map((c) => c.id));
+  }
+
+  return calendars;
+}
+
 /**
  * Method 1: Native Android/iOS Calendar Sync (Capacitor APK)
  * Reads phone OS calendar directly with zero OAuth and zero login!
@@ -474,6 +559,7 @@ export async function fetchNativeDeviceCalendarEvents(
     throw new Error('此功能僅能在手機 App (APK) 原生環境中直接讀取手機系統行事曆。在電腦瀏覽器請使用「即時 JSON 網址連動」！');
   }
 
+  const enabledIds = getEnabledCalendarIds();
   const win = window as any;
   const startOfDay = new Date(targetDate);
   startOfDay.setHours(0, 0, 0, 0);
@@ -496,27 +582,35 @@ export async function fetchNativeDeviceCalendarEvents(
       });
 
       const rawEvents: any[] = res.result || [];
-      return rawEvents.map((e, idx) => {
-        const start = new Date(e.startDate || e.start || startOfDay.getTime());
-        const end = new Date(e.endDate || e.end || start.getTime() + 60 * 60 * 1000);
-        const startHour = start.getHours();
-        const startMinute = start.getMinutes();
-        const durationMinutes = Math.max(15, Math.round((end.getTime() - start.getTime()) / (1000 * 60)));
-        const isFridayAfterFour =
-          targetDate.getDay() === 5 &&
-          (startHour >= 16 || (startHour === 15 && startMinute >= 45));
+      const meetings = rawEvents
+        .filter((e) => {
+          if (!enabledIds || enabledIds.length === 0) return true;
+          const calId = e.calendarId || e.calendar_id;
+          return !calId || enabledIds.includes(String(calId));
+        })
+        .map((e, idx) => {
+          const start = new Date(e.startDate || e.start || startOfDay.getTime());
+          const end = new Date(e.endDate || e.end || start.getTime() + 60 * 60 * 1000);
+          const startHour = start.getHours();
+          const startMinute = start.getMinutes();
+          const durationMinutes = Math.max(15, Math.round((end.getTime() - start.getTime()) / (1000 * 60)));
+          const isFridayAfterFour =
+            targetDate.getDay() === 5 &&
+            (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
-        return {
-          id: e.id || `native-${idx + 1}`,
-          title: e.title || '未命名會議',
-          startHour,
-          startMinute,
-          durationMinutes,
-          isFridayAfterFour,
-          calendarName: e.calendarName || e.calendarTitle,
-          calendarColor: e.calendarColor,
-        };
-      });
+          return {
+            id: e.id || `native-${idx + 1}`,
+            title: e.title || '未命名會議',
+            startHour,
+            startMinute,
+            durationMinutes,
+            isFridayAfterFour,
+            calendarId: e.calendarId ? String(e.calendarId) : undefined,
+            calendarName: e.calendarName || e.calendarTitle,
+            calendarColor: e.calendarColor || e.color,
+          };
+        });
+      return meetings;
     } catch (pluginErr) {
       console.warn('CapacitorCalendar plugin failed, falling back to Ganhua bridge:', pluginErr);
     }
@@ -528,22 +622,29 @@ export async function fetchNativeDeviceCalendarEvents(
     const res = await bridge.readDeviceCalendarEvents();
     const rawEvents: any[] = res.events || [];
 
-    return rawEvents.map((e, idx) => {
-      const isFridayAfterFour =
-        targetDate.getDay() === 5 &&
-        (e.startHour >= 16 || (e.startHour === 15 && e.startMinute >= 45));
+    const meetings = rawEvents
+      .filter((e) => {
+        if (!enabledIds || enabledIds.length === 0) return true;
+        return !e.calendarId || enabledIds.includes(String(e.calendarId));
+      })
+      .map((e, idx) => {
+        const isFridayAfterFour =
+          targetDate.getDay() === 5 &&
+          (e.startHour >= 16 || (e.startHour === 15 && e.startMinute >= 45));
 
-      return {
-        id: `device-${idx + 1}`,
-        title: e.title || '未命名會議',
-        startHour: e.startHour || 0,
-        startMinute: e.startMinute || 0,
-        durationMinutes: e.durationMinutes || 60,
-        isFridayAfterFour,
-        calendarName: e.calendarName,
-        calendarColor: e.calendarColor,
-      };
-    });
+        return {
+          id: `device-${idx + 1}`,
+          title: e.title || '未命名會議',
+          startHour: e.startHour || 0,
+          startMinute: e.startMinute || 0,
+          durationMinutes: e.durationMinutes || 60,
+          isFridayAfterFour,
+          calendarId: e.calendarId ? String(e.calendarId) : undefined,
+          calendarName: e.calendarName,
+          calendarColor: e.calendarColor,
+        };
+      });
+    return meetings;
   }
 
   throw new Error('未偵測到手機行事曆支援外掛，請確認 App 是否已授權讀取日曆權限。');

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Calendar, Settings2, Lock, Sparkles, RotateCcw, Plus } from 'lucide-react';
-import { CalendarRoastResult } from '../services/calendarService';
+import { Calendar, Settings2, Lock, Sparkles, RotateCcw, Plus, Layers } from 'lucide-react';
+import { CalendarRoastResult, getEnabledCalendarIds } from '../services/calendarService';
 
 interface CalendarSyncBarProps {
   isPro: boolean;
@@ -21,6 +21,8 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
   onToggleConnected,
   onOpenAddEvent,
 }) => {
+  const enabledCount = getEnabledCalendarIds()?.length || 0;
+
   const handleBarClick = () => {
     if (!isPro) {
       onOpenPaywall();
@@ -54,6 +56,12 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
               <span className="font-sans font-bold text-xs truncate">
                 {roastResult.summaryBadge}
               </span>
+              {enabledCount > 1 && (
+                <span className="hidden sm:inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-white/10 text-[#D4B483] font-bold shrink-0">
+                  <Layers className="w-2.5 h-2.5" />
+                  <span>{enabledCount}日曆</span>
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">

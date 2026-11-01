@@ -470,7 +470,7 @@ export const App: React.FC = () => {
     }
   };
 
-  // Listen for native Android widget date selection deep-link
+  // Listen for native Android widget date selection deep-link & 1x1 Survival Stamp sync
   useEffect(() => {
     const handleWidgetDateEvent = (e: any) => {
       const dateStr = e.detail;
@@ -483,6 +483,27 @@ export const App: React.FC = () => {
     };
     window.addEventListener('widgetSelectDate', handleWidgetDateEvent);
 
+    const handleWidgetSurvivedSync = (e: any) => {
+      const detail = e.detail;
+      if (!detail) return;
+      const { survivedDates, streakCount } = detail;
+      if (Array.isArray(survivedDates)) {
+        setPersisted((prev) => {
+          const merged = Array.from(new Set([...prev.survivedDates, ...survivedDates]));
+          return {
+            ...prev,
+            survivedDates: merged,
+            streakCount:
+              typeof streakCount === 'number' && streakCount > prev.streakCount
+                ? streakCount
+                : prev.streakCount,
+          };
+        });
+        showToast('💮 已同步桌面小工具的今日生還打卡！');
+      }
+    };
+    window.addEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
+
     // Read pending widget date from native Capacitor plugin if cold-started
     const win = window as any;
     if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingWidgetDate) {
@@ -492,6 +513,27 @@ export const App: React.FC = () => {
           if (y && m && d) {
             handleJumpToDate(new Date(y, m - 1, d));
           }
+        }
+      }).catch(() => {});
+    }
+
+    // Read pending 1x1 widget survival stamps
+    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingSurvivedSync) {
+      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingSurvivedSync().then((res: any) => {
+        if (res?.survivedDatesJson) {
+          try {
+            const list = JSON.parse(res.survivedDatesJson);
+            if (Array.isArray(list) && list.length > 0) {
+              setPersisted((prev) => ({
+                ...prev,
+                survivedDates: Array.from(new Set([...prev.survivedDates, ...list])),
+                streakCount:
+                  res.streakCount && res.streakCount > prev.streakCount
+                    ? res.streakCount
+                    : prev.streakCount,
+              }));
+            }
+          } catch {}
         }
       }).catch(() => {});
     }
@@ -510,6 +552,7 @@ export const App: React.FC = () => {
 
     return () => {
       window.removeEventListener('widgetSelectDate', handleWidgetDateEvent);
+      window.removeEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
     };
   }, []);
 

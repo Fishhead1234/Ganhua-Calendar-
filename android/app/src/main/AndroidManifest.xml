@@ -76,6 +76,20 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_monthly_large_info" />
         </receiver>
+
+        <!-- Native Android Survival Stamp Widget Provider (1x1 One-Tap Stamp) -->
+        <receiver
+            android:name=".SurvivalStampWidgetProvider"
+            android:label="@string/widget_label_survival_stamp"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ganhuacalendar.app.ACTION_STAMP_TODAY" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_survival_stamp_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->

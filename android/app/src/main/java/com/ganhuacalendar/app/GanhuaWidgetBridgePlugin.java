@@ -150,6 +150,103 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
     }
 
     @PluginMethod
+    public void getPendingSurvivedSync(PluginCall call) {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                GanhuaWidgetProvider.PREFS_NAME,
+                Context.MODE_PRIVATE
+        );
+        boolean hasPending = prefs.getBoolean("has_pending_survived_sync", false);
+        String survivedJson = prefs.getString("survived_dates_json", "[]");
+        int streakCount = prefs.getInt("streak_count", 3);
+        if (hasPending) {
+            prefs.edit().putBoolean("has_pending_survived_sync", false).apply();
+        }
+        JSObject ret = new JSObject();
+        ret.put("hasPending", hasPending);
+        ret.put("survivedDatesJson", survivedJson);
+        ret.put("streakCount", streakCount);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void listCalendars(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionForAlias("calendar", call, "listCalendarsCallback");
+            return;
+        }
+        executeListCalendars(call);
+    }
+
+    @PermissionCallback
+    private void listCalendarsCallback(PluginCall call) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            executeListCalendars(call);
+        } else {
+            call.reject("Calendar permission denied");
+        }
+    }
+
+    private void executeListCalendars(PluginCall call) {
+        try {
+            String[] projection = new String[]{
+                CalendarContract.Calendars._ID,
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Calendars.ACCOUNT_NAME,
+                CalendarContract.Calendars.CALENDAR_COLOR,
+                CalendarContract.Calendars.IS_PRIMARY
+            };
+
+            ContentResolver resolver = getContext().getContentResolver();
+            Cursor cursor = resolver.query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + " ASC");
+
+            JSArray calendarsArray = new JSArray();
+            if (cursor != null) {
+                try {
+                    int idIdx = cursor.getColumnIndex(CalendarContract.Calendars._ID);
+                    int nameIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+                    int accIdx = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME);
+                    int colorIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
+                    int primaryIdx = cursor.getColumnIndex(CalendarContract.Calendars.IS_PRIMARY);
+
+                    while (cursor.moveToNext()) {
+                        String id = String.valueOf(cursor.getLong(idIdx));
+                        String name = cursor.getString(nameIdx);
+                        if (name == null || name.trim().isEmpty()) {
+                            name = "未命名日曆";
+                        }
+                        String accountName = accIdx != -1 ? cursor.getString(accIdx) : "";
+                        boolean isPrimary = primaryIdx != -1 && cursor.getInt(primaryIdx) != 0;
+
+                        String colorHex = "#2D2D2D";
+                        if (colorIdx != -1 && !cursor.isNull(colorIdx)) {
+                            int colorInt = cursor.getInt(colorIdx);
+                            colorHex = String.format("#%06X", (0xFFFFFF & colorInt));
+                        }
+
+                        JSObject calObj = new JSObject();
+                        calObj.put("id", id);
+                        calObj.put("name", name);
+                        calObj.put("title", name);
+                        calObj.put("accountName", accountName != null ? accountName : "");
+                        calObj.put("color", colorHex);
+                        calObj.put("isPrimary", isPrimary);
+
+                        calendarsArray.put(calObj);
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+
+            JSObject res = new JSObject();
+            res.put("calendars", calendarsArray);
+            call.resolve(res);
+        } catch (Exception e) {
+            call.reject("Failed to list calendars: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
     public void readDeviceCalendarEvents(PluginCall call) {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionForAlias("calendar", call, "readEventsCallback");
@@ -192,6 +289,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                 CalendarContract.Instances.BEGIN,
                 CalendarContract.Instances.END,
                 CalendarContract.Instances.ALL_DAY,
+                CalendarContract.Instances.CALENDAR_ID,
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Instances.CALENDAR_COLOR
             };
@@ -206,6 +304,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                     int beginIdx = cursor.getColumnIndex(CalendarContract.Instances.BEGIN);
                     int endIdx = cursor.getColumnIndex(CalendarContract.Instances.END);
                     int allDayIdx = cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY);
+                    int calIdColIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_ID);
                     int calNameIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_DISPLAY_NAME);
                     int calColorIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_COLOR);
 
@@ -232,6 +331,10 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                         ev.put("isAllDay", isAllDay);
                         ev.put("beginMs", begin);
                         ev.put("endMs", end);
+
+                        if (calIdColIdx != -1 && !cursor.isNull(calIdColIdx)) {
+                            ev.put("calendarId", String.valueOf(cursor.getLong(calIdColIdx)));
+                        }
 
                         if (calNameIdx != -1 && !cursor.isNull(calNameIdx)) {
                             String calName = cursor.getString(calNameIdx);

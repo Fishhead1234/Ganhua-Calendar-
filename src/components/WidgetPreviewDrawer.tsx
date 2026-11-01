@@ -12,6 +12,7 @@ import {
   Lock,
   Calendar,
   RotateCcw,
+  Stamp,
 } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -28,7 +29,7 @@ interface WidgetPreviewDrawerProps {
   activeMeetings?: CalendarMeeting[];
 }
 
-type WidgetSizeTab = 'monthly_split' | 'monthly_large' | 'home_medium' | 'ios_lock' | 'notion_embed';
+type WidgetSizeTab = 'monthly_split' | 'monthly_large' | 'survival_stamp' | 'home_medium' | 'ios_lock' | 'notion_embed';
 
 interface CalendarGridCell {
   date: Date;
@@ -214,6 +215,19 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
               >
                 <CalendarDays className="w-3.5 h-3.5 text-[#C83E31]" />
                 <span>4×4 全月農曆</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveWidget('survival_stamp')}
+                className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-2xl border text-xs font-sans font-bold transition cursor-pointer ${
+                  activeWidget === 'survival_stamp'
+                    ? 'bg-[#2D2D2D] text-[#F9F6F0] border-[#2D2D2D] shadow-sm'
+                    : 'bg-[#F9F6F0] text-[#2D2D2D] border-[#2D2D2D]/25 hover:border-[#2D2D2D]'
+                }`}
+              >
+                <Stamp className="w-3.5 h-3.5 text-[#C83E31]" />
+                <span>1×1 生還打卡章</span>
               </button>
 
               <button
@@ -566,7 +580,56 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                 );
               })()}
 
-              {/* 3. Medium Home Screen Widget (Date + Mini doodle + Quote) */}
+              {/* 3. Native Android 1x1 One-Tap Survival Stamp Widget */}
+              {activeWidget === 'survival_stamp' && (
+                <div className="w-full max-w-[380px] space-y-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6 py-2 select-none">
+                    {/* State 1: Before Stamping */}
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-[11px] font-sans font-bold text-[#6E6A63]">
+                        ① 未打卡狀態（點擊一鍵打卡）
+                      </span>
+                      <div className="w-32 h-32 rounded-3xl bg-[#FAF7F0] border-[3px] border-[#2D2D2D] shadow-md p-2.5 flex flex-col items-center justify-between transition hover:scale-105 cursor-pointer active:scale-95">
+                        <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#9E988D] flex items-center justify-center text-2xl mt-0.5">
+                          💮
+                        </div>
+                        <span className="font-serif font-black text-xs text-[#2D2D2D]">
+                          點擊生還
+                        </span>
+                        <div className="px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#FAF7F0] font-sans font-bold text-[9px]">
+                          🔥 {streakCount} 天
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* State 2: Stamped Today */}
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-[11px] font-sans font-bold text-[#C83E31]">
+                        ② 已打卡狀態（全小工具同步生還）
+                      </span>
+                      <div className="w-32 h-32 rounded-3xl bg-[#FAF7F0] border-[3px] border-[#2D2D2D] shadow-md p-2.5 flex flex-col items-center justify-between">
+                        <div className="w-full h-20 flex flex-col items-center justify-center -rotate-8 border-2 border-[#C83E31] rounded-xl p-1 bg-white/40 shadow-xs">
+                          <span className="font-serif font-black text-xs sm:text-sm text-[#C83E31] tracking-wider">
+                            今日已生還
+                          </span>
+                          <span className="font-sans font-extrabold text-[8px] text-[#C83E31] tracking-widest mt-0.5">
+                            ✓ SURVIVED
+                          </span>
+                        </div>
+                        <div className="px-2.5 py-0.5 rounded-full bg-[#C83E31] text-[#FAF7F0] border border-[#2D2D2D] font-sans font-bold text-[9px]">
+                          🔥 連續 {streakCount} 天
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-center text-xs font-sans text-[#6E6A63]">
+                    1×1 生還打卡章小工具：在手機桌面輕點一下即可直接蓋章，無需開啟 App，即時刷新 4×2、4×4 與 App 內生還印記！
+                  </p>
+                </div>
+              )}
+
+              {/* 4. Medium Home Screen Widget (Date + Mini doodle + Quote) */}
               {activeWidget === 'home_medium' && (
                 <div className="w-full max-w-[380px] space-y-3">
                   <div className="rounded-[28px] paper-texture border-2 border-[#2D2D2D] p-4 shadow-[0_12px_28px_rgba(45,45,45,0.16)] flex items-center gap-3.5">
