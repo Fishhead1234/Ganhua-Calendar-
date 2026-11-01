@@ -306,7 +306,7 @@ export function useTodayQuote({
   const isToday = dateOffset === 0;
   const isPastDate = dateOffset < 0;
   const isFutureDate = dateOffset > 0;
-  const canGoNext = allowFutureDates ? true : dateOffset < 0;
+  const canGoNext = allowFutureDates ? true : dateOffset !== 0;
 
   // Free Tier: past 7 days archive. Pro Tier or Admin: unlimited (365 days)
   const maxHistory = isPro || isAdmin ? 365 : 7;

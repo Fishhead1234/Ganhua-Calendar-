@@ -135,6 +135,21 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
     }
 
     @PluginMethod
+    public void getPendingWidgetDate(PluginCall call) {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                GanhuaWidgetProvider.PREFS_NAME,
+                Context.MODE_PRIVATE
+        );
+        String pending = prefs.getString("pending_widget_select_date", null);
+        if (pending != null) {
+            prefs.edit().remove("pending_widget_select_date").apply();
+        }
+        JSObject ret = new JSObject();
+        ret.put("date", pending != null ? pending : "");
+        call.resolve(ret);
+    }
+
+    @PluginMethod
     public void readDeviceCalendarEvents(PluginCall call) {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionForAlias("calendar", call, "readEventsCallback");
@@ -176,7 +191,9 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                 CalendarContract.Instances.TITLE,
                 CalendarContract.Instances.BEGIN,
                 CalendarContract.Instances.END,
-                CalendarContract.Instances.ALL_DAY
+                CalendarContract.Instances.ALL_DAY,
+                CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Instances.CALENDAR_COLOR
             };
 
             ContentResolver resolver = getContext().getContentResolver();
@@ -189,6 +206,8 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                     int beginIdx = cursor.getColumnIndex(CalendarContract.Instances.BEGIN);
                     int endIdx = cursor.getColumnIndex(CalendarContract.Instances.END);
                     int allDayIdx = cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY);
+                    int calNameIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_DISPLAY_NAME);
+                    int calColorIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_COLOR);
 
                     while (cursor.moveToNext()) {
                         String title = cursor.getString(titleIdx);
@@ -213,6 +232,19 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                         ev.put("isAllDay", isAllDay);
                         ev.put("beginMs", begin);
                         ev.put("endMs", end);
+
+                        if (calNameIdx != -1 && !cursor.isNull(calNameIdx)) {
+                            String calName = cursor.getString(calNameIdx);
+                            if (calName != null && !calName.isEmpty()) {
+                                ev.put("calendarName", calName);
+                            }
+                        }
+                        if (calColorIdx != -1 && !cursor.isNull(calColorIdx)) {
+                            int colorInt = cursor.getInt(calColorIdx);
+                            String colorHex = String.format("#%06X", (0xFFFFFF & colorInt));
+                            ev.put("calendarColor", colorHex);
+                        }
+
                         eventsArray.put(ev);
                     }
                 } finally {

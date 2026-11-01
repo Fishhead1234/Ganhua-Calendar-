@@ -185,6 +185,19 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                         <span className="font-mono font-bold text-[#6E6A63] shrink-0 text-[11px]">
                           {formatTime(evt.startHour, evt.startMinute, evt.isAllDay)}
                         </span>
+                        {evt.calendarName && (
+                          <span
+                            className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[85px] truncate border"
+                            style={{
+                              backgroundColor: evt.calendarColor ? `${evt.calendarColor}18` : '#2D2D2D10',
+                              borderColor: evt.calendarColor ? `${evt.calendarColor}50` : '#2D2D2D25',
+                              color: evt.calendarColor || '#2D2D2D',
+                            }}
+                            title={evt.calendarName}
+                          >
+                            {evt.calendarName}
+                          </span>
+                        )}
                         <span className="font-bold text-[#2D2D2D] truncate">
                           {evt.title}
                         </span>

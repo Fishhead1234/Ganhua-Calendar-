@@ -517,6 +517,19 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                             <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
                               {formatEventTime(m)}
                             </span>
+                            {m.calendarName && (
+                              <span
+                                className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[80px] truncate border"
+                                style={{
+                                  backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
+                                  borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
+                                  color: m.calendarColor || '#2D2D2D',
+                                }}
+                                title={m.calendarName}
+                              >
+                                {m.calendarName}
+                              </span>
+                            )}
                             <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
@@ -614,6 +627,19 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                             <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
                               {formatEventTime(m)}
                             </span>
+                            {m.calendarName && (
+                              <span
+                                className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[80px] truncate border"
+                                style={{
+                                  backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
+                                  borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
+                                  color: m.calendarColor || '#2D2D2D',
+                                }}
+                                title={m.calendarName}
+                              >
+                                {m.calendarName}
+                              </span>
+                            )}
                             <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">

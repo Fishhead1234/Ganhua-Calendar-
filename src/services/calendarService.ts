@@ -11,6 +11,8 @@ export interface CalendarMeeting {
   notes?: string;
   isAllDay?: boolean;
   source?: 'local' | 'synced' | 'preset';
+  calendarName?: string;
+  calendarColor?: string;
 }
 
 export interface CalendarRoastResult {
@@ -46,15 +48,24 @@ export const GOOGLE_APPS_SCRIPT_SAMPLE = `function doGet() {
   var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
   var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
-  // 讀取當日主日曆所有行程 (支援 Google 日曆自動同步)
-  var events = CalendarApp.getDefaultCalendar().getEvents(start, end);
-  var result = events.map(function(e) {
-    return {
-      title: e.getTitle() || "未命名會議",
-      start: e.getStartTime().toISOString(),
-      end: e.getEndTime().toISOString(),
-      isAllDay: e.isAllDayEvent()
-    };
+  // 讀取所有日曆（支援工作、家庭、學校等全日曆聯動）
+  var allCalendars = CalendarApp.getAllCalendars();
+  var result = [];
+
+  allCalendars.forEach(function(cal) {
+    try {
+      var events = cal.getEvents(start, end);
+      events.forEach(function(e) {
+        result.push({
+          title: e.getTitle() || "未命名會議",
+          start: e.getStartTime().toISOString(),
+          end: e.getEndTime().toISOString(),
+          isAllDay: e.isAllDayEvent(),
+          calendarName: cal.getName(),
+          calendarColor: cal.getColor()
+        });
+      });
+    } catch (err) {}
   });
 
   return ContentService.createTextOutput(JSON.stringify(result))
@@ -228,12 +239,32 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
   let hasReviewOr1on1 = false;
   let hasAllHands = false;
   let hasEarlyMonday = false;
+  let hasParentOrSchool = false;
 
   const todayDay = new Date().getDay();
 
   events.forEach((ev) => {
     totalMinutes += ev.durationMinutes;
-    const lowerTitle = ev.title.toLowerCase();
+    const lowerTitle = (ev.title || '').toLowerCase();
+    const lowerCalName = (ev.calendarName || '').toLowerCase();
+    const combo = `${lowerTitle} ${lowerCalName}`;
+
+    if (
+      combo.includes('school') ||
+      combo.includes('parent') ||
+      combo.includes('schoolsbuddy') ||
+      combo.includes('家長') ||
+      combo.includes('學校') ||
+      combo.includes('班級') ||
+      combo.includes('小孩') ||
+      combo.includes('家庭') ||
+      combo.includes('家長會') ||
+      combo.includes('聯絡簿') ||
+      combo.includes('接送') ||
+      combo.includes('家長日')
+    ) {
+      hasParentOrSchool = true;
+    }
 
     if (
       lowerTitle.includes('review') ||
@@ -276,7 +307,26 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const isBackToBack = count >= 4;
 
-  // 1. Keyword: Performance Review / 1-on-1 / 面談
+  // 1. Keyword: School / Parent / Family
+  if (hasParentOrSchool) {
+    return {
+      meetingsCount: count,
+      hasFridayLateMeeting: hasFridayLate,
+      hasBackToBackMeetings: isBackToBack,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🎒 偵測到【學校/家長行程】專屬吐槽',
+      roastQuote: '自己當社畜就算了，下班還要當小孩的專屬司機兼書僮。',
+      roastSubtext: '白天被老闆KPI折磨，晚上被學校聯絡簿與家長會群組二度審查。',
+      yi: '假笑點頭兼準時接送・深呼吸修煉脾氣',
+      ji: '在班級家長群組手滑誤傳上班幹話・忘簽聯絡簿',
+      character: 'cat',
+      sceneId: 'cat_coffee',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '0% 0%',
+    };
+  }
+
+  // 2. Keyword: Performance Review / 1-on-1 / 面談
   if (hasReviewOr1on1) {
     return {
       meetingsCount: count,
@@ -463,6 +513,8 @@ export async function fetchNativeDeviceCalendarEvents(
           startMinute,
           durationMinutes,
           isFridayAfterFour,
+          calendarName: e.calendarName || e.calendarTitle,
+          calendarColor: e.calendarColor,
         };
       });
     } catch (pluginErr) {
@@ -488,6 +540,8 @@ export async function fetchNativeDeviceCalendarEvents(
         startMinute: e.startMinute || 0,
         durationMinutes: e.durationMinutes || 60,
         isFridayAfterFour,
+        calendarName: e.calendarName,
+        calendarColor: e.calendarColor,
       };
     });
   }
@@ -568,6 +622,8 @@ export async function fetchLiveJsonCalendarEvents(
       startMinute,
       durationMinutes,
       isFridayAfterFour,
+      calendarName: item.calendarName,
+      calendarColor: item.calendarColor,
     });
   });
 
@@ -687,6 +743,8 @@ export interface CustomCalendarEvent {
   notes?: string;
   source: 'local';
   createdAt?: number;
+  calendarName?: string;
+  calendarColor?: string;
 }
 
 const CUSTOM_EVENTS_STORAGE_KEY = 'user_custom_events';
@@ -721,6 +779,8 @@ export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
     notes: e.notes,
     isAllDay: e.isAllDay,
     source: 'local',
+    calendarName: e.calendarName,
+    calendarColor: e.calendarColor,
   };
 }
 

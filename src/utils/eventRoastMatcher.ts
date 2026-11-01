@@ -78,7 +78,9 @@ export function matchSpecialEventRoast({
 
   // 2. Synced Calendar Event Keyword Match
   if (calendarEvents && calendarEvents.length > 0) {
-    const titles = calendarEvents.map((evt) => evt.title.toLowerCase());
+    const titles = calendarEvents.map((evt) =>
+      `${evt.title || ''} ${evt.calendarName || ''}`.toLowerCase()
+    );
     const keywordMatches: SpecialEventQuote[] = [];
 
     // Find all items matching any event keyword

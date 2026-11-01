@@ -562,5 +562,37 @@
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
     "spritePosition": "50% 100%",
     "assetPath": "/assets/scenes/capy_daydream_beach.webp"
+  },
+  {
+    "id": "evt_parent_school_01",
+    "eventType": "parent_school",
+    "eventLabel": "🎒 學校與家長行程模式",
+    "triggerKeywords": [
+      "school",
+      "parent",
+      "schoolsbuddy",
+      "家長",
+      "學校",
+      "班級",
+      "家長會",
+      "聯絡簿",
+      "家長日",
+      "母姐會",
+      "接送",
+      "課後班",
+      "校外教學",
+      "家長座談"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "自己當社畜就算了，下班還要當小孩的專屬司機兼書僮。",
+    "subtext": "白天被老闆KPI折磨，晚上被學校聯絡簿與家長會群組二度審查。",
+    "yi": "假笑點頭兼準時接送・深呼吸修煉脾氣",
+    "ji": "在班級家長群組手滑誤傳上班幹話・忘簽聯絡簿",
+    "character": "cat",
+    "sceneId": "cat_coffee",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 0%",
+    "assetPath": "/assets/scenes/cat_coffee.webp"
   }
 ]

@@ -63,6 +63,8 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [copied, setCopied] = useState(false);
 
+  const isDraggingBody = useRef(false);
+  const isDraggingStrip = useRef(false);
   const dragStartX = useRef<number | null>(null);
   const dragStartY = useRef<number | null>(null);
   const dragStartTime = useRef<number>(0);
@@ -102,46 +104,51 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
     }
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  // Card Body: Horizontal swipe only with touch-action: pan-y (vertical scrolling preserved!)
+  const handleBodyPointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
     dragStartX.current = e.clientX;
     dragStartY.current = e.clientY;
     dragStartTime.current = Date.now();
-    try {
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {
-      // ignore
-    }
+    isDraggingBody.current = false;
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
+  const handleBodyPointerMove = (e: React.PointerEvent) => {
     if (dragStartX.current === null || dragStartY.current === null || isTearing) return;
-    const rawDeltaX = e.clientX - dragStartX.current;
-    const rawDeltaY = e.clientY - dragStartY.current;
+    const deltaX = e.clientX - dragStartX.current;
+    const deltaY = e.clientY - dragStartY.current;
+
+    if (!isDraggingBody.current) {
+      // If moving predominantly vertically, abort drag so browser handles smooth page scrolling!
+      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 8) {
+        dragStartX.current = null;
+        dragStartY.current = null;
+        return;
+      }
+      // If moving horizontally, lock into card drag!
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+        isDraggingBody.current = true;
+        try {
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+      } else {
+        return;
+      }
+    }
 
     if (isToday || isFutureDate) {
-      // Asymmetric elasticity when on Today's date:
-      // Downward: max 25px (elastic: 0.12)
-      // Leftward: max 25px (elastic: 0.12)
-      // Rightward: generous pull (up to 140px, elastic: 0.6)
-      const clampedX = rawDeltaX > 0
-        ? Math.min(140, rawDeltaX * 0.6)
-        : Math.max(-25, rawDeltaX * 0.12);
-
-      const clampedY = rawDeltaY > 0
-        ? Math.min(25, rawDeltaY * 0.12)
-        : Math.max(-10, rawDeltaY * 0.08);
-
+      const clampedX = deltaX > 0
+        ? Math.min(140, deltaX * 0.6)
+        : Math.max(-25, deltaX * 0.12);
       setDragOffsetX(clampedX);
-      setDragOffsetY(clampedY);
     } else {
-      // Past date: natural drag response
-      setDragOffsetX(Math.max(-220, Math.min(220, rawDeltaX)));
-      setDragOffsetY(Math.max(-15, Math.min(200, rawDeltaY)));
+      setDragOffsetX(Math.max(-220, Math.min(220, deltaX)));
     }
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handleBodyPointerUp = (e: React.PointerEvent) => {
     try {
       if ((e.currentTarget as HTMLElement).hasPointerCapture?.(e.pointerId)) {
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
@@ -149,19 +156,25 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
     } catch {
       // ignore
     }
-    if (dragStartX.current === null || dragStartY.current === null) return;
-    const rawDeltaX = e.clientX - dragStartX.current;
-    const rawDeltaY = e.clientY - dragStartY.current;
+
+    if (!isDraggingBody.current || dragStartX.current === null) {
+      dragStartX.current = null;
+      dragStartY.current = null;
+      isDraggingBody.current = false;
+      setDragOffsetX(0);
+      return;
+    }
+
+    const deltaX = e.clientX - dragStartX.current;
     const elapsedSeconds = Math.max(0.04, (Date.now() - dragStartTime.current) / 1000);
-    const velocityX = rawDeltaX / elapsedSeconds;
-    const velocityY = rawDeltaY / elapsedSeconds;
+    const velocityX = deltaX / elapsedSeconds;
 
     dragStartX.current = null;
     dragStartY.current = null;
+    isDraggingBody.current = false;
 
-    // a) Left-to-Right Swipe (offset.x > 75 or velocity.x > 450)
-    // Reverse flip animation to previous day (allowed even on Today)
-    if (rawDeltaX > 75 || velocityX > 450) {
+    // Right swipe: Previous day flip
+    if (deltaX > 75 || velocityX > 450) {
       if (canGoPrev) {
         setTearDirection('flip_right');
         setIsTearing(true);
@@ -169,16 +182,14 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           onPrevDay();
           setIsTearing(false);
           setDragOffsetX(0);
-          setDragOffsetY(0);
         }, 280);
         return;
       }
     }
 
-    // b) Top-to-Bottom Pull (offset.y > 80 or velocity.y > 450) OR Right-to-Left Swipe (offset.x < -75 or velocity.x < -450)
-    if (rawDeltaY > 80 || velocityY > 450 || rawDeltaX < -75 || velocityX < -450) {
+    // Left swipe: Next day
+    if (deltaX < -75 || velocityX < -450) {
       if (isPastDate && canGoNext) {
-        // Detach page with realistic paper tear sound
         playPaperTearSound();
         setTearDirection('tear_away');
         setIsTearing(true);
@@ -186,30 +197,91 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           onNextDay();
           setIsTearing(false);
           setDragOffsetX(0);
+        }, 320);
+        return;
+      } else {
+        playLockedBounceSound();
+        setDragOffsetX(0);
+        onBlockedTomorrow();
+        return;
+      }
+    }
+
+    setDragOffsetX(0);
+  };
+
+  // Header Strip: Dedicated downward pull-to-tear gesture
+  const handleStripPointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    dragStartX.current = e.clientX;
+    dragStartY.current = e.clientY;
+    dragStartTime.current = Date.now();
+    isDraggingStrip.current = true;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleStripPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingStrip.current || dragStartY.current === null || isTearing) return;
+    const rawDeltaY = e.clientY - dragStartY.current;
+
+    if (isToday || isFutureDate) {
+      const clampedY = rawDeltaY > 0
+        ? Math.min(30, rawDeltaY * 0.15)
+        : Math.max(-10, rawDeltaY * 0.08);
+      setDragOffsetY(clampedY);
+    } else {
+      setDragOffsetY(Math.max(-10, Math.min(220, rawDeltaY)));
+    }
+  };
+
+  const handleStripPointerUp = (e: React.PointerEvent) => {
+    try {
+      if ((e.currentTarget as HTMLElement).hasPointerCapture?.(e.pointerId)) {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!isDraggingStrip.current || dragStartY.current === null) {
+      dragStartX.current = null;
+      dragStartY.current = null;
+      isDraggingStrip.current = false;
+      setDragOffsetY(0);
+      return;
+    }
+
+    const rawDeltaY = e.clientY - dragStartY.current;
+    const elapsedSeconds = Math.max(0.04, (Date.now() - dragStartTime.current) / 1000);
+    const velocityY = rawDeltaY / elapsedSeconds;
+
+    dragStartX.current = null;
+    dragStartY.current = null;
+    isDraggingStrip.current = false;
+
+    if (rawDeltaY > 70 || velocityY > 400) {
+      if (isPastDate && canGoNext) {
+        playPaperTearSound();
+        setTearDirection('tear_away');
+        setIsTearing(true);
+        setTimeout(() => {
+          onNextDay();
+          setIsTearing(false);
           setDragOffsetY(0);
         }, 320);
         return;
       } else {
-        // Today or future date: bounce back + thud sound + blocked toast
         playLockedBounceSound();
-        setDragOffsetX(0);
         setDragOffsetY(0);
         onBlockedTomorrow();
         return;
       }
     }
 
-    // Minor resistance tug on Today: if pulled down or left slightly (> 18px)
-    if (isToday && (rawDeltaY > 18 || rawDeltaX < -18)) {
-      playLockedBounceSound();
-      setDragOffsetX(0);
-      setDragOffsetY(0);
-      onBlockedTomorrow();
-      return;
-    }
-
-    // Snap back to origin
-    setDragOffsetX(0);
     setDragOffsetY(0);
   };
 
@@ -225,7 +297,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[390px] mx-auto select-none pt-2 pb-4">
+    <div className="relative w-full max-w-[400px] mx-auto select-none pt-2 pb-4 px-3 sm:px-5">
       {/* Navigation Flip Bar */}
       <div className="flex items-center justify-between text-xs font-sans text-[#6E6A63] px-1 mb-2">
         <button
@@ -299,11 +371,18 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           </div>
         </div>
 
-        {/* 2. Perforated Binding Stub (Fixed guide strip above the paper page) */}
-        <div className="relative px-5 py-2 bg-[#F3EFE6] perforated-line border-x-2 border-[#2D2D2D] flex items-center justify-between z-20 select-none">
+        {/* 2. Perforated Binding Stub (Fixed guide strip above the paper page - Grab & pull down to tear) */}
+        <div
+          onPointerDown={handleStripPointerDown}
+          onPointerMove={handleStripPointerMove}
+          onPointerUp={handleStripPointerUp}
+          onPointerCancel={handleStripPointerUp}
+          className="relative px-5 py-2.5 bg-[#F3EFE6] perforated-line border-x-2 border-[#2D2D2D] flex items-center justify-between z-20 select-none cursor-grab active:cursor-grabbing touch-none"
+          title="抓住此撕頁虛線向下拉即可撕掉日曆"
+        >
           <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63]">
             <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
-            <span>{isPastDate ? '已存檔・向下滑/右翻閱' : '✂️ 撕頁區・今日存活中'}</span>
+            <span>{isPastDate ? '✂️ 撕頁區・向下拉撕頁' : '✂️ 撕頁區・今日存活中'}</span>
           </div>
           {isPastDate ? (
             <button
@@ -370,29 +449,30 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           </div>
         )}
 
-        {/* 4. Active Draggable & Tearable Calendar Sheet */}
+        {/* 4. Active Draggable & Tearable Calendar Sheet (Horizontal swipe for days, native vertical scroll) */}
         <div
-          style={
-            (Math.abs(dragOffsetX) > 0 || dragOffsetY > 0) && !isTearing
+          style={{
+            touchAction: 'pan-y',
+            ...((Math.abs(dragOffsetX) > 0 || dragOffsetY > 0) && !isTearing
               ? {
                   transform: `translate(${dragOffsetX * 0.9}px, ${Math.max(0, dragOffsetY) * 0.65}px) rotate(${dragOffsetX * 0.05 + dragOffsetY * 0.03}deg)`,
                   transformOrigin: 'top left',
                   transition: isPastDate ? 'none' : 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }
-              : undefined
-          }
-          className={`relative z-10 rounded-b-[26px] paper-texture border-2 border-t-0 border-[#2D2D2D] overflow-hidden select-none touch-none cursor-grab active:cursor-grabbing ${
+              : {}),
+          }}
+          className={`relative z-10 rounded-b-[26px] paper-texture border-2 border-t-0 border-[#2D2D2D] overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing ${
             isTearing
               ? tearDirection === 'flip_right'
                 ? 'animate-reverse-flip'
                 : 'animate-realistic-tear'
               : ''
           }`}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          title={isPastDate ? '向下滑動或向左撕頁，向右滑動翻回前一日' : '今日日曆不可撕頁，明天請待續'}
+          onPointerDown={handleBodyPointerDown}
+          onPointerMove={handleBodyPointerMove}
+          onPointerUp={handleBodyPointerUp}
+          onPointerCancel={handleBodyPointerUp}
+          title={isPastDate ? '向左滑撕頁，向右滑翻回前一日，向下滾動檢視行程' : '今日日曆不可撕頁，向下滑動檢視今日行程'}
         >
           {/* Sawtooth Jagged Tear Edge SVG at the very top of the detached paper sheet */}
           <div className="w-full overflow-hidden h-2 -mt-0.5 pointer-events-none select-none">
@@ -493,7 +573,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                     🔮 未來幹話封印中
                   </div>
                   <p className="text-xs font-sans text-[#6E6A63]">
-                    （當日 00:00 自動解鎖）
+                    （將於當日 00:00 解鎖）
                   </p>
                   <p className="text-xs font-sans text-[#2D2D2D]/70 italic">
                     「命運不可預支，未來的爛事請留到明天再承受。」

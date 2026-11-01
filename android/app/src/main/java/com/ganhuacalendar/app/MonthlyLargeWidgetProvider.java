@@ -656,7 +656,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
 
             // Header Title Touch Area: Open App
             Intent openAppIntent = new Intent(context, MainActivity.class);
-            openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            openAppIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openAppIntent.putExtra("select_date", selectedDate);
             openAppIntent.putExtra("jumpToYmd", selectedDate);
             openAppIntent.putExtra("jumpToDay", selDay);
@@ -677,7 +677,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                 if (cellYmd.equals(selectedDate)) {
                     // Second Tap on already-selected cell opens MainActivity
                     Intent tapSecondIntent = new Intent(context, MainActivity.class);
-                    tapSecondIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    tapSecondIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     tapSecondIntent.putExtra("select_date", cellYmd);
                     tapSecondIntent.putExtra("jumpToYmd", cellYmd);
                     PendingIntent piCellOpen = PendingIntent.getActivity(

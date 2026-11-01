@@ -86,14 +86,10 @@ function loadPersistedState(): PersistedState {
         const lastOpenedDate = new Date(ly, lm - 1, ld);
         const diffMs = lastOpenedDate.getTime() - todayDate.getTime();
         const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-        if (diffDays < 0) {
-          // In the past: resume from last opened date (max 365 days back)
-          initialOffset = Math.max(-365, diffDays);
-        } else {
-          initialOffset = 0;
-        }
+        // Allow resuming on viewed date (both past archive and future schedule up to 365 days)
+        initialOffset = Math.max(-365, Math.min(365, diffDays));
       } else if (typeof parsed.dateOffset === 'number') {
-        initialOffset = parsed.dateOffset;
+        initialOffset = Math.max(-365, Math.min(365, parsed.dateOffset));
       }
 
       return {
@@ -473,6 +469,49 @@ export const App: React.FC = () => {
       showToast(`已翻閱至歷史存檔 (${targetDate.getMonth() + 1}/${targetDate.getDate()})`);
     }
   };
+
+  // Listen for native Android widget date selection deep-link
+  useEffect(() => {
+    const handleWidgetDateEvent = (e: any) => {
+      const dateStr = e.detail;
+      if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        if (y && m && d) {
+          handleJumpToDate(new Date(y, m - 1, d));
+        }
+      }
+    };
+    window.addEventListener('widgetSelectDate', handleWidgetDateEvent);
+
+    // Read pending widget date from native Capacitor plugin if cold-started
+    const win = window as any;
+    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingWidgetDate) {
+      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingWidgetDate().then((res: any) => {
+        if (res?.date && /^\d{4}-\d{2}-\d{2}$/.test(res.date)) {
+          const [y, m, d] = res.date.split('-').map(Number);
+          if (y && m && d) {
+            handleJumpToDate(new Date(y, m - 1, d));
+          }
+        }
+      }).catch(() => {});
+    }
+
+    // Check URL parameters (?select_date=YYYY-MM-DD)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlDate = params.get('select_date') || params.get('jumpToYmd');
+      if (urlDate && /^\d{4}-\d{2}-\d{2}$/.test(urlDate)) {
+        const [y, m, d] = urlDate.split('-').map(Number);
+        if (y && m && d) {
+          handleJumpToDate(new Date(y, m - 1, d));
+        }
+      }
+    }
+
+    return () => {
+      window.removeEventListener('widgetSelectDate', handleWidgetDateEvent);
+    };
+  }, []);
 
   const handleBackToToday = () => {
     setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
