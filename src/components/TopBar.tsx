@@ -12,9 +12,12 @@ import {
   Shield,
   Settings2,
   Cake,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { CharacterType, CHARACTER_META } from '../types/calendar';
 import { AppTier } from '../services/purchaseService';
+import { isSoundEnabled, toggleSoundEnabled, playPaperTearSound } from '../utils/soundEffects';
 
 interface TopBarProps {
   selectedTheme: CharacterType | 'all';
@@ -64,6 +67,15 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [now, setNow] = useState<Date>(() => new Date());
   const [editingOffHour, setEditingOffHour] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+
+  const handleToggleSound = () => {
+    const next = toggleSoundEnabled();
+    setSoundOn(next);
+    if (next) {
+      playPaperTearSound();
+    }
+  };
 
   const handleLogoClick = () => {
     if (isAdminAuthed) {
@@ -288,6 +300,19 @@ export const TopBar: React.FC<TopBarProps> = ({
               <Flame className="w-3.5 h-3.5 fill-[#C83E31]" />
               <span>平安下班 {streakCount} 天</span>
             </div>
+
+            <button
+              type="button"
+              onClick={handleToggleSound}
+              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition cursor-pointer ${
+                soundOn
+                  ? 'bg-[#FAF7F0] text-[#2D2D2D] border-[#2D2D2D]/30 hover:border-[#2D2D2D]'
+                  : 'bg-[#FAF7F0]/60 text-[#6E6A63]/60 border-[#2D2D2D]/15'
+              }`}
+              title={soundOn ? '撕曆擬真音效已開啟 (點擊靜音)' : '撕曆音效已靜音 (點擊開啟)'}
+            >
+              {soundOn ? <Volume2 className="w-3.5 h-3.5 text-[#2D2D2D]" /> : <VolumeX className="w-3.5 h-3.5 text-[#6E6A63]" />}
+            </button>
 
             <button
               type="button"

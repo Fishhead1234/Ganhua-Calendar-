@@ -66,6 +66,46 @@
   transform-origin: top right;
 }
 
+/* Realistic 0.32s Paper-Tear Animation: tilts -15deg, falls away (x: -90, y: 450, opacity: 0) */
+@keyframes realisticTearOff {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-30px, 95px) rotate(-6deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-90px, 450px) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+.animate-realistic-tear {
+  animation: realisticTearOff 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+/* Reverse Flip Animation: swipes right to previous day (x: 320, rotate: 8deg, opacity: 0) */
+@keyframes reverseFlip {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(320px, 35px) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+.animate-reverse-flip {
+  animation: reverseFlip 0.28s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  transform-origin: center right;
+  pointer-events: none;
+}
+
 /* Stamp slam animation */
 @keyframes stampSlam {
   0% {
