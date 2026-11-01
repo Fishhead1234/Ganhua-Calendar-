@@ -23,6 +23,7 @@ import { BirthdayModal } from './components/BirthdayModal';
 import { FloatingVersionBar } from './components/FloatingVersionBar';
 import { DailyAgendaStrip } from './components/DailyAgendaStrip';
 import { MonthlyCalendarModal } from './components/MonthlyCalendarModal';
+import { AddEventModal } from './components/AddEventModal';
 import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { useSubscription } from './hooks/useSubscription';
@@ -36,6 +37,14 @@ import {
   analyzeCalendarEvents,
   fetchNativeDeviceCalendarEvents,
   fetchLiveJsonCalendarEvents,
+  CustomCalendarEvent,
+  getCustomEvents,
+  saveCustomEvent,
+  deleteCustomEvent,
+  getMergedEvents,
+  writeNativeDeviceCalendarEvent,
+  deleteNativeDeviceCalendarEvent,
+  pushEventToGoogleAppsScript,
 } from './services/calendarService';
 
 const STORAGE_KEY = 'ganhua_calendar_state_v3';
@@ -170,9 +179,34 @@ export const App: React.FC = () => {
       return null;
     }
   });
+
+  const currentDateObj = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + persisted.dateOffset);
+    return d;
+  }, [persisted.dateOffset]);
+
+  const currentDateKey = useMemo(() => {
+    const y = currentDateObj.getFullYear();
+    const m = String(currentDateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(currentDateObj.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }, [currentDateObj]);
+
+  // Custom Appointments State
+  const [customEvents, setCustomEvents] = useState<CustomCalendarEvent[]>(() => getCustomEvents());
+  const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+  const [addEventInitialDate, setAddEventInitialDate] = useState<string>('');
+  const [editingCustomEvent, setEditingCustomEvent] = useState<CustomCalendarEvent | null>(null);
+
+  // Merged meetings for currently viewed date
+  const effectiveMeetings = useMemo(() => {
+    return getMergedEvents(activeMeetings, currentDateKey);
+  }, [activeMeetings, customEvents, currentDateKey]);
+
   const roastResult: CalendarRoastResult = useMemo(() => {
-    return analyzeCalendarEvents(activeMeetings, activePresetId || undefined);
-  }, [activeMeetings, activePresetId]);
+    return analyzeCalendarEvents(effectiveMeetings, activePresetId || undefined);
+  }, [effectiveMeetings, activePresetId]);
 
   const isEmbedMode = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -239,7 +273,7 @@ export const App: React.FC = () => {
     roastResult: persisted.calendarConnected ? roastResult : null,
     selectedThemeFilter: persisted.selectedTheme,
     birthday: persisted.birthday || null,
-    calendarEvents: activeMeetings,
+    calendarEvents: effectiveMeetings,
     specialQuoteCycleIndex,
   });
 
@@ -307,7 +341,7 @@ export const App: React.FC = () => {
         persisted.streakCount,
         persisted.offWorkHour,
         persisted.survivedDates,
-        activeMeetings
+        effectiveMeetings
       );
       // Advance lastOpenedDateStr whenever user tears forward / views a newer date
       setPersisted((prev) => {
@@ -320,7 +354,7 @@ export const App: React.FC = () => {
         return prev;
       });
     }
-  }, [currentQuote, persisted.streakCount, persisted.offWorkHour]);
+  }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
@@ -359,11 +393,53 @@ export const App: React.FC = () => {
     }
   };
 
-  const currentDateObj = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + persisted.dateOffset);
-    return d;
-  }, [persisted.dateOffset]);
+  const handleOpenAddEvent = (dateStr?: string) => {
+    setAddEventInitialDate(dateStr || currentDateKey);
+    setEditingCustomEvent(null);
+    setIsAddEventModalOpen(true);
+  };
+
+  const handleEditMeeting = (meeting: CalendarMeeting) => {
+    const found = customEvents.find((e) => e.id === meeting.id);
+    if (found) {
+      setEditingCustomEvent(found);
+      setAddEventInitialDate(found.dateKey);
+      setIsAddEventModalOpen(true);
+    } else {
+      setEditingCustomEvent(null);
+      setAddEventInitialDate(currentDateKey);
+      setIsAddEventModalOpen(true);
+    }
+  };
+
+  const handleSaveCustomEvent = (newEvent: CustomCalendarEvent) => {
+    saveCustomEvent(newEvent);
+    setCustomEvents(getCustomEvents());
+
+    // 2. Native device calendar write (Capacitor)
+    const [y, m, d] = newEvent.dateKey.split('-').map(Number);
+    const sDate = new Date(y, (m || 1) - 1, d || 1, newEvent.startHour, newEvent.startMinute);
+    const eDate = new Date(sDate.getTime() + newEvent.durationMinutes * 60 * 1000);
+    writeNativeDeviceCalendarEvent({
+      title: newEvent.title,
+      startDate: sDate,
+      endDate: eDate,
+      isAllDay: newEvent.isAllDay,
+      notes: newEvent.notes,
+    }).catch(() => {});
+
+    // 3. Google Apps Script Push (Two-way web bridge)
+    pushEventToGoogleAppsScript(newEvent).catch(() => {});
+
+    showToast(`✨ 行程「${newEvent.title}」已儲存！已即時連動專屬幹話`);
+  };
+
+  const handleDeleteCustomEvent = (eventId: string) => {
+    deleteCustomEvent(eventId);
+    setCustomEvents(getCustomEvents());
+    deleteNativeDeviceCalendarEvent(eventId).catch(() => {});
+    showToast('🗑️ 行程已成功刪除');
+  };
 
   const handleJumpToDate = (targetDate: Date) => {
     const t = new Date();
@@ -520,6 +596,7 @@ export const App: React.FC = () => {
             onToggleConnected={(connected) => {
               setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
             }}
+            onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
           />
         )}
 
@@ -588,9 +665,11 @@ export const App: React.FC = () => {
 
             {/* Daily Agenda & Sarcastic Timeline Strip */}
             <DailyAgendaStrip
-              events={activeMeetings}
+              events={effectiveMeetings}
               isFuture={isFutureDate}
               onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
+              onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
+              onEditEvent={handleEditMeeting}
             />
           </>
         )}
@@ -640,7 +719,7 @@ export const App: React.FC = () => {
           streakCount={persisted.streakCount}
           offWorkHour={persisted.offWorkHour}
           survivedDates={persisted.survivedDates}
-          activeMeetings={activeMeetings}
+          activeMeetings={effectiveMeetings}
         />
       </main>
 
@@ -708,9 +787,25 @@ export const App: React.FC = () => {
         currentDate={currentDateObj}
         today={new Date()}
         survivedDates={persisted.survivedDates || []}
-        activeMeetings={activeMeetings || []}
+        activeMeetings={effectiveMeetings || []}
+        customEvents={customEvents}
         quotes={contentSyncService.getQuotes365()}
         onSelectDate={handleJumpToDate}
+        onOpenAddEvent={(dateStr) => handleOpenAddEvent(dateStr)}
+        onEditEvent={handleEditMeeting}
+      />
+
+      {/* Add / Edit Appointment Modal */}
+      <AddEventModal
+        isOpen={isAddEventModalOpen}
+        onClose={() => {
+          setIsAddEventModalOpen(false);
+          setEditingCustomEvent(null);
+        }}
+        initialDate={addEventInitialDate || currentQuote?.date}
+        editingEvent={editingCustomEvent}
+        onSave={handleSaveCustomEvent}
+        onDelete={handleDeleteCustomEvent}
       />
 
       {/* Floating Version Quick-Switcher */}

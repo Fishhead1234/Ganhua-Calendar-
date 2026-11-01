@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Calendar, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, Calendar, Plus, Edit2 } from 'lucide-react';
 import { CalendarMeeting } from '../services/calendarService';
 
 interface DailyAgendaStripProps {
   events: CalendarMeeting[];
   isFuture?: boolean;
   onOpenSyncModal: () => void;
+  onOpenAddEvent?: () => void;
+  onEditEvent?: (event: CalendarMeeting) => void;
 }
 
 /**
@@ -38,6 +40,24 @@ export function generateMeetingRoastTag(title: string, startHour: number): strin
   if (title.includes('培訓') || title.includes('分享') || lower.includes('workshop')) {
     return '帶薪光明正大放空';
   }
+  if (title.includes('家庭') || title.includes('聚餐') || title.includes('親戚')) {
+    return '年菜塞滿嘴應付中';
+  }
+  if (title.includes('喜酒') || title.includes('婚禮')) {
+    return '紅色炸彈肉痛中';
+  }
+  if (title.includes('尾牙') || title.includes('春酒')) {
+    return '假笑敬酒抽大獎';
+  }
+  if (title.includes('牙醫') || title.includes('看醫生') || title.includes('診所')) {
+    return '帶薪看病逃離辦公室';
+  }
+  if (title.includes('約會')) {
+    return '準時落跑誰也別想加班';
+  }
+  if (title.includes('特休') || title.includes('請假') || title.includes('休假')) {
+    return '關通知人間蒸發模式';
+  }
 
   // Rotating default sarcastic tags
   const defaults = [
@@ -56,10 +76,13 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
   events,
   isFuture = false,
   onOpenSyncModal,
+  onOpenAddEvent,
+  onEditEvent,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
 
-  const formatTime = (h: number, m: number) => {
+  const formatTime = (h: number, m: number, isAllDay?: boolean) => {
+    if (isAllDay) return '全天';
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   };
 
@@ -82,6 +105,21 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {onOpenAddEvent && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenAddEvent();
+                }}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#2D2D2D] hover:bg-[#C83E31] text-[#F9F6F0] text-[10px] font-sans font-bold transition shadow-xs cursor-pointer active:scale-95"
+                title="新增自訂行程與社畜吐槽"
+              >
+                <Plus className="w-3 h-3 text-[#D4B483]" />
+                <span>+ 新增行程</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={(e) => {
@@ -91,7 +129,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
               className="text-[11px] font-sans font-bold text-[#6E6A63] hover:text-[#2D2D2D] flex items-center gap-1 cursor-pointer transition"
             >
               <Calendar className="w-3.5 h-3.5 text-[#C83E31]" />
-              <span>行事曆連動</span>
+              <span className="hidden sm:inline">連動</span>
             </button>
             {isOpen ? (
               <ChevronUp className="w-4 h-4 text-[#6E6A63]" />
@@ -105,29 +143,63 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
         {isOpen && (
           <div className="px-4 pb-3 pt-1 border-t border-[#2D2D2D]/15 space-y-2">
             {events.length === 0 ? (
-              <div className="py-2 text-center text-xs font-sans text-[#6E6A63]">
+              <div className="py-2.5 text-center text-xs font-sans text-[#6E6A63] space-y-1">
                 <p className="font-bold text-[#2D2D2D]">今日行事曆一片淨土 🏖️</p>
-                <p className="text-[11px] mt-0.5">薪水小偷模式全面啟動，零干擾專注當個空氣。</p>
+                <p className="text-[11px]">薪水小偷模式全面啟動，零干擾專注當個空氣。</p>
+                {onOpenAddEvent && (
+                  <button
+                    type="button"
+                    onClick={onOpenAddEvent}
+                    className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-[#C83E31] hover:underline pt-1 cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>立即新增第一筆行程</span>
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-1.5 pt-1">
                 {events.map((evt) => {
                   const tag = generateMeetingRoastTag(evt.title, evt.startHour);
+                  const isCustom = evt.source === 'local';
+
                   return (
                     <div
                       key={evt.id}
-                      className="flex items-baseline gap-2 text-xs font-sans text-[#2D2D2D] py-0.5"
+                      onClick={() => {
+                        if (isCustom && onEditEvent) {
+                          onEditEvent(evt);
+                        }
+                      }}
+                      className={`flex items-baseline justify-between text-xs font-sans text-[#2D2D2D] py-1 px-1.5 rounded-lg transition ${
+                        isCustom ? 'hover:bg-[#F3EFE6] cursor-pointer' : ''
+                      }`}
+                      title={isCustom ? '點擊編輯此行程' : undefined}
                     >
-                      <span className="w-1.5 h-3.5 bg-[#C83E31] rounded-full shrink-0 self-center" />
-                      <span className="font-mono font-bold text-[#6E6A63] shrink-0">
-                        {formatTime(evt.startHour, evt.startMinute)}
-                      </span>
-                      <span className="font-bold text-[#2D2D2D] truncate">
-                        {evt.title}
-                      </span>
-                      <span className="text-[#6E6A63] font-medium text-[11px] shrink-0">
-                        ({tag})
-                      </span>
+                      <div className="flex items-baseline gap-2 min-w-0 pr-2">
+                        <span
+                          className={`w-1.5 h-3.5 rounded-full shrink-0 self-center ${
+                            isCustom ? 'bg-[#D4B483]' : 'bg-[#C83E31]'
+                          }`}
+                        />
+                        <span className="font-mono font-bold text-[#6E6A63] shrink-0 text-[11px]">
+                          {formatTime(evt.startHour, evt.startMinute, evt.isAllDay)}
+                        </span>
+                        <span className="font-bold text-[#2D2D2D] truncate">
+                          {evt.title}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[#6E6A63] font-medium text-[10px]">
+                          ({tag})
+                        </span>
+                        {isCustom && (
+                          <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold flex items-center gap-0.5">
+                            <Edit2 className="w-2.5 h-2.5" /> 自訂
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -139,4 +211,3 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
     </div>
   );
 };
-

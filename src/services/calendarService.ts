@@ -7,6 +7,10 @@ export interface CalendarMeeting {
   startMinute: number; // 0-59
   durationMinutes: number;
   isFridayAfterFour?: boolean;
+  dateKey?: string; // YYYY-MM-DD
+  notes?: string;
+  isAllDay?: boolean;
+  source?: 'local' | 'synced' | 'preset';
 }
 
 export interface CalendarRoastResult {
@@ -663,3 +667,237 @@ export async function parseIcsFile(file: File, targetDate: Date = new Date()): P
     reader.readAsText(file);
   });
 }
+
+/**
+ * ----------------------------------------------------
+ * Custom Calendar Appointments (Create / Edit / Delete)
+ * ----------------------------------------------------
+ */
+
+export interface CustomCalendarEvent {
+  id: string;
+  title: string;
+  dateKey: string; // YYYY-MM-DD
+  startHour: number; // 0-23
+  startMinute: number; // 0-59
+  durationMinutes: number;
+  isAllDay: boolean;
+  notes?: string;
+  source: 'local';
+  createdAt?: number;
+}
+
+const CUSTOM_EVENTS_STORAGE_KEY = 'user_custom_events';
+
+export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
+  const [y, m, d] = e.dateKey.split('-').map(Number);
+  const dateObj = new Date(y, (m || 1) - 1, d || 1);
+  const isFriday = dateObj.getDay() === 5;
+  const isFridayAfterFour = isFriday && (e.startHour >= 16 || (e.startHour === 15 && e.startMinute >= 45));
+
+  return {
+    id: e.id,
+    title: e.title,
+    startHour: e.startHour,
+    startMinute: e.startMinute,
+    durationMinutes: e.isAllDay ? 480 : e.durationMinutes,
+    isFridayAfterFour,
+    dateKey: e.dateKey,
+    notes: e.notes,
+    isAllDay: e.isAllDay,
+    source: 'local',
+  };
+}
+
+export function getCustomEvents(): CustomCalendarEvent[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(CUSTOM_EVENTS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomEvent(event: CustomCalendarEvent): void {
+  if (typeof window === 'undefined') return;
+  const events = getCustomEvents();
+  const existingIdx = events.findIndex((e) => e.id === event.id);
+  let updated: CustomCalendarEvent[];
+  if (existingIdx >= 0) {
+    updated = [...events];
+    updated[existingIdx] = event;
+  } else {
+    updated = [event, ...events];
+  }
+  localStorage.setItem(CUSTOM_EVENTS_STORAGE_KEY, JSON.stringify(updated));
+}
+
+export function deleteCustomEvent(id: string): void {
+  if (typeof window === 'undefined') return;
+  const events = getCustomEvents();
+  const updated = events.filter((e) => e.id !== id);
+  localStorage.setItem(CUSTOM_EVENTS_STORAGE_KEY, JSON.stringify(updated));
+}
+
+export function getCustomEventsForDate(dateKey: string): CalendarMeeting[] {
+  const events = getCustomEvents();
+  return events
+    .filter((e) => e.dateKey === dateKey)
+    .map(customEventToMeeting)
+    .sort((a, b) => a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute));
+}
+
+/**
+ * Merges external synced/preset meetings with user custom events for the target date
+ */
+export function getMergedEvents(
+  syncedEvents: CalendarMeeting[] = [],
+  targetDateKey: string
+): CalendarMeeting[] {
+  const customEvents = getCustomEventsForDate(targetDateKey);
+
+  const [tY, tM, tD] = targetDateKey.split('-').map(Number);
+  const targetDateObj = new Date(tY, (tM || 1) - 1, tD || 1);
+  const today = new Date();
+  const isTargetToday =
+    targetDateObj.getFullYear() === today.getFullYear() &&
+    targetDateObj.getMonth() === today.getMonth() &&
+    targetDateObj.getDate() === today.getDate();
+
+  // Synced meetings: include if they explicitly match dateKey, or if they lack dateKey and target date is today
+  const relevantSynced = syncedEvents.filter((ev) => {
+    if (ev.source === 'local') return false; // avoid duplicate
+    if (ev.dateKey) return ev.dateKey === targetDateKey;
+    return isTargetToday;
+  });
+
+  const merged = [...relevantSynced, ...customEvents];
+  merged.sort((a, b) => a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute));
+  return merged;
+}
+
+/**
+ * 2. Native Android / iOS Calendar Write via Capacitor
+ */
+export async function writeNativeDeviceCalendarEvent(event: {
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  isAllDay?: boolean;
+  notes?: string;
+}): Promise<boolean> {
+  const isNative =
+    typeof window !== 'undefined' &&
+    (window as any).Capacitor &&
+    (window as any).Capacitor.isNativePlatform();
+
+  if (!isNative) return false;
+
+  const win = window as any;
+  if (win.Capacitor?.Plugins?.CapacitorCalendar) {
+    try {
+      const plugin = win.Capacitor.Plugins.CapacitorCalendar;
+      if (plugin.requestWriteOnlyCalendarAccess) {
+        await plugin.requestWriteOnlyCalendarAccess();
+      } else if (plugin.requestFullCalendarAccess) {
+        await plugin.requestFullCalendarAccess();
+      }
+
+      if (plugin.createEvent) {
+        await plugin.createEvent({
+          title: event.title,
+          startDate: event.startDate.getTime(),
+          endDate: event.endDate.getTime(),
+          isAllDay: Boolean(event.isAllDay),
+          notes: event.notes || '',
+        });
+        return true;
+      }
+    } catch (err) {
+      console.warn('Native CapacitorCalendar.createEvent error:', err);
+    }
+  }
+
+  // Also check if GanhuaWidgetBridge has write
+  if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.createDeviceCalendarEvent) {
+    try {
+      await win.Capacitor.Plugins.GanhuaWidgetBridge.createDeviceCalendarEvent({
+        title: event.title,
+        startDate: event.startDate.getTime(),
+        endDate: event.endDate.getTime(),
+        isAllDay: Boolean(event.isAllDay),
+      });
+      return true;
+    } catch (e) {
+      console.warn('Bridge create event error:', e);
+    }
+  }
+
+  return false;
+}
+
+export async function deleteNativeDeviceCalendarEvent(id: string): Promise<boolean> {
+  const isNative =
+    typeof window !== 'undefined' &&
+    (window as any).Capacitor &&
+    (window as any).Capacitor.isNativePlatform();
+
+  if (!isNative) return false;
+  const win = window as any;
+  if (win.Capacitor?.Plugins?.CapacitorCalendar?.deleteEventById) {
+    try {
+      await win.Capacitor.Plugins.CapacitorCalendar.deleteEventById({ id });
+      return true;
+    } catch (e) {
+      console.warn('Native delete error:', e);
+    }
+  }
+  return false;
+}
+
+/**
+ * 3. Push Event to Google Apps Script (Two-Way Sync Web Bridge)
+ */
+export async function pushEventToGoogleAppsScript(newEvent: {
+  id: string;
+  title: string;
+  dateKey: string;
+  startHour: number;
+  startMinute: number;
+  durationMinutes: number;
+  isAllDay: boolean;
+  notes?: string;
+}): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  const liveUrl = localStorage.getItem('live_calendar_url');
+  if (!liveUrl) return false;
+
+  try {
+    await fetch(liveUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'create_event',
+        id: newEvent.id,
+        title: newEvent.title,
+        date: newEvent.dateKey,
+        startHour: newEvent.startHour,
+        startMinute: newEvent.startMinute,
+        durationMinutes: newEvent.durationMinutes,
+        isAllDay: newEvent.isAllDay,
+        notes: newEvent.notes || '',
+      }),
+    });
+    return true;
+  } catch (err) {
+    console.warn('GAS push failed:', err);
+    return false;
+  }
+}
+

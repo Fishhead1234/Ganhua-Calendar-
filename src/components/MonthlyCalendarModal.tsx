@@ -8,9 +8,11 @@ import {
   Sparkles,
   CheckCircle2,
   CalendarDays,
+  Plus,
+  Edit2,
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
-import { CalendarMeeting } from '../services/calendarService';
+import { CalendarMeeting, CustomCalendarEvent, customEventToMeeting } from '../services/calendarService';
 import quotes365Raw from '../data/quotes365.json';
 import { formatQuoteFrom365 } from '../hooks/useTodayQuote';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -23,8 +25,11 @@ interface MonthlyCalendarModalProps {
   today?: Date;
   survivedDates?: string[];
   activeMeetings?: CalendarMeeting[];
+  customEvents?: CustomCalendarEvent[];
   quotes?: RawStaticQuote365[];
   onSelectDate: (targetDate: Date) => void;
+  onOpenAddEvent?: (dateStr: string) => void;
+  onEditEvent?: (event: CalendarMeeting) => void;
 }
 
 export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
@@ -34,8 +39,11 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   today = new Date(),
   survivedDates = [],
   activeMeetings = [],
+  customEvents = [],
   quotes,
   onSelectDate,
+  onOpenAddEvent,
+  onEditEvent,
 }) => {
   // Validate and sanitize dates
   const safeCurrentDate = useMemo(() => {
@@ -70,6 +78,27 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
 
   const isPickedFuture = pickedMidnight.getTime() > todayMidnight.getTime();
   const isPickedToday = pickedMidnight.getTime() === todayMidnight.getTime();
+
+  const pickedDateStr = useMemo(() => {
+    const y = pickedDate.getFullYear();
+    const m = String(pickedDate.getMonth() + 1).padStart(2, '0');
+    const d = String(pickedDate.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }, [pickedDate]);
+
+  const pickedDayEvents = useMemo<CalendarMeeting[]>(() => {
+    const customForDate = (customEvents || [])
+      .filter((e) => e.dateKey === pickedDateStr)
+      .map(customEventToMeeting);
+
+    const syncedForDate = isPickedToday
+      ? (activeMeetings || []).filter((m) => m.source !== 'local')
+      : [];
+
+    const merged = [...syncedForDate, ...customForDate];
+    merged.sort((a, b) => a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute));
+    return merged;
+  }, [customEvents, pickedDateStr, isPickedToday, activeMeetings]);
 
   // Find Gàn-huà quote and illustration for selected date with strict fallback
   const pickedMonth = pickedDate.getMonth() + 1;
@@ -368,6 +397,21 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     {cell.isToday && !hasSurvived && (
                       <span className="w-1 h-1 rounded-full bg-[#D4B483]" />
                     )}
+                    {cell.isCurrentMonth && (
+                      (() => {
+                        const cellDateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(cell.dayNum).padStart(2, '0')}`;
+                        const hasCustom = customEvents?.some((e) => e.dateKey === cellDateStr);
+                        if (hasCustom) {
+                          return (
+                            <span
+                              className="w-1 h-1 rounded-full bg-[#2D2D2D]/80 ring-0.5 ring-stone-400"
+                              title="此日有自訂行程"
+                            />
+                          );
+                        }
+                        return null;
+                      })()
+                    )}
                   </div>
                 </button>
               );
@@ -376,20 +420,32 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
 
           {/* Selected Date Preview Box */}
           <div className="rounded-2xl border-2 border-[#2D2D2D] p-3.5 bg-white/80 shadow-sm space-y-2.5">
-            {/* Header info */}
-            <div className="flex items-center justify-between border-b border-[#2D2D2D]/15 pb-2">
-              <div className="flex items-center gap-2">
+            {/* Header info + Add Event Button */}
+            <div className="flex items-center justify-between border-b border-[#2D2D2D]/15 pb-2 gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-serif font-black text-2xl text-[#2D2D2D]">
                   {pickedDate.getMonth() + 1}月 {pickedDate.getDate()}日
                 </span>
                 <span className="text-xs font-sans text-[#6E6A63] font-bold">
                   {pickedWeekdayZh} | {pickedLunar?.fullDisplayText || '農曆九月廿二'}
                 </span>
+                {isPickedToday && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#C83E31] text-white">
+                    今天
+                  </span>
+                )}
               </div>
-              {isPickedToday && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#C83E31] text-white">
-                  今天
-                </span>
+
+              {onOpenAddEvent && (
+                <button
+                  type="button"
+                  onClick={() => onOpenAddEvent(pickedDateStr)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2D2D2D] hover:bg-[#C83E31] text-[#F9F6F0] text-[11px] font-sans font-bold shadow-xs transition active:scale-95 cursor-pointer ml-auto"
+                  title="為此日新增行程"
+                >
+                  <Plus className="w-3 h-3 text-[#D4B483]" />
+                  <span>+ 新增行程</span>
+                </button>
               )}
             </div>
 
@@ -419,7 +475,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 </div>
 
                 {/* Future Schedule Preview (Planner Mode) */}
-                {activeMeetings && activeMeetings.length > 0 && (
+                {pickedDayEvents.length > 0 && (
                   <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
                     <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
                       <span className="flex items-center gap-1">
@@ -427,20 +483,43 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                         <span>預排行程</span>
                       </span>
                       <span className="text-[10px] text-[#6E6A63]">
-                        {activeMeetings.length} 場行程
+                        {pickedDayEvents.length} 場行程
                       </span>
                     </div>
-                    {activeMeetings.map((m, idx) => (
-                      <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
-                        <span className="flex items-center gap-1.5 truncate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#6E6A63] shrink-0" />
-                          <span className="truncate">{m?.title || '未命名行程'}</span>
-                        </span>
-                        <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
-                          {String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}
-                        </span>
-                      </div>
-                    ))}
+                    {pickedDayEvents.map((m) => {
+                      const isCustom = m.source === 'local';
+                      return (
+                        <div
+                          key={m.id}
+                          onClick={() => {
+                            if (isCustom && onEditEvent) {
+                              onEditEvent(m);
+                            }
+                          }}
+                          className={`text-xs font-sans text-[#6E6A63] flex items-center justify-between py-1 px-1 rounded-md transition ${
+                            isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
+                          }`}
+                          title={isCustom ? '點擊編輯此行程' : undefined}
+                        >
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                isCustom ? 'bg-[#D4B483]' : 'bg-[#6E6A63]'
+                              }`}
+                            />
+                            <span className="truncate font-medium">{m?.title || '未命名行程'}</span>
+                            {isCustom && (
+                              <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
+                                <Edit2 className="w-2.5 h-2.5" /> 自訂
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2 font-mono">
+                            {m.isAllDay ? '全天' : `${String(m?.startHour ?? 9).padStart(2, '0')}:${String(m?.startMinute ?? 0).padStart(2, '0')}`}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -492,29 +571,52 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                   </div>
                 </div>
 
-                {/* Synced meetings for today */}
-                {isPickedToday && activeMeetings && activeMeetings.length > 0 && (
+                {/* Day meetings */}
+                {pickedDayEvents.length > 0 && (
                   <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
                     <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
                       <span className="flex items-center gap-1">
                         <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
-                        <span>今日已連動行程</span>
+                        <span>當日排定行程</span>
                       </span>
                       <span className="text-[10px] text-[#6E6A63]">
-                        {activeMeetings.length} 場行程
+                        {pickedDayEvents.length} 場行程
                       </span>
                     </div>
-                    {activeMeetings.map((m, idx) => (
-                      <div key={idx} className="text-xs font-sans text-[#6E6A63] flex items-center justify-between py-0.5">
-                        <span className="flex items-center gap-1.5 truncate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#C83E31] shrink-0" />
-                          <span className="truncate">{m?.title || '未命名行程'}</span>
-                        </span>
-                        <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2">
-                          {String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}
-                        </span>
-                      </div>
-                    ))}
+                    {pickedDayEvents.map((m) => {
+                      const isCustom = m.source === 'local';
+                      return (
+                        <div
+                          key={m.id}
+                          onClick={() => {
+                            if (isCustom && onEditEvent) {
+                              onEditEvent(m);
+                            }
+                          }}
+                          className={`text-xs font-sans text-[#6E6A63] flex items-center justify-between py-1 px-1 rounded-md transition ${
+                            isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
+                          }`}
+                          title={isCustom ? '點擊編輯此行程' : undefined}
+                        >
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                isCustom ? 'bg-[#D4B483]' : 'bg-[#C83E31]'
+                              }`}
+                            />
+                            <span className="truncate font-medium">{m?.title || '未命名行程'}</span>
+                            {isCustom && (
+                              <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
+                                <Edit2 className="w-2.5 h-2.5" /> 自訂
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-[10px] text-[#6E6A63] shrink-0 ml-2 font-mono">
+                            {m.isAllDay ? '全天' : `${String(m?.startHour ?? 9).padStart(2, '0')}:{String(m?.startMinute ?? 0).padStart(2, '0')}`}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
