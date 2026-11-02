@@ -584,39 +584,42 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
               {activeWidget === 'survival_stamp' && (
                 <div className="w-full max-w-[380px] space-y-4">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-6 py-2 select-none">
-                    {/* State 1: Before Stamping */}
+                    {/* State 1: Before Stamping (Warm Cream + Charcoal Dashed Border) */}
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-[11px] font-sans font-bold text-[#6E6A63]">
                         ① 未打卡狀態（點擊一鍵打卡）
                       </span>
-                      <div className="w-32 h-32 rounded-3xl bg-[#FAF7F0] border-[3px] border-[#2D2D2D] shadow-md p-2.5 flex flex-col items-center justify-between transition hover:scale-105 cursor-pointer active:scale-95">
-                        <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#9E988D] flex items-center justify-center text-2xl mt-0.5">
-                          💮
+                      <div className="w-32 h-32 rounded-3xl bg-[#F9F6F0] border-2 border-dashed border-[#2D2D2D] shadow-md p-2.5 flex flex-col items-center justify-between transition hover:scale-105 cursor-pointer active:scale-95">
+                        <div className="w-16 h-16 rounded-full border border-dashed border-[#9E988D] flex flex-col items-center justify-center mt-1">
+                          <span className="text-sm">💮</span>
+                          <span className="font-serif font-black text-xs text-[#2D2D2D] leading-tight mt-0.5">
+                            點擊
+                          </span>
+                          <span className="font-serif font-black text-xs text-[#2D2D2D] leading-tight">
+                            生還
+                          </span>
                         </div>
-                        <span className="font-serif font-black text-xs text-[#2D2D2D]">
-                          點擊生還
-                        </span>
                         <div className="px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#FAF7F0] font-sans font-bold text-[9px]">
                           🔥 {streakCount} 天
                         </div>
                       </div>
                     </div>
 
-                    {/* State 2: Stamped Today */}
+                    {/* State 2: Stamped Today (Solid Traditional Seal Red) */}
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-[11px] font-sans font-bold text-[#C83E31]">
-                        ② 已打卡狀態（全小工具同步生還）
+                        ② 已打卡狀態（全卡翻轉為硃砂紅印）
                       </span>
-                      <div className="w-32 h-32 rounded-3xl bg-[#FAF7F0] border-[3px] border-[#2D2D2D] shadow-md p-2.5 flex flex-col items-center justify-between">
-                        <div className="w-full h-20 flex flex-col items-center justify-center -rotate-8 border-2 border-[#C83E31] rounded-xl p-1 bg-white/40 shadow-xs">
-                          <span className="font-serif font-black text-xs sm:text-sm text-[#C83E31] tracking-wider">
-                            今日已生還
+                      <div className="w-32 h-32 rounded-3xl bg-[#C83E31] border-2 border-[#9E2218] shadow-md p-2.5 flex flex-col items-center justify-between text-white transition hover:scale-105 cursor-pointer active:scale-95">
+                        <div className="w-full h-20 rounded-2xl border border-white/80 p-1 flex flex-col items-center justify-center mt-0.5 bg-black/5">
+                          <span className="font-serif font-black text-sm tracking-wide text-white">
+                            💮 已生還
                           </span>
-                          <span className="font-sans font-extrabold text-[8px] text-[#C83E31] tracking-widest mt-0.5">
+                          <span className="font-sans font-extrabold text-[9px] text-white/90 tracking-widest mt-1">
                             ✓ SURVIVED
                           </span>
                         </div>
-                        <div className="px-2.5 py-0.5 rounded-full bg-[#C83E31] text-[#FAF7F0] border border-[#2D2D2D] font-sans font-bold text-[9px]">
+                        <div className="px-2.5 py-0.5 rounded-full bg-white/20 border border-white/60 text-white font-sans font-bold text-[9px]">
                           🔥 連續 {streakCount} 天
                         </div>
                       </div>
