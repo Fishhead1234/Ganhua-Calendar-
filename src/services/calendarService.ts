@@ -1,5 +1,5 @@
 import { CharacterType } from '../types/calendar';
-import { toLocalDateKey } from '../utils/dateUtils';
+import { toLocalDateKey, parseLocalDateKey } from '../utils/dateUtils';
 
 export interface CalendarMeeting {
   id: string;
@@ -497,13 +497,23 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     try {
       const res = await win.Capacitor.Plugins.CapacitorCalendar.listCalendars();
       const list = res.result || res.calendars || [];
-      calendars = list.map((c: any) => ({
-        id: String(c.id),
-        name: c.name || c.title || '未命名日曆',
-        accountName: c.accountName || c.source || '',
-        color: c.color || '#2D2D2D',
-        isPrimary: Boolean(c.isPrimary),
-      }));
+      calendars = list.map((c: any) => {
+        let name = c.name || c.title || '未命名日曆';
+        const accountName = c.accountName || c.source || '';
+        const lowerStr = (name + ' ' + accountName).toLowerCase();
+        if (lowerStr.includes('schoolsbuddy')) {
+          name = '🏫 SchoolsBuddy (學校日曆)';
+        } else if (name.startsWith('http://') || name.startsWith('https://')) {
+          name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
+        }
+        return {
+          id: String(c.id),
+          name,
+          accountName,
+          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : '#2D2D2D'),
+          isPrimary: Boolean(c.isPrimary),
+        };
+      });
     } catch (e) {
       console.warn('CapacitorCalendar.listCalendars error:', e);
     }
@@ -514,13 +524,23 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     try {
       const res = await win.Capacitor.Plugins.GanhuaWidgetBridge.listCalendars();
       const list = res.calendars || [];
-      calendars = list.map((c: any) => ({
-        id: String(c.id),
-        name: c.name || c.title || '未命名日曆',
-        accountName: c.accountName || '',
-        color: c.color || '#2D2D2D',
-        isPrimary: Boolean(c.isPrimary),
-      }));
+      calendars = list.map((c: any) => {
+        let name = c.name || c.title || '未命名日曆';
+        const accountName = c.accountName || '';
+        const lowerStr = (name + ' ' + accountName).toLowerCase();
+        if (lowerStr.includes('schoolsbuddy')) {
+          name = '🏫 SchoolsBuddy (學校日曆)';
+        } else if (name.startsWith('http://') || name.startsWith('https://')) {
+          name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
+        }
+        return {
+          id: String(c.id),
+          name,
+          accountName,
+          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : '#2D2D2D'),
+          isPrimary: Boolean(c.isPrimary),
+        };
+      });
     } catch (e) {
       console.warn('GanhuaWidgetBridge.listCalendars error:', e);
     }
@@ -736,38 +756,198 @@ export async function fetchNativeDeviceCalendarEvents(
 }
 
 /**
- * Method 2: Live Google Apps Script (GAS) JSON Sync (Web Browser)
- * Fetches JSON directly from user's deployed Google Apps Script web app URL
+ * Helper: Parse iCalendar timestamp string into local Date and all-day flag.
+ * Handles UTC (ending in Z), Local/Floating (no Z), and All-Day (YYYYMMDD).
  */
-export async function fetchLiveJsonCalendarEvents(
-  rawUrl?: string,
-  targetDate: Date = new Date()
-): Promise<CalendarMeeting[]> {
-  const url =
-    rawUrl?.trim() ||
-    (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : null);
+export function parseIcsTimestamp(val: string): { date: Date; isAllDay: boolean } | null {
+  if (!val) return null;
+  const clean = val.replace(/^.*:/, '').trim();
 
-  if (!url) {
-    throw new Error('請先輸入 Google Apps Script 部署網址（Web App URL）！');
+  // All-day: YYYYMMDD (8 digits)
+  if (/^\d{8}$/.test(clean)) {
+    const y = parseInt(clean.substring(0, 4), 10);
+    const m = parseInt(clean.substring(4, 6), 10);
+    const d = parseInt(clean.substring(6, 8), 10);
+    return { date: new Date(y, m - 1, d, 0, 0, 0, 0), isAllDay: true };
   }
 
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-    signal: AbortSignal.timeout(8000),
+  // Date-time: YYYYMMDDTHHMMSS(Z)?
+  const match = clean.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/);
+  if (match) {
+    const y = parseInt(match[1], 10);
+    const mon = parseInt(match[2], 10) - 1;
+    const d = parseInt(match[3], 10);
+    const h = parseInt(match[4], 10);
+    const min = parseInt(match[5], 10);
+    const sec = parseInt(match[6], 10);
+    const isUtc = Boolean(match[7]);
+
+    // If UTC (Z), construct UTC Date so that getHours() / toLocalDateKey() converts to local timezone!
+    const date = isUtc ? new Date(Date.UTC(y, mon, d, h, min, sec)) : new Date(y, mon, d, h, min, sec);
+    return { date, isAllDay: false };
+  }
+
+  return null;
+}
+
+/**
+ * Universal iCalendar / webcal Parser
+ * Correctly parses multi-day events, UTC timezone conversions, and assigns local dateKey.
+ * Supports SchoolsBuddy, Google Calendar ICS, Outlook, and Apple iCal feeds.
+ */
+export function parseICSToMeetings(
+  icsContent: string,
+  defaultCalendarName: string = '🏫 SchoolsBuddy'
+): CalendarMeeting[] {
+  const meetings: CalendarMeeting[] = [];
+
+  // RFC 5545 line unfolding
+  const unfolded = icsContent.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+  const lines = unfolded.split(/\r?\n/);
+
+  // Extract calendar display name if present (e.g. X-WR-CALNAME:SchoolsBuddy)
+  let detectedCalName = defaultCalendarName;
+  for (const line of lines) {
+    if (line.startsWith('X-WR-CALNAME:')) {
+      const name = line.substring(13).trim();
+      if (name) detectedCalName = name;
+      break;
+    }
+  }
+
+  let inEvent = false;
+  let currentEvent: {
+    uid?: string;
+    summary?: string;
+    dtstart?: string;
+    dtend?: string;
+    description?: string;
+    location?: string;
+  } = {};
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const line = rawLine.trim();
+
+    if (line === 'BEGIN:VEVENT') {
+      inEvent = true;
+      currentEvent = {};
+      continue;
+    }
+
+    if (line === 'END:VEVENT') {
+      if (inEvent && currentEvent.dtstart) {
+        const startParsed = parseIcsTimestamp(currentEvent.dtstart);
+        if (startParsed && !isNaN(startParsed.date.getTime())) {
+          const endParsed = currentEvent.dtend ? parseIcsTimestamp(currentEvent.dtend) : null;
+          const isAllDay = startParsed.isAllDay;
+
+          const title = (currentEvent.summary || '未命名學校行程')
+            .replace(/\\,/g, ',')
+            .replace(/\\;/g, ';')
+            .replace(/\\n/gi, ' ')
+            .trim();
+
+          const calName =
+            detectedCalName.toLowerCase().includes('schoolsbuddy') ||
+            (currentEvent.description || '').toLowerCase().includes('schoolsbuddy')
+              ? '🏫 SchoolsBuddy'
+              : detectedCalName;
+
+          // If all-day event spanning multiple days (e.g. DTSTART:20261102 to DTEND:20261105)
+          if (isAllDay && endParsed && endParsed.isAllDay) {
+            const cur = new Date(startParsed.date);
+            const endLimit = new Date(endParsed.date);
+            // End date in iCal all-day events is exclusive; ensure at least 1 day
+            const maxDays = Math.max(1, Math.round((endLimit.getTime() - cur.getTime()) / (1000 * 60 * 60 * 24)));
+            for (let d = 0; d < Math.min(30, maxDays); d++) {
+              const dayDate = new Date(cur.getTime() + d * 86400000);
+              const dateKey = toLocalDateKey(dayDate);
+              meetings.push({
+                id: `ics-${currentEvent.uid || Date.now()}-${d}`,
+                title,
+                startHour: 9,
+                startMinute: 0,
+                durationMinutes: 480,
+                isAllDay: true,
+                dateKey,
+                isFridayAfterFour: false,
+                source: 'synced',
+                calendarName: calName,
+                calendarColor: '#0F9D58',
+              });
+            }
+          } else {
+            // Standard timed meeting or single-day all day event
+            const localDate = startParsed.date;
+            const dateKey = toLocalDateKey(localDate);
+            const startHour = isAllDay ? 9 : localDate.getHours();
+            const startMinute = isAllDay ? 0 : localDate.getMinutes();
+            let durationMinutes = isAllDay ? 480 : 60;
+
+            if (!isAllDay && endParsed && !isNaN(endParsed.date.getTime())) {
+              const diffMs = endParsed.date.getTime() - startParsed.date.getTime();
+              if (diffMs > 0) {
+                durationMinutes = Math.max(15, Math.round(diffMs / (1000 * 60)));
+              }
+            }
+
+            const isFridayAfterFour =
+              localDate.getDay() === 5 &&
+              (startHour >= 16 || (startHour === 15 && startMinute >= 45));
+
+            meetings.push({
+              id: `ics-${currentEvent.uid || meetings.length + 1}-${Date.now()}`,
+              title,
+              startHour,
+              startMinute,
+              durationMinutes,
+              isFridayAfterFour,
+              dateKey,
+              isAllDay,
+              source: 'synced',
+              calendarName: calName,
+              calendarColor: '#0F9D58',
+            });
+          }
+        }
+      }
+      inEvent = false;
+      currentEvent = {};
+      continue;
+    }
+
+    if (!inEvent) continue;
+
+    if (line.startsWith('UID:')) {
+      currentEvent.uid = line.substring(4).trim();
+    } else if (line.startsWith('SUMMARY:')) {
+      currentEvent.summary = line.substring(8);
+    } else if (line.startsWith('DTSTART')) {
+      currentEvent.dtstart = line;
+    } else if (line.startsWith('DTEND')) {
+      currentEvent.dtend = line;
+    } else if (line.startsWith('DESCRIPTION:')) {
+      currentEvent.description = line.substring(12);
+    } else if (line.startsWith('LOCATION:')) {
+      currentEvent.location = line.substring(9);
+    }
+  }
+
+  meetings.sort((a, b) => {
+    if ((a.dateKey || '') !== (b.dateKey || '')) {
+      return (a.dateKey || '').localeCompare(b.dateKey || '');
+    }
+    return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
   });
 
-  if (!res.ok) {
-    throw new Error(`連線失敗 (HTTP ${res.status})，請確認 Google Apps Script 是否已部署為「任何人」皆可讀取。`);
-  }
+  return meetings;
+}
 
-  const data = await res.json();
-  if (!Array.isArray(data)) {
-    throw new Error('回傳的資料不是陣列格式，請確認 Apps Script 程式碼是否回傳 JSON 陣列。');
-  }
-
+/**
+ * Parses Google Apps Script JSON array into CalendarMeeting[]
+ */
+export function parseJsonMeetings(data: any[], targetDate: Date = new Date()): CalendarMeeting[] {
   const meetings: CalendarMeeting[] = [];
 
   data.forEach((item: any, idx: number) => {
@@ -797,11 +977,14 @@ export async function fetchLiveJsonCalendarEvents(
       durationMinutes = 480;
     }
 
-    const isFridayAfterFour =
-      targetDate.getDay() === 5 &&
-      (startHour >= 16 || (startHour === 15 && startMinute >= 45));
+    const eventDateKey =
+      item.dateKey ||
+      (item.start ? toLocalDateKey(new Date(item.start)) : toLocalDateKey(targetDate));
 
-    const eventDateKey = item.dateKey || (item.start ? toLocalDateKey(new Date(item.start)) : toLocalDateKey(targetDate));
+    const itemDate = parseLocalDateKey(eventDateKey);
+    const isFridayAfterFour =
+      itemDate.getDay() === 5 &&
+      (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
     meetings.push({
       id: `live-json-${idx + 1}-${Date.now()}`,
@@ -823,80 +1006,121 @@ export async function fetchLiveJsonCalendarEvents(
 }
 
 /**
- * Backward compatibility: Lightweight iCal Parser
+ * Universal Live Calendar Feed Fetcher
+ * Automatically detects and parses:
+ * 1. SchoolsBuddy / iCal / webcal feeds (BEGIN:VCALENDAR)
+ * 2. Google Apps Script JSON
+ * With CORS proxy fallback for browser security restrictions.
  */
-export function parseICSForToday(icsContent: string, targetDate: Date = new Date()): CalendarMeeting[] {
-  const meetings: CalendarMeeting[] = [];
-  const targetYear = targetDate.getFullYear();
-  const targetMonth = targetDate.getMonth();
-  const targetDay = targetDate.getDate();
+export async function fetchLiveCalendarFeed(
+  rawUrl?: string,
+  targetDate: Date = new Date()
+): Promise<CalendarMeeting[]> {
+  const url =
+    rawUrl?.trim() ||
+    (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : null);
 
-  const unfolded = icsContent.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
-  const lines = unfolded.split(/\r?\n/);
+  if (!url) {
+    throw new Error('請輸入日曆網址（支援 SchoolsBuddy、Google/Apple iCal 或 Apps Script）！');
+  }
 
-  let inEvent = false;
-  let currentEvent: { summary?: string; dtstart?: string; dtend?: string } = {};
+  // Normalize webcal:// to https://
+  const cleanUrl = url.trim().replace(/^webcal:\/\//i, 'https://');
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line === 'BEGIN:VEVENT') {
-      inEvent = true;
-      currentEvent = {};
-      continue;
+  let text = '';
+  let fetchErrorMsg = '';
+
+  // 1. Attempt direct fetch
+  try {
+    const res = await fetch(cleanUrl, {
+      method: 'GET',
+      headers: {
+        Accept: 'text/calendar, application/json, text/plain, */*',
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      text = await res.text();
+    } else {
+      fetchErrorMsg = `HTTP ${res.status}`;
     }
+  } catch (err: any) {
+    fetchErrorMsg = err?.message || 'CORS 或連線中斷';
+  }
 
-    if (line === 'END:VEVENT') {
-      if (inEvent && currentEvent.dtstart) {
-        const match = currentEvent.dtstart.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2}))?(Z)?$/);
-        if (match) {
-          const year = parseInt(match[1], 10);
-          const month = parseInt(match[2], 10) - 1;
-          const day = parseInt(match[3], 10);
-          const hour = match[4] ? parseInt(match[4], 10) : 0;
-          const minute = match[5] ? parseInt(match[5], 10) : 0;
+  // 2. Fallback to CORS proxies if direct fetch was blocked (common in web browsers)
+  if (!text) {
+    const proxyUrls = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(cleanUrl)}`,
+      `https://corsproxy.io/?url=${encodeURIComponent(cleanUrl)}`,
+    ];
 
-          if (year === targetYear && month === targetMonth && day === targetDay) {
-            meetings.push({
-              id: `ics-${meetings.length + 1}-${Date.now()}`,
-              title: currentEvent.summary || '未命名會議',
-              startHour: hour,
-              startMinute: minute,
-              durationMinutes: 60,
-              isFridayAfterFour: targetDate.getDay() === 5 && hour >= 16,
-            });
+    for (const proxy of proxyUrls) {
+      try {
+        const pRes = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+        if (pRes.ok) {
+          const body = await pRes.text();
+          if (body && (body.includes('BEGIN:VCALENDAR') || body.includes('[') || body.includes('{'))) {
+            text = body;
+            break;
           }
         }
+      } catch {
+        // try next proxy
       }
-      inEvent = false;
-      currentEvent = {};
-      continue;
-    }
-
-    if (!inEvent) continue;
-    if (line.startsWith('SUMMARY:')) {
-      currentEvent.summary = line.substring(8).replace(/\\,/g, ',').replace(/\\;/g, ';');
-    } else if (line.startsWith('DTSTART')) {
-      const val = line.split(':')[1];
-      if (val) currentEvent.dtstart = val.trim();
     }
   }
 
-  return meetings;
+  if (!text) {
+    throw new Error(`無法讀取日曆網址（${fetchErrorMsg}）。請確認網址正確且公開可用，或已授權學校/行事曆訂閱。`);
+  }
+
+  const isSchoolsBuddy = cleanUrl.toLowerCase().includes('schoolsbuddy');
+  const defaultName = isSchoolsBuddy ? '🏫 SchoolsBuddy' : '🌐 訂閱日曆';
+
+  // Format 1: iCalendar (.ics / webcal / SchoolsBuddy)
+  if (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT')) {
+    const meetings = parseICSToMeetings(text, defaultName);
+    if (meetings.length === 0) {
+      throw new Error('已連線至 iCal 日曆，但近期未發現任何有效行程。');
+    }
+    return meetings;
+  }
+
+  // Format 2: Google Apps Script JSON array
+  try {
+    const data = JSON.parse(text);
+    if (Array.isArray(data)) {
+      return parseJsonMeetings(data, targetDate);
+    }
+  } catch {
+    // not JSON
+  }
+
+  throw new Error('無法識別回傳的日曆格式，請確認是否為 SchoolsBuddy iCal 或 Google Apps Script JSON。');
+}
+
+/**
+ * Backward compatibility alias for live JSON / Apps Script
+ */
+export async function fetchLiveJsonCalendarEvents(
+  rawUrl?: string,
+  targetDate: Date = new Date()
+): Promise<CalendarMeeting[]> {
+  return fetchLiveCalendarFeed(rawUrl, targetDate);
+}
+
+/**
+ * Backward compatibility: Lightweight iCal Parser for today
+ */
+export function parseICSForToday(icsContent: string, targetDate: Date = new Date()): CalendarMeeting[] {
+  const all = parseICSToMeetings(icsContent);
+  const targetKey = toLocalDateKey(targetDate);
+  return all.filter((m) => m.dateKey === targetKey);
 }
 
 export async function fetchIcsWithCorsFallback(rawUrl: string, targetDate: Date = new Date()): Promise<CalendarMeeting[]> {
-  const cleanUrl = rawUrl.trim().replace(/^webcal:\/\//i, 'https://');
-  try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(cleanUrl)}`;
-    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
-    if (res.ok) {
-      const text = await res.text();
-      return parseICSForToday(text, targetDate);
-    }
-  } catch (e) {
-    console.warn('Proxy fetch failed:', e);
-  }
-  throw new Error('無法讀取此 iCal 網址');
+  return fetchLiveCalendarFeed(rawUrl, targetDate);
 }
 
 export async function parseIcsFile(file: File, targetDate: Date = new Date()): Promise<CalendarMeeting[]> {

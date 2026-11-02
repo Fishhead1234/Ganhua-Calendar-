@@ -25,6 +25,7 @@ import {
   analyzeCalendarEvents,
   fetchNativeDeviceCalendarEvents,
   fetchLiveJsonCalendarEvents,
+  fetchLiveCalendarFeed,
   saveCustomEvent,
   deleteCustomEvent,
   DeviceCalendarSource,
@@ -43,6 +44,9 @@ interface CalendarSyncModalProps {
   isPro: boolean;
   onOpenPaywall: () => void;
   activePresetId?: string | null;
+  isSyncing?: boolean;
+  onForceResync?: () => Promise<void> | void;
+  onRemoveSync?: () => void;
 }
 
 export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
@@ -55,6 +59,9 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   isPro,
   onOpenPaywall,
   activePresetId,
+  isSyncing,
+  onForceResync,
+  onRemoveSync,
 }) => {
   const isNative =
     typeof window !== 'undefined' &&
@@ -213,10 +220,10 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     }
   };
 
-  // --- Method 2: Live Google Apps Script JSON Sync (Web Browser) ---
+  // --- Method 2: Live Universal Calendar Feed Sync (SchoolsBuddy / iCal / webcal / GAS) ---
   const handleLiveJsonSync = async () => {
     if (!liveJsonUrl.trim()) {
-      setErrorMsg('請先輸入 Google Apps Script 部署的 Web App URL 網址');
+      setErrorMsg('請先輸入日曆網址（支援 SchoolsBuddy、Google/Apple iCal 或 Apps Script）');
       return;
     }
 
@@ -226,12 +233,13 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
     try {
       localStorage.setItem('live_calendar_url', liveJsonUrl.trim());
-      const meetings = await fetchLiveJsonCalendarEvents(liveJsonUrl.trim());
+      const meetings = await fetchLiveCalendarFeed(liveJsonUrl.trim());
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
-      setSuccessMsg(`🌐 即時行程連線成功！今日偵測到 ${meetings.length} 場會議。`);
+      const isSchoolsBuddy = liveJsonUrl.toLowerCase().includes('schoolsbuddy');
+      setSuccessMsg(`🌐 ${isSchoolsBuddy ? 'SchoolsBuddy 學校日曆' : '日曆網址'}連線成功！共抓取 ${meetings.length} 場行程。`);
     } catch (err: any) {
-      setErrorMsg(err.message || '連線失敗，請確認 Apps Script 網址是否正確部署且權限為「任何人」。');
+      setErrorMsg(err.message || '連線失敗，請確認日曆網址是否正確且公開可用。');
     } finally {
       setIsLoading(false);
     }
@@ -402,8 +410,8 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                 : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
             }`}
           >
-            <span>🌐 即時 JSON</span>
-            <span className="text-[9px] opacity-75">(網頁測試)</span>
+            <span>🌐 網址連動</span>
+            <span className="text-[9px] opacity-75">(SchoolsBuddy/iCal)</span>
           </button>
 
           <button
@@ -627,17 +635,17 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: Live Google Apps Script JSON Sync (Method 2) */}
+          {/* TAB 3: Live Universal Calendar Feed (SchoolsBuddy / iCal / webcal / GAS) */}
           {activeTab === 'live_json' && (
             <div className="space-y-4">
               <div className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-sans font-bold text-[#2D2D2D] flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-[#C83E31]" />
-                    <span>貼上 Google Apps Script 部署網址 (Web App URL)</span>
+                    <span>貼上 SchoolsBuddy 或 iCal / webcal / GAS 網址</span>
                   </label>
                   <span className="text-[10px] font-sans text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-bold">
-                    零 CORS 阻擋
+                    全格式自動解析
                   </span>
                 </div>
 
@@ -646,34 +654,37 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                     type="url"
                     value={liveJsonUrl}
                     onChange={(e) => setLiveJsonUrl(e.target.value)}
-                    placeholder="https://script.google.com/macros/s/.../exec"
+                    placeholder="https://asia1schoolsbuddy.com/... 或 webcal://..."
                     className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31]"
                   />
                   <button
                     type="button"
                     onClick={handleLiveJsonSync}
-                    disabled={isLoading}
+                    disabled={isLoading || isSyncing}
                     className="px-4 py-2 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer disabled:opacity-50 shrink-0 shadow-xs flex items-center gap-1"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-                    <span>重新整理行程</span>
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isSyncing ? 'animate-spin' : ''}`} />
+                    <span>同步讀取</span>
                   </button>
                 </div>
 
-                {/* 3-Step Setup Instructions */}
+                {/* Clear Explanations for SchoolsBuddy and iCal */}
                 <div className="pt-2 border-t border-[#2D2D2D]/15 space-y-2 text-xs font-sans text-[#6E6A63]">
-                  <div className="font-bold text-[#2D2D2D]">💡 3 步架設專屬 Google 日曆即時 JSON 串流：</div>
-                  <ol className="list-decimal list-inside space-y-1.5 leading-relaxed text-[11px]">
-                    <li>
-                      打開 <a href="https://script.google.com" target="_blank" rel="noreferrer" className="text-[#C83E31] underline font-bold inline-flex items-center gap-0.5">Google Apps Script <ExternalLink className="w-2.5 h-2.5" /></a> 點擊「新專案」。
+                  <div className="font-bold text-[#2D2D2D]">🏫 支援的日曆來源說明：</div>
+                  <ul className="space-y-1.5 text-[11px] leading-relaxed">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-[#C83E31] font-bold">●</span>
+                      <span><strong>SchoolsBuddy 學校日曆：</strong>直接貼上以 <code>https://asia1schoolsbuddy.com/...</code> 開頭的個人行事曆訂閱網址，系統將自動解析全月所有學生課程、活動與課後社團。</span>
                     </li>
-                    <li>
-                      貼上下方範本程式碼 ➔ 點擊右上角「部署」➔「新增部署作業」➔ 類型選「網路應用程式」。
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-[#C83E31] font-bold">●</span>
+                      <span><strong>Apple iCal / Google 日曆 / webcal：</strong>支援 <code>webcal://</code> 與 <code>.ics</code> 公開或私密日曆訂閱連結。</span>
                     </li>
-                    <li>
-                      存取權限選「所有人 (Anyone)」➔ 點擊部署並複製網址貼進上方輸入框！
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-[#C83E31] font-bold">●</span>
+                      <span><strong>自架 Google Apps Script：</strong>亦可使用自架的 GAS 網路應用程式回傳 JSON 陣列。</span>
                     </li>
-                  </ol>
+                  </ul>
 
                   <div className="pt-1">
                     <button
@@ -689,7 +700,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-[#C83E31]" />
-                          <span>複製 Google Apps Script 範本程式碼</span>
+                          <span>複製 Google Apps Script 備用範本</span>
                         </>
                       )}
                     </button>
@@ -829,22 +840,58 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-[#FAF7F0] border-t border-[#2D2D2D]/20 p-4 flex items-center justify-between">
-          <div className="text-xs font-sans text-[#6E6A63]">
-            連動狀態：
-            <span
-              className={`font-bold ml-1 ${isConnected ? 'text-emerald-700' : 'text-[#6E6A63]'}`}
-            >
-              {isConnected ? '已啟用 (吐槽中)' : '未連動 (常規日曆)'}
-            </span>
+        <div className="bg-[#FAF7F0] border-t border-[#2D2D2D]/20 p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-sans text-[#6E6A63]">
+              連動狀態：
+              <span
+                className={`font-bold ml-1 ${isConnected ? 'text-emerald-700' : 'text-[#6E6A63]'}`}
+              >
+                {isConnected ? '已啟用 (吐槽中)' : '未連動 (常規日曆)'}
+              </span>
+            </div>
+
+            {/* Remove Sync Button */}
+            {onRemoveSync && isConnected && (
+              <button
+                type="button"
+                onClick={() => {
+                  onRemoveSync();
+                  handleClearAll();
+                }}
+                className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-[11px] font-sans font-bold flex items-center gap-1 transition cursor-pointer"
+                title="清除行事曆連動快取並恢復常規 365 幹話"
+              >
+                <Trash2 className="w-3 h-3 text-red-600" />
+                <span>解除連動</span>
+              </button>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={handleFinish}
-            className="px-5 py-2 rounded-xl bg-[#2D2D2D] text-[#FAF7F0] text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm active:scale-95"
-          >
-            完成設定
-          </button>
+
+          <div className="flex items-center gap-2">
+            {/* Force 1-Push Re-sync Button */}
+            {onForceResync && (
+              <button
+                type="button"
+                onClick={() => {
+                  onForceResync();
+                }}
+                disabled={isSyncing || isLoading}
+                className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-[#FAF7F0] text-xs font-sans font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing || isLoading ? 'animate-spin' : ''}`} />
+                <span>一鍵強制重新同步</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleFinish}
+              className="px-5 py-2 rounded-xl bg-[#2D2D2D] text-[#FAF7F0] text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm active:scale-95"
+            >
+              完成設定
+            </button>
+          </div>
         </div>
       </div>
     </div>

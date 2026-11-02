@@ -37,6 +37,7 @@ import {
   analyzeCalendarEvents,
   fetchNativeDeviceCalendarEvents,
   fetchLiveJsonCalendarEvents,
+  fetchLiveCalendarFeed,
   CustomCalendarEvent,
   getCustomEvents,
   saveCustomEvent,
@@ -72,26 +73,9 @@ function loadPersistedState(): PersistedState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      let initialOffset = 0;
-
-      // Experience the joy of tearing calendar:
-      // If user opened on a previous date, resume from that date so user can tear off missed days!
-      if (typeof parsed.lastOpenedDateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOpenedDateStr)) {
-        const [ly, lm, ld] = parsed.lastOpenedDateStr.split('-').map(Number);
-        const t = new Date();
-        const todayDate = new Date(t.getFullYear(), t.getMonth(), t.getDate());
-        const lastOpenedDate = new Date(ly, lm - 1, ld);
-        const diffMs = lastOpenedDate.getTime() - todayDate.getTime();
-        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-        // Allow resuming on viewed date (both past archive and future schedule up to 365 days)
-        initialOffset = Math.max(-365, Math.min(365, diffDays));
-      } else if (typeof parsed.dateOffset === 'number') {
-        initialOffset = Math.max(-365, Math.min(365, parsed.dateOffset));
-      }
-
       return {
         selectedTheme: parsed.selectedTheme || 'all',
-        dateOffset: initialOffset,
+        dateOffset: 0, // ALWAYS start on TODAY (0 offset) upon fresh app launch!
         favoritedIds: Array.isArray(parsed.favoritedIds) ? parsed.favoritedIds : ['q365-01-01'],
         survivedDates: Array.isArray(parsed.survivedDates) ? parsed.survivedDates : [],
         streakCount: typeof parsed.streakCount === 'number' ? parsed.streakCount : 3,
@@ -104,7 +88,7 @@ function loadPersistedState(): PersistedState {
           typeof parsed.birthday.day === 'number'
             ? parsed.birthday
             : null,
-        lastOpenedDateStr: parsed.lastOpenedDateStr || todayYmd,
+        lastOpenedDateStr: todayYmd,
       };
     }
   } catch {
@@ -152,6 +136,7 @@ export const App: React.FC = () => {
   const [specialQuoteCycleIndex, setSpecialQuoteCycleIndex] = useState(0);
   const [allowFutureDates, setAllowFutureDates] = useState(false);
   const [toastText, setToastText] = useState<string | null>(null);
+  const [isCalendarSyncing, setIsCalendarSyncing] = useState(false);
 
   // Calendar Roast State
   const [activeMeetings, setActiveMeetings] = useState<CalendarMeeting[]>(() => {
@@ -283,6 +268,91 @@ export const App: React.FC = () => {
     specialQuoteCycleIndex,
   });
 
+  const syncAllCalendarSources = async (): Promise<CalendarMeeting[]> => {
+    setIsCalendarSyncing(true);
+    try {
+      const isNative =
+        typeof window !== 'undefined' &&
+        (window as any).Capacitor &&
+        (window as any).Capacitor.isNativePlatform();
+
+      const results: CalendarMeeting[] = [];
+      const seenKeys = new Set<string>();
+
+      const addEvents = (list: CalendarMeeting[]) => {
+        for (const ev of list) {
+          const key = `${ev.dateKey || ''}_${ev.title}_${ev.startHour}_${ev.startMinute}`;
+          if (!seenKeys.has(key)) {
+            seenKeys.add(key);
+            results.push(ev);
+          }
+        }
+      };
+
+      // 1. Fetch native device calendars on mobile APK
+      if (isNative) {
+        try {
+          const nativeEvents = await fetchNativeDeviceCalendarEvents();
+          addEvents(nativeEvents);
+        } catch (e) {
+          console.warn('Native calendar sync warning:', e);
+        }
+      }
+
+      // 2. Fetch saved live calendar feed URL (SchoolsBuddy / iCal / webcal / GAS)
+      const savedLiveUrl = localStorage.getItem('live_calendar_url');
+      if (savedLiveUrl && savedLiveUrl.trim()) {
+        try {
+          const feedEvents = await fetchLiveCalendarFeed(savedLiveUrl.trim());
+          addEvents(feedEvents);
+        } catch (e) {
+          console.warn('Live feed sync warning:', e);
+        }
+      }
+
+      if (results.length > 0) {
+        setActiveMeetings(results);
+        setActivePresetId(null);
+        try {
+          localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(results));
+        } catch {
+          // ignore
+        }
+        setPersisted((prev) => ({ ...prev, calendarConnected: true }));
+      }
+      return results;
+    } finally {
+      setIsCalendarSyncing(false);
+    }
+  };
+
+  const handleForceCalendarResync = async () => {
+    showToast('🔄 正在一鍵強制重新同步行事曆...');
+    try {
+      const results = await syncAllCalendarSources();
+      if (results.length > 0) {
+        showToast(`✅ 行事曆重新同步完成！共載入 ${results.length} 場行程。`);
+      } else {
+        showToast('⚠️ 未偵測到行程，請確認已授權日曆或已設定 SchoolsBuddy 網址。');
+      }
+    } catch (err: any) {
+      showToast(`❌ 同步失敗: ${err?.message || '請稍候再試'}`);
+    }
+  };
+
+  const handleRemoveCalendarSync = () => {
+    setActiveMeetings([]);
+    setActivePresetId(null);
+    try {
+      localStorage.removeItem('ganhua_calendar_meetings');
+      localStorage.removeItem('ganhua_active_preset_id');
+    } catch {
+      // ignore
+    }
+    setPersisted((prev) => ({ ...prev, calendarConnected: false }));
+    showToast('✕ 已解除行事曆連動，恢復每日常規 365 幹話！');
+  };
+
   // Check for OTA Remote Content Updates in background on app start
   useEffect(() => {
     contentSyncService.checkForUpdates().then((res) => {
@@ -293,35 +363,7 @@ export const App: React.FC = () => {
 
     // Auto-sync calendar events on app start if calendar connected
     if (persisted.calendarConnected) {
-      const isNative =
-        typeof window !== 'undefined' &&
-        (window as any).Capacitor &&
-        (window as any).Capacitor.isNativePlatform();
-
-      if (isNative) {
-        fetchNativeDeviceCalendarEvents()
-          .then((events) => {
-            if (Array.isArray(events)) {
-              setActiveMeetings(events);
-              setActivePresetId(null);
-              localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(events));
-            }
-          })
-          .catch(() => {});
-      } else {
-        const savedLiveUrl = localStorage.getItem('live_calendar_url');
-        if (savedLiveUrl) {
-          fetchLiveJsonCalendarEvents(savedLiveUrl)
-            .then((events) => {
-              if (Array.isArray(events)) {
-                setActiveMeetings(events);
-                setActivePresetId(null);
-                localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(events));
-              }
-            })
-            .catch(() => {});
-        }
-      }
+      syncAllCalendarSources().catch(() => {});
     }
   }, []);
 
@@ -352,16 +394,6 @@ export const App: React.FC = () => {
         effectiveMeetings,
         allAppointments
       );
-      // Advance lastOpenedDateStr whenever user tears forward / views a newer date
-      setPersisted((prev) => {
-        if (!prev.lastOpenedDateStr || currentQuote.date > prev.lastOpenedDateStr) {
-          return {
-            ...prev,
-            lastOpenedDateStr: currentQuote.date,
-          };
-        }
-        return prev;
-      });
     }
   }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings, allAppointments]);
 
@@ -683,11 +715,14 @@ export const App: React.FC = () => {
           isPro={isPro || isAdmin}
           isConnected={persisted.calendarConnected}
           roastResult={persisted.calendarConnected ? roastResult : null}
+          isSyncing={isCalendarSyncing}
           onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
           onOpenPaywall={() => setIsPaywallOpen(true)}
           onToggleConnected={(connected) => {
             setPersisted((prev) => ({ ...prev, calendarConnected: connected }));
           }}
+          onForceResync={handleForceCalendarResync}
+          onRemoveSync={handleRemoveCalendarSync}
           onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
         />
 
@@ -823,6 +858,9 @@ export const App: React.FC = () => {
         isConnected={persisted.calendarConnected}
         activeMeetings={activeMeetings}
         activePresetId={activePresetId}
+        isSyncing={isCalendarSyncing}
+        onForceResync={handleForceCalendarResync}
+        onRemoveSync={handleRemoveCalendarSync}
         onUpdateMeetings={(meetings, presetId = null) => {
           setActiveMeetings(meetings);
           setActivePresetId(presetId);
