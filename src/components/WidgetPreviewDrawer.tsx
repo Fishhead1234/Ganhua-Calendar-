@@ -27,6 +27,7 @@ interface WidgetPreviewDrawerProps {
   offWorkHour: number;
   survivedDates?: string[];
   activeMeetings?: CalendarMeeting[];
+  initialOpen?: boolean;
 }
 
 type WidgetSizeTab = 'monthly_split' | 'monthly_large' | 'survival_stamp' | 'home_medium' | 'ios_lock' | 'notion_embed';
@@ -48,8 +49,9 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
   offWorkHour,
   survivedDates = [],
   activeMeetings = [],
+  initialOpen = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const [activeWidget, setActiveWidget] = useState<WidgetSizeTab>('monthly_split');
   const [copiedEmbed, setCopiedEmbed] = useState(false);
   const [selectedLargeWidgetDate, setSelectedLargeWidgetDate] = useState<string>('');
@@ -159,7 +161,9 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-5 py-3.5 bg-[#F3EFE6] hover:bg-[#EAE3D5] border-b border-[#2D2D2D]/20 flex items-center justify-between transition cursor-pointer"
+          className={`w-full px-5 py-3.5 bg-[#F3EFE6] hover:bg-[#EAE3D5] flex items-center justify-between transition cursor-pointer select-none ${
+            isOpen ? 'border-b border-[#2D2D2D]/20' : ''
+          }`}
         >
           <div className="flex items-center gap-2.5">
             <Smartphone className="w-4 h-4 text-[#2D2D2D]" />
