@@ -776,41 +776,76 @@ export const App: React.FC = () => {
               onEditEvent={handleEditMeeting}
             />
 
-        {/* C. Bottom Action Bar */}
-        <div className="max-w-xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        {/* C. 3-Logo Horizontal Action Dock */}
+        <div className="max-w-md w-full mx-auto grid grid-cols-3 gap-3 sm:gap-4 my-3 p-3 rounded-2xl bg-[#F9F6F0] border border-[#2D2D2D]/15 shadow-sm select-none">
+          {/* Button 1 (Left — 蓋章打卡 / 今日已生還) */}
           <button
             type="button"
             onClick={handleStampSurvived}
-            className={`flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border-2 font-sans font-extrabold text-xs sm:text-sm transition active:scale-95 cursor-pointer shadow-[0_4px_0_#2D2D2D] ${
-              persisted.survivedDates.includes(currentQuote.date)
-                ? 'bg-[#C83E31] text-white border-[#2D2D2D]'
-                : 'bg-[#FAF7F0] hover:bg-[#C83E31]/10 text-[#C83E31] border-[#2D2D2D]'
-            }`}
+            className="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform cursor-pointer"
           >
-            <Stamp className="w-4 h-4 shrink-0" />
-            <span>
-              {persisted.survivedDates.includes(currentQuote.date)
-                ? '✓ 今日已平安生還'
-                : '今日已平安下班 (蓋章)'}
+            <div
+              className={`w-20 h-20 rounded-2xl shadow-sm border border-[#2D2D2D]/15 overflow-hidden relative transition-all ${
+                persisted.survivedDates.includes(currentQuote.date)
+                  ? 'ring-2 ring-[#C83E31] shadow-md'
+                  : 'group-hover:border-[#2D2D2D]/30'
+              }`}
+              style={{
+                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
+                backgroundSize: '380% auto',
+                backgroundPosition: '10% 50%',
+                backgroundRepeat: 'no-repeat',
+              }}
+            >
+              {persisted.survivedDates.includes(currentQuote.date) && (
+                <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full bg-[#C83E31] text-[#FAF7F0] text-[9px] font-sans font-black shadow-xs flex items-center gap-0.5 animate-in fade-in zoom-in duration-150">
+                  <span>✓ 已蓋章</span>
+                </div>
+              )}
+            </div>
+            <span className="font-sans font-bold text-xs text-[#2D2D2D] group-hover:text-[#C83E31] transition-colors truncate max-w-full">
+              {persisted.survivedDates.includes(currentQuote.date) ? '今日已生還' : '點擊蓋章生還'}
             </span>
           </button>
 
+          {/* Button 2 (Center — 分享 IG 限動) */}
           <button
             type="button"
             onClick={() => setIsIgModalOpen(true)}
-            className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border-2 border-[#2D2D2D] bg-[#2D2D2D] hover:bg-[#1c1c1c] text-[#F9F6F0] font-sans font-extrabold text-xs sm:text-sm transition active:scale-95 cursor-pointer shadow-[0_4px_0_#6E6A63]"
+            className="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform cursor-pointer"
           >
-            <Share2 className="w-4 h-4 shrink-0 text-[#D4B483]" />
-            <span>分享到 IG 限動 (9:16)</span>
+            <div
+              className="w-20 h-20 rounded-2xl shadow-sm border border-[#2D2D2D]/15 overflow-hidden transition-all group-hover:border-[#2D2D2D]/30"
+              style={{
+                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
+                backgroundSize: '380% auto',
+                backgroundPosition: '50% 50%',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+            <span className="font-sans font-bold text-xs text-[#2D2D2D] group-hover:text-[#C83E31] transition-colors truncate max-w-full">
+              分享 IG 限動
+            </span>
           </button>
 
+          {/* Button 3 (Right — 生還月曆總覽) */}
           <button
             type="button"
-            onClick={handleBackToToday}
-            className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border-2 border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#EAE3D5] text-[#2D2D2D] font-sans font-extrabold text-xs sm:text-sm transition active:scale-95 cursor-pointer shadow-[0_4px_0_#2D2D2D]"
+            onClick={() => setIsMonthlyCalendarOpen(true)}
+            className="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform cursor-pointer"
           >
-            <CalendarIcon className="w-4 h-4 shrink-0" />
-            <span>{isToday ? '今日生還中' : '返回今日日曆'}</span>
+            <div
+              className="w-20 h-20 rounded-2xl shadow-sm border border-[#2D2D2D]/15 overflow-hidden transition-all group-hover:border-[#2D2D2D]/30"
+              style={{
+                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
+                backgroundSize: '380% auto',
+                backgroundPosition: '90% 50%',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+            <span className="font-sans font-bold text-xs text-[#2D2D2D] group-hover:text-[#C83E31] transition-colors truncate max-w-full">
+              生還月曆 ({persisted.streakCount}天)
+            </span>
           </button>
         </div>
 
