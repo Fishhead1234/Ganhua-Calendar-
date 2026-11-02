@@ -25,6 +25,7 @@ import { MonthlyCalendarModal } from './components/MonthlyCalendarModal';
 import { AddEventModal } from './components/AddEventModal';
 import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
+import { toLocalDateKey, getTodayLocalDateKey } from './utils/dateUtils';
 import { useSubscription } from './hooks/useSubscription';
 import { useTodayQuote } from './hooks/useTodayQuote';
 import { contentSyncService } from './services/contentSyncService';
@@ -62,11 +63,7 @@ interface PersistedState {
 }
 
 function getTodayYmd(): string {
-  const t = new Date();
-  const y = t.getFullYear();
-  const m = String(t.getMonth() + 1).padStart(2, '0');
-  const d = String(t.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return getTodayLocalDateKey();
 }
 
 function loadPersistedState(): PersistedState {
@@ -181,10 +178,7 @@ export const App: React.FC = () => {
   }, [persisted.dateOffset]);
 
   const currentDateKey = useMemo(() => {
-    const y = currentDateObj.getFullYear();
-    const m = String(currentDateObj.getMonth() + 1).padStart(2, '0');
-    const d = String(currentDateObj.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return toLocalDateKey(currentDateObj);
   }, [currentDateObj]);
 
   // Custom Appointments State
@@ -210,6 +204,8 @@ export const App: React.FC = () => {
       dateKey: e.dateKey,
       notes: e.notes,
       source: 'local',
+      calendarName: e.calendarName,
+      calendarColor: e.calendarColor,
     }));
     return [...activeMeetings, ...customAsMeetings];
   }, [activeMeetings, customEvents]);
@@ -305,9 +301,10 @@ export const App: React.FC = () => {
       if (isNative) {
         fetchNativeDeviceCalendarEvents()
           .then((events) => {
-            if (events && events.length > 0) {
+            if (Array.isArray(events)) {
               setActiveMeetings(events);
               setActivePresetId(null);
+              localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(events));
             }
           })
           .catch(() => {});
@@ -316,9 +313,10 @@ export const App: React.FC = () => {
         if (savedLiveUrl) {
           fetchLiveJsonCalendarEvents(savedLiveUrl)
             .then((events) => {
-              if (events && events.length > 0) {
+              if (Array.isArray(events)) {
                 setActiveMeetings(events);
                 setActivePresetId(null);
+                localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(events));
               }
             })
             .catch(() => {});

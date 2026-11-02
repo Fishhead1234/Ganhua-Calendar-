@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toLocalDateKey } from '../utils/dateUtils';
 import {
   X,
   Calendar as CalendarIcon,
@@ -206,7 +207,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = toLocalDateKey(new Date());
     const isFridayAfterFour =
       new Date().getDay() === 5 && (newHour >= 16 || (newHour === 15 && newMinute >= 45));
 

@@ -1,4 +1,5 @@
 import { CharacterType } from '../types/calendar';
+import { toLocalDateKey } from '../utils/dateUtils';
 
 export interface CalendarMeeting {
   id: string;
@@ -534,10 +535,22 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     ];
   }
 
-  // Auto-activate all discovered calendars if not set yet
+  // Auto-activate all discovered calendars if not set yet, or include new ones
   const savedEnabled = getEnabledCalendarIds();
   if (!savedEnabled || savedEnabled.length === 0) {
     saveEnabledCalendarIds(calendars.map((c) => c.id));
+  } else {
+    try {
+      const disabledRaw = localStorage.getItem('disabled_calendar_ids');
+      const disabledIds: string[] = disabledRaw ? JSON.parse(disabledRaw) : [];
+      const updated = Array.from(new Set([
+        ...savedEnabled,
+        ...calendars.filter((c) => !disabledIds.includes(c.id)).map((c) => c.id)
+      ]));
+      saveEnabledCalendarIds(updated);
+    } catch {
+      // ignore
+    }
   }
 
   return calendars;
@@ -548,7 +561,8 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
  * Reads phone OS calendar directly with zero OAuth and zero login!
  */
 export async function fetchNativeDeviceCalendarEvents(
-  targetDate: Date = new Date()
+  targetDate: Date = new Date(),
+  options?: { startDate?: Date; endDate?: Date }
 ): Promise<CalendarMeeting[]> {
   const isNative =
     typeof window !== 'undefined' &&
@@ -561,10 +575,8 @@ export async function fetchNativeDeviceCalendarEvents(
 
   const enabledIds = getEnabledCalendarIds();
   const win = window as any;
-  const startOfDay = new Date(targetDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(targetDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = options?.startDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() - 30, 0, 0, 0, 0);
+  const endOfDay = options?.endDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 60, 23, 59, 59, 999);
 
   // 1. Try @ebarooni/capacitor-calendar if available in plugins
   if (win.Capacitor?.Plugins?.CapacitorCalendar) {
@@ -591,20 +603,25 @@ export async function fetchNativeDeviceCalendarEvents(
         .map((e, idx) => {
           const start = new Date(e.startDate || e.start || startOfDay.getTime());
           const end = new Date(e.endDate || e.end || start.getTime() + 60 * 60 * 1000);
-          const startHour = start.getHours();
-          const startMinute = start.getMinutes();
-          const durationMinutes = Math.max(15, Math.round((end.getTime() - start.getTime()) / (1000 * 60)));
+          const isAllDay = Boolean(e.isAllDay || e.allDay);
+          const dateKey = toLocalDateKey(start);
+          const startHour = isAllDay ? 9 : start.getHours();
+          const startMinute = isAllDay ? 0 : start.getMinutes();
+          const durationMinutes = isAllDay ? 480 : Math.max(15, Math.round((end.getTime() - start.getTime()) / (1000 * 60)));
           const isFridayAfterFour =
-            targetDate.getDay() === 5 &&
+            start.getDay() === 5 &&
             (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
           return {
-            id: e.id || `native-${idx + 1}`,
+            id: String(e.id || `native-${idx + 1}`),
             title: e.title || '未命名會議',
             startHour,
             startMinute,
             durationMinutes,
             isFridayAfterFour,
+            dateKey,
+            isAllDay,
+            source: 'synced' as const,
             calendarId: e.calendarId ? String(e.calendarId) : undefined,
             calendarName: e.calendarName || e.calendarTitle,
             calendarColor: e.calendarColor || e.color,
@@ -619,26 +636,51 @@ export async function fetchNativeDeviceCalendarEvents(
   // 2. Direct Android CalendarContract read via GanhuaWidgetBridgePlugin
   if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.readDeviceCalendarEvents) {
     const bridge = win.Capacitor.Plugins.GanhuaWidgetBridge;
-    const res = await bridge.readDeviceCalendarEvents();
+    const res = await bridge.readDeviceCalendarEvents({
+      startDate: startOfDay.getTime(),
+      endDate: endOfDay.getTime(),
+    });
     const rawEvents: any[] = res.events || [];
 
-    const meetings = rawEvents
+    const meetings: CalendarMeeting[] = rawEvents
       .filter((e) => {
         if (!enabledIds || enabledIds.length === 0) return true;
         return !e.calendarId || enabledIds.includes(String(e.calendarId));
       })
       .map((e, idx) => {
+        const isAllDay = Boolean(e.isAllDay);
+        let dateKey = e.dateKey;
+        if (!dateKey) {
+          if (isAllDay && e.beginMs) {
+            const d = new Date(e.beginMs);
+            dateKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+          } else if (e.beginMs) {
+            dateKey = toLocalDateKey(new Date(e.beginMs));
+          } else {
+            dateKey = toLocalDateKey(targetDate);
+          }
+        }
+
+        const [y, m, d] = dateKey.split('-').map(Number);
+        const evDate = new Date(y, (m || 1) - 1, d || 1);
+        const startHour = Number(e.startHour ?? (isAllDay ? 9 : 0));
+        const startMinute = Number(e.startMinute ?? 0);
+        const durationMinutes = isAllDay ? 480 : Number(e.durationMinutes || 60);
+
         const isFridayAfterFour =
-          targetDate.getDay() === 5 &&
-          (e.startHour >= 16 || (e.startHour === 15 && e.startMinute >= 45));
+          evDate.getDay() === 5 &&
+          (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
         return {
-          id: `device-${idx + 1}`,
+          id: String(e.id || `device-${idx + 1}`),
           title: e.title || '未命名會議',
-          startHour: e.startHour || 0,
-          startMinute: e.startMinute || 0,
-          durationMinutes: e.durationMinutes || 60,
+          startHour,
+          startMinute,
+          durationMinutes,
           isFridayAfterFour,
+          dateKey,
+          isAllDay,
+          source: 'synced' as const,
           calendarId: e.calendarId ? String(e.calendarId) : undefined,
           calendarName: e.calendarName,
           calendarColor: e.calendarColor,
@@ -716,6 +758,8 @@ export async function fetchLiveJsonCalendarEvents(
       targetDate.getDay() === 5 &&
       (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
+    const eventDateKey = item.dateKey || (item.start ? toLocalDateKey(new Date(item.start)) : toLocalDateKey(targetDate));
+
     meetings.push({
       id: `live-json-${idx + 1}-${Date.now()}`,
       title: item.title || item.summary || '未命名會議',
@@ -723,6 +767,9 @@ export async function fetchLiveJsonCalendarEvents(
       startMinute,
       durationMinutes,
       isFridayAfterFour,
+      dateKey: eventDateKey,
+      isAllDay: Boolean(item.isAllDay),
+      source: 'synced',
       calendarName: item.calendarName,
       calendarColor: item.calendarColor,
     });
@@ -935,19 +982,12 @@ export function getMergedEvents(
 ): CalendarMeeting[] {
   const customEvents = getCustomEventsForDate(targetDateKey);
 
-  const [tY, tM, tD] = targetDateKey.split('-').map(Number);
-  const targetDateObj = new Date(tY, (tM || 1) - 1, tD || 1);
-  const today = new Date();
-  const isTargetToday =
-    targetDateObj.getFullYear() === today.getFullYear() &&
-    targetDateObj.getMonth() === today.getMonth() &&
-    targetDateObj.getDate() === today.getDate();
-
-  // Synced meetings: include if they explicitly match dateKey, or if they lack dateKey and target date is today
+  // Synced meetings: ONLY include if dateKey strictly matches targetDateKey!
+  // This prevents yesterday's events (like Nov 1 flights) from leaking onto Nov 2.
   const relevantSynced = syncedEvents.filter((ev) => {
     if (ev.source === 'local') return false; // avoid duplicate
     if (ev.dateKey) return ev.dateKey === targetDateKey;
-    return isTargetToday;
+    return false;
   });
 
   const merged = [...relevantSynced, ...customEvents];

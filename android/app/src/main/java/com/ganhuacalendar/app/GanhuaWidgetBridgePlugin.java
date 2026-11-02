@@ -266,18 +266,33 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
 
     private void executeReadEvents(PluginCall call) {
         try {
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            long startMs = cal.getTimeInMillis();
+            Long customStart = call.getLong("startDate");
+            Long customEnd = call.getLong("endDate");
+            long startMs;
+            long endMs;
 
-            cal.set(Calendar.HOUR_OF_DAY, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.SECOND, 59);
-            cal.set(Calendar.MILLISECOND, 999);
-            long endMs = cal.getTimeInMillis();
+            if (customStart != null && customEnd != null) {
+                startMs = customStart;
+                endMs = customEnd;
+            } else {
+                // Default range: 30 days in the past to 60 days in the future
+                // Covers the full month so MonthlyCalendarModal has dots & details for all days!
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_YEAR, -30);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                startMs = cal.getTimeInMillis();
+
+                Calendar endCal = Calendar.getInstance();
+                endCal.add(Calendar.DAY_OF_YEAR, 60);
+                endCal.set(Calendar.HOUR_OF_DAY, 23);
+                endCal.set(Calendar.MINUTE, 59);
+                endCal.set(Calendar.SECOND, 59);
+                endCal.set(Calendar.MILLISECOND, 999);
+                endMs = endCal.getTimeInMillis();
+            }
 
             Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
             ContentUris.appendId(builder, startMs);
@@ -300,6 +315,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             JSArray eventsArray = new JSArray();
             if (cursor != null) {
                 try {
+                    int eventIdIdx = cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID);
                     int titleIdx = cursor.getColumnIndex(CalendarContract.Instances.TITLE);
                     int beginIdx = cursor.getColumnIndex(CalendarContract.Instances.BEGIN);
                     int endIdx = cursor.getColumnIndex(CalendarContract.Instances.END);
@@ -313,22 +329,44 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
                         if (title == null || title.trim().isEmpty()) {
                             title = "未命名會議";
                         }
+                        String eventId = eventIdIdx != -1 ? String.valueOf(cursor.getLong(eventIdIdx)) : ("device-" + cursor.getPosition());
                         long begin = cursor.getLong(beginIdx);
                         long end = cursor.getLong(endIdx);
                         boolean isAllDay = cursor.getInt(allDayIdx) != 0;
 
-                        Calendar eventCal = Calendar.getInstance();
-                        eventCal.setTimeInMillis(begin);
-                        int startHour = eventCal.get(Calendar.HOUR_OF_DAY);
-                        int startMinute = eventCal.get(Calendar.MINUTE);
+                        Calendar eventCal;
+                        int startHour;
+                        int startMinute;
+
+                        if (isAllDay) {
+                            // In Android CalendarContract, all-day events have BEGIN stored at UTC midnight.
+                            // Parsing with UTC Calendar prevents off-by-one day shifting in UTC+8 / other timezones!
+                            eventCal = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+                            eventCal.setTimeInMillis(begin);
+                            startHour = 9;
+                            startMinute = 0;
+                        } else {
+                            eventCal = Calendar.getInstance();
+                            eventCal.setTimeInMillis(begin);
+                            startHour = eventCal.get(Calendar.HOUR_OF_DAY);
+                            startMinute = eventCal.get(Calendar.MINUTE);
+                        }
+
+                        int year = eventCal.get(Calendar.YEAR);
+                        int month = eventCal.get(Calendar.MONTH) + 1;
+                        int day = eventCal.get(Calendar.DAY_OF_MONTH);
+                        String dateKey = String.format("%04d-%02d-%02d", year, month, day);
+
                         int durationMinutes = isAllDay ? 480 : (int) Math.max(15, (end - begin) / (1000 * 60));
 
                         JSObject ev = new JSObject();
+                        ev.put("id", eventId);
                         ev.put("title", title);
                         ev.put("startHour", startHour);
                         ev.put("startMinute", startMinute);
                         ev.put("durationMinutes", durationMinutes);
                         ev.put("isAllDay", isAllDay);
+                        ev.put("dateKey", dateKey);
                         ev.put("beginMs", begin);
                         ev.put("endMs", end);
 

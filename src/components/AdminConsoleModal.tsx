@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toLocalDateKey } from '../utils/dateUtils';
 import {
   X,
   Shield,
@@ -68,7 +69,7 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
   const [customDateStr, setCustomDateStr] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + dateOffset);
-    return d.toISOString().split('T')[0];
+    return toLocalDateKey(d);
   });
 
   if (!isOpen) return null;

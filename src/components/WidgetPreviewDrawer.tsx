@@ -18,6 +18,7 @@ import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { CharacterIllustration } from './CharacterIllustration';
 import { parseQuoteDateDisplay } from './DeskCalendarCard';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
+import { toLocalDateKey } from '../utils/dateUtils';
 import { CalendarMeeting } from '../services/calendarService';
 
 interface WidgetPreviewDrawerProps {
@@ -82,7 +83,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
   const viewYear = baseDate.getFullYear();
   const viewMonth = baseDate.getMonth(); // 0-11
   const monthEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][viewMonth];
-  const todayYmd = `${baseDate.getFullYear()}-${String(baseDate.getMonth() + 1).padStart(2, '0')}-${String(baseDate.getDate()).padStart(2, '0')}`;
+  const todayYmd = toLocalDateKey(baseDate);
 
   // Generate 7-column calendar grid for the month
   const calendarCells = useMemo<CalendarGridCell[]>(() => {
@@ -96,7 +97,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
     // Leading previous month days
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       const d = new Date(viewYear, viewMonth - 1, daysInPrevMonth - i);
-      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const ymd = toLocalDateKey(d);
       cells.push({
         date: d,
         dayNum: d.getDate(),
@@ -111,7 +112,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
     // Current month days
     for (let d = 1; d <= daysInMonth; d++) {
       const dateObj = new Date(viewYear, viewMonth, d);
-      const ymd = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const ymd = toLocalDateKey(dateObj);
       cells.push({
         date: dateObj,
         dayNum: d,
@@ -128,7 +129,7 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
     const remaining = targetLength - cells.length;
     for (let i = 1; i <= remaining; i++) {
       const d = new Date(viewYear, viewMonth + 1, i);
-      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const ymd = toLocalDateKey(d);
       cells.push({
         date: d,
         dayNum: d.getDate(),
@@ -375,8 +376,10 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                 const isSelectedCellToday = activeSelectedCell.ymd === todayYmd;
                 const isSelectedCellFuture = activeSelectedCell.date.getTime() > baseDate.getTime();
 
-                // Appointments on selected day: if today, show activeMeetings; otherwise if past/future, display scheduled list or clear status
-                const dayMeetings = isSelectedCellToday ? activeMeetings : [];
+                // Appointments on selected day: filter by dateKey
+                const dayMeetings = (activeMeetings || []).filter((m) =>
+                  m.dateKey ? m.dateKey === activeSelectedCell.ymd : isSelectedCellToday
+                );
 
                 return (
                   <div className="w-full max-w-[370px] space-y-3">
@@ -493,9 +496,9 @@ export const WidgetPreviewDrawer: React.FC<WidgetPreviewDrawerProps> = ({
                                   {subText}
                                 </span>
 
-                                {/* Today Meeting Dot Indicator */}
-                                {cell.isToday && (
-                                  <span className="w-1 h-1 rounded-full bg-[#C83E31] mt-0.5" />
+                                {/* Scheduled Meeting Dot Indicator */}
+                                {activeMeetings?.some((m) => m.dateKey ? m.dateKey === cell.ymd : cell.isToday) && (
+                                  <span className="w-1 h-1 rounded-full bg-[#C83E31] mt-0.5" title="有排定行程" />
                                 )}
                               </button>
                             );

@@ -12,7 +12,8 @@ import {
   Edit2,
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
-import { CalendarMeeting, CustomCalendarEvent, customEventToMeeting } from '../services/calendarService';
+import { toLocalDateKey } from '../utils/dateUtils';
+import { CalendarMeeting, CustomCalendarEvent, getMergedEvents } from '../services/calendarService';
 import quotes365Raw from '../data/quotes365.json';
 import { formatQuoteFrom365 } from '../hooks/useTodayQuote';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -80,25 +81,12 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   const isPickedToday = pickedMidnight.getTime() === todayMidnight.getTime();
 
   const pickedDateStr = useMemo(() => {
-    const y = pickedDate.getFullYear();
-    const m = String(pickedDate.getMonth() + 1).padStart(2, '0');
-    const d = String(pickedDate.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return toLocalDateKey(pickedDate);
   }, [pickedDate]);
 
   const pickedDayEvents = useMemo<CalendarMeeting[]>(() => {
-    const customForDate = (customEvents || [])
-      .filter((e) => e.dateKey === pickedDateStr)
-      .map(customEventToMeeting);
-
-    const syncedForDate = isPickedToday
-      ? (activeMeetings || []).filter((m) => m.source !== 'local')
-      : [];
-
-    const merged = [...syncedForDate, ...customForDate];
-    merged.sort((a, b) => a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute));
-    return merged;
-  }, [customEvents, pickedDateStr, isPickedToday, activeMeetings]);
+    return getMergedEvents(activeMeetings, pickedDateStr);
+  }, [activeMeetings, customEvents, pickedDateStr]);
 
   // Find Gàn-huà quote and illustration for selected date with strict fallback
   const pickedMonth = pickedDate.getMonth() + 1;
@@ -189,7 +177,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
       // Previous month padding
       for (let i = startDayOfWeek - 1; i >= 0; i--) {
         const d = new Date(viewYear, viewMonth - 1, daysInPrevMonth - i);
-        const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const ymd = toLocalDateKey(d);
         cells.push({
           date: d,
           dayNum: d.getDate(),
@@ -205,7 +193,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
       // Current month days
       for (let d = 1; d <= daysInMonth; d++) {
         const dateObj = new Date(viewYear, viewMonth, d);
-        const ymd = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const ymd = toLocalDateKey(dateObj);
         const isToday = dateObj.getTime() === todayMidnight.getTime();
         cells.push({
           date: dateObj,
@@ -223,7 +211,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
       const remaining = (7 - (cells.length % 7)) % 7;
       for (let i = 1; i <= remaining; i++) {
         const d = new Date(viewYear, viewMonth + 1, i);
-        const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const ymd = toLocalDateKey(d);
         cells.push({
           date: d,
           dayNum: d.getDate(),
@@ -244,7 +232,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
 
   const pickedLunar = useMemo(() => getLunarDetails(pickedDate), [pickedDate]);
   const pickedWeekdayZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][pickedDate.getDay()] || '星期六';
-  const pickedYmd = `${pickedDate.getFullYear()}-${String(pickedDate.getMonth() + 1).padStart(2, '0')}-${String(pickedDate.getDate()).padStart(2, '0')}`;
+  const pickedYmd = toLocalDateKey(pickedDate);
   const isPickedSurvived = Boolean(survivedDates && survivedDates.includes(pickedYmd));
 
   const handleConfirmSelect = () => {
@@ -406,13 +394,15 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     )}
                     {cell.isCurrentMonth && (
                       (() => {
-                        const cellDateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(cell.dayNum).padStart(2, '0')}`;
-                        const hasCustom = customEvents?.some((e) => e.dateKey === cellDateStr);
-                        if (hasCustom) {
+                        const cellDateStr = cell.ymd;
+                        const hasEvent =
+                          customEvents?.some((e) => e.dateKey === cellDateStr) ||
+                          activeMeetings?.some((m) => m.dateKey === cellDateStr);
+                        if (hasEvent) {
                           return (
                             <span
-                              className="w-1 h-1 rounded-full bg-[#2D2D2D]/80 ring-0.5 ring-stone-400"
-                              title="此日有自訂行程"
+                              className="w-1.5 h-1.5 rounded-full bg-[#2D2D2D]/80 ring-0.5 ring-stone-400"
+                              title="此日有排定行程"
                             />
                           );
                         }
