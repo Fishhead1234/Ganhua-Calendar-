@@ -77,7 +77,10 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
   // Multi-Calendar Checklist State
   const [deviceCalendars, setDeviceCalendars] = useState<DeviceCalendarSource[]>([]);
-  const [enabledCalendarIds, setEnabledCalendarIds] = useState<string[]>([]);
+  const [enabledCalendarIds, setEnabledCalendarIds] = useState<string[]>(() => {
+    const saved = getEnabledCalendarIds();
+    return saved !== null ? saved.map(String) : [];
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -85,10 +88,12 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
       if (!isMounted) return;
       setDeviceCalendars(cals);
       const saved = getEnabledCalendarIds();
-      if (saved && saved.length > 0) {
-        setEnabledCalendarIds(saved);
+      if (saved !== null) {
+        // Strictly respect user's saved selection (even if unchecked)
+        setEnabledCalendarIds(saved.map(String));
       } else {
-        const allIds = cals.map((c) => c.id);
+        // Default to all enabled only on very first run
+        const allIds = cals.map((c) => String(c.id));
         setEnabledCalendarIds(allIds);
         saveEnabledCalendarIds(allIds);
       }
@@ -99,11 +104,24 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   }, [isOpen]);
 
   const handleToggleCalendar = async (calId: string) => {
-    const next = enabledCalendarIds.includes(calId)
-      ? enabledCalendarIds.filter((id) => id !== calId)
-      : [...enabledCalendarIds, calId];
-    setEnabledCalendarIds(next);
-    saveEnabledCalendarIds(next);
+    const idStr = String(calId);
+    const next = enabledCalendarIds.includes(idStr)
+      ? enabledCalendarIds.filter((id) => id !== idStr)
+      : [...enabledCalendarIds, idStr];
+    const normalized = next.map(String);
+    setEnabledCalendarIds(normalized);
+    saveEnabledCalendarIds(normalized);
+
+    // Immediately filter out events belonging to unchecked calendars from activeMeetings
+    const filteredMeetings = activeMeetings.filter((m) => {
+      if (m.source === 'local') return true;
+      if (!m.calendarId) return true;
+      return normalized.includes(String(m.calendarId));
+    });
+    onUpdateMeetings(filteredMeetings, activePresetId);
+    try {
+      localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(filteredMeetings));
+    } catch {}
 
     // If native sync is active, re-sync with updated filter
     if (activeTab === 'native') {
@@ -117,10 +135,22 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   };
 
   const handleToggleAllCalendars = async () => {
-    const allIds = deviceCalendars.map((c) => c.id);
-    const next = enabledCalendarIds.length === allIds.length ? [] : allIds;
-    setEnabledCalendarIds(next);
-    saveEnabledCalendarIds(next);
+    const allIds = deviceCalendars.map((c) => String(c.id));
+    const enabledInList = deviceCalendars.filter((c) => enabledCalendarIds.includes(String(c.id)));
+    const next = enabledInList.length === allIds.length ? [] : allIds;
+    const normalized = next.map(String);
+    setEnabledCalendarIds(normalized);
+    saveEnabledCalendarIds(normalized);
+
+    const filteredMeetings = activeMeetings.filter((m) => {
+      if (m.source === 'local') return true;
+      if (!m.calendarId) return true;
+      return normalized.includes(String(m.calendarId));
+    });
+    onUpdateMeetings(filteredMeetings, activePresetId);
+    try {
+      localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(filteredMeetings));
+    } catch {}
 
     if (activeTab === 'native') {
       try {
@@ -130,6 +160,29 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
         console.warn('Re-syncing all calendars error:', err);
       }
     }
+  };
+
+  const handleFinish = async () => {
+    const normalized = enabledCalendarIds.map(String);
+    saveEnabledCalendarIds(normalized);
+
+    // Auto-activate master Calendar Sync toggle when syncing or clicking "完成設定"
+    if (normalized.length > 0 || activeMeetings.length > 0) {
+      onToggleConnected(true);
+    }
+
+    // Immediately filter out events belonging to unchecked calendars
+    const filteredMeetings = activeMeetings.filter((m) => {
+      if (m.source === 'local') return true;
+      if (!m.calendarId) return true;
+      return normalized.includes(String(m.calendarId));
+    });
+    onUpdateMeetings(filteredMeetings, activePresetId);
+    try {
+      localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(filteredMeetings));
+    } catch {}
+
+    onClose();
   };
 
   // Custom Meeting Form State
@@ -478,89 +531,92 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                 </button>
 
                 {/* Multi-Calendar Checklist & Auto-Activation */}
-                {deviceCalendars.length > 0 && (
-                  <div className="bg-[#FAF7F0] p-4 rounded-2xl border-2 border-[#2D2D2D]/20 text-left space-y-3 pt-3 mt-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-base">📂</span>
-                        <span className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D]">
-                          已連結的行事曆來源
-                        </span>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#2D2D2D]/10 text-[#6E6A63]">
-                          {enabledCalendarIds.length} / {deviceCalendars.length}
-                        </span>
+                {deviceCalendars.length > 0 && (() => {
+                  const enabledInList = deviceCalendars.filter((c) => enabledCalendarIds.includes(String(c.id)));
+                  return (
+                    <div className="bg-[#FAF7F0] p-4 rounded-2xl border-2 border-[#2D2D2D]/20 text-left space-y-3 pt-3 mt-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-base">📂</span>
+                          <span className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D]">
+                            已連結的行事曆來源
+                          </span>
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#2D2D2D]/10 text-[#6E6A63]">
+                            {enabledInList.length} / {deviceCalendars.length}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleToggleAllCalendars}
+                          className="text-[10px] font-sans font-bold text-[#C83E31] hover:underline cursor-pointer"
+                        >
+                          {enabledInList.length === deviceCalendars.length ? '全部取消' : '全選所有日曆'}
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={handleToggleAllCalendars}
-                        className="text-[10px] font-sans font-bold text-[#C83E31] hover:underline cursor-pointer"
-                      >
-                        {enabledCalendarIds.length === deviceCalendars.length ? '全部取消' : '全選所有日曆'}
-                      </button>
-                    </div>
+                      <p className="text-[11px] font-sans text-[#6E6A63] leading-relaxed">
+                        勾選您希望日曆讀取的行事曆（已自動為您勾選包括學校、家長聯絡簿、家庭與工作日曆）：
+                      </p>
 
-                    <p className="text-[11px] font-sans text-[#6E6A63] leading-relaxed">
-                      勾選您希望日曆讀取的行事曆（已自動為您勾選包括學校、家長聯絡簿、家庭與工作日曆）：
-                    </p>
-
-                    <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                      {deviceCalendars.map((cal) => {
-                        const isChecked = enabledCalendarIds.includes(cal.id);
-                        return (
-                          <label
-                            key={cal.id}
-                            className={`flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer select-none ${
-                              isChecked
-                                ? 'bg-white border-[#2D2D2D]/30 shadow-xs'
-                                : 'bg-[#F3EFE6]/60 border-transparent opacity-60 hover:opacity-100'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleToggleCalendar(cal.id)}
-                                className="w-4 h-4 rounded text-[#C83E31] border-stone-300 focus:ring-[#C83E31] cursor-pointer"
-                              />
-                              <span
-                                className="w-3 h-3 rounded-full shrink-0 shadow-xs border border-black/10"
-                                style={{ backgroundColor: cal.color || '#2D2D2D' }}
-                              />
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-sans font-bold text-xs text-[#2D2D2D] truncate">
-                                    {cal.name}
-                                  </span>
-                                  {cal.isPrimary && (
-                                    <span className="text-[9px] px-1 py-0.2 rounded bg-[#D4B483]/30 text-[#785A3C] font-bold shrink-0">
-                                      主要
-                                    </span>
-                                  )}
-                                </div>
-                                {cal.accountName && (
-                                  <p className="text-[10px] font-mono text-[#6E6A63] truncate">
-                                    {cal.accountName}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-
-                            <span
-                              className={`text-[10px] font-sans font-bold shrink-0 px-2 py-0.5 rounded-full ${
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                        {deviceCalendars.map((cal) => {
+                          const isChecked = enabledCalendarIds.includes(String(cal.id));
+                          return (
+                            <label
+                              key={cal.id}
+                              className={`flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer select-none ${
                                 isChecked
-                                  ? 'bg-emerald-100 text-emerald-800'
-                                  : 'bg-stone-200 text-stone-500'
+                                  ? 'bg-white border-[#2D2D2D]/30 shadow-xs'
+                                  : 'bg-[#F3EFE6]/60 border-transparent opacity-60 hover:opacity-100'
                               }`}
                             >
-                              {isChecked ? '已啟用' : '已停用'}
-                            </span>
-                          </label>
-                        );
-                      })}
+                              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => handleToggleCalendar(cal.id)}
+                                  className="w-4 h-4 rounded text-[#C83E31] border-stone-300 focus:ring-[#C83E31] cursor-pointer"
+                                />
+                                <span
+                                  className="w-3 h-3 rounded-full shrink-0 shadow-xs border border-black/10"
+                                  style={{ backgroundColor: cal.color || '#2D2D2D' }}
+                                />
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-sans font-bold text-xs text-[#2D2D2D] truncate">
+                                      {cal.name}
+                                    </span>
+                                    {cal.isPrimary && (
+                                      <span className="text-[9px] px-1 py-0.2 rounded bg-[#D4B483]/30 text-[#785A3C] font-bold shrink-0">
+                                        主要
+                                      </span>
+                                    )}
+                                  </div>
+                                  {cal.accountName && (
+                                    <p className="text-[10px] font-mono text-[#6E6A63] truncate">
+                                      {cal.accountName}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <span
+                                className={`text-[10px] font-sans font-bold shrink-0 px-2 py-0.5 rounded-full ${
+                                  isChecked
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-stone-200 text-stone-500'
+                                }`}
+                              >
+                                {isChecked ? '已啟用' : '已停用'}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {!isNative && (
                   <p className="text-[11px] font-sans text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200">
@@ -784,8 +840,8 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
           </div>
           <button
             type="button"
-            onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-[#2D2D2D] text-[#FAF7F0] text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm"
+            onClick={handleFinish}
+            className="px-5 py-2 rounded-xl bg-[#2D2D2D] text-[#FAF7F0] text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm active:scale-95"
           >
             完成設定
           </button>

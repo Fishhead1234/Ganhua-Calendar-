@@ -474,9 +474,9 @@ export function getEnabledCalendarIds(): string[] | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(ENABLED_CALENDARS_STORAGE_KEY);
-    if (!raw) return null;
+    if (raw === null) return null;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : null;
+    return Array.isArray(parsed) ? parsed.map(String) : null;
   } catch {
     return null;
   }
@@ -484,7 +484,8 @@ export function getEnabledCalendarIds(): string[] | null {
 
 export function saveEnabledCalendarIds(ids: string[]): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(ENABLED_CALENDARS_STORAGE_KEY, JSON.stringify(ids));
+  const normalized = Array.from(new Set(ids.map(String)));
+  localStorage.setItem(ENABLED_CALENDARS_STORAGE_KEY, JSON.stringify(normalized));
 }
 
 export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
@@ -535,25 +536,28 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     ];
   }
 
-  // Auto-activate all discovered calendars if not set yet, or include new ones
-  const savedEnabled = getEnabledCalendarIds();
-  if (!savedEnabled || savedEnabled.length === 0) {
-    saveEnabledCalendarIds(calendars.map((c) => c.id));
-  } else {
-    try {
-      const disabledRaw = localStorage.getItem('disabled_calendar_ids');
-      const disabledIds: string[] = disabledRaw ? JSON.parse(disabledRaw) : [];
-      const updated = Array.from(new Set([
-        ...savedEnabled,
-        ...calendars.filter((c) => !disabledIds.includes(c.id)).map((c) => c.id)
-      ]));
-      saveEnabledCalendarIds(updated);
-    } catch {
-      // ignore
+  // Deduplicate calendars strictly by String(cal.id)
+  // Do NOT deduplicate by title or name (user may have multiple accounts each with a "My calendar")
+  const seenIds = new Set<string>();
+  const uniqueCalendars: DeviceCalendarSource[] = [];
+  for (const cal of calendars) {
+    const calId = String(cal.id);
+    if (!seenIds.has(calId)) {
+      seenIds.add(calId);
+      uniqueCalendars.push({
+        ...cal,
+        id: calId,
+      });
     }
   }
 
-  return calendars;
+  // ONLY default to selecting all calendars on the very first run when localStorage.getItem('enabled_calendar_ids') === null
+  const rawSaved = typeof window !== 'undefined' ? localStorage.getItem(ENABLED_CALENDARS_STORAGE_KEY) : null;
+  if (rawSaved === null) {
+    saveEnabledCalendarIds(uniqueCalendars.map((c) => c.id));
+  }
+
+  return uniqueCalendars;
 }
 
 /**
@@ -573,7 +577,31 @@ export async function fetchNativeDeviceCalendarEvents(
     throw new Error('此功能僅能在手機 App (APK) 原生環境中直接讀取手機系統行事曆。在電腦瀏覽器請使用「即時 JSON 網址連動」！');
   }
 
+  // 1. Build calendar lookup map strictly by String(id)
+  const calendarMap = new Map<string, DeviceCalendarSource>();
+  let allCalendars: DeviceCalendarSource[] = [];
+  try {
+    allCalendars = await fetchDeviceCalendars();
+    for (const c of allCalendars) {
+      calendarMap.set(String(c.id), c);
+    }
+  } catch (err) {
+    console.warn('Failed to load device calendars for mapping:', err);
+  }
+
   const enabledIds = getEnabledCalendarIds();
+  const enabledSet = enabledIds !== null ? new Set(enabledIds.map(String)) : null;
+  const allEnabled = enabledSet === null || (allCalendars.length > 0 && allCalendars.every((c) => enabledSet.has(c.id)));
+
+  const isEventEnabled = (rawCalId: any): boolean => {
+    if (enabledSet === null) return true; // first run default
+    if (rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== '') {
+      return enabledSet.has(String(rawCalId));
+    }
+    // If event.calendarId is missing/unmapped, include if all calendars are enabled
+    return allEnabled;
+  };
+
   const win = window as any;
   const startOfDay = options?.startDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() - 30, 0, 0, 0, 0);
   const endOfDay = options?.endDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 60, 23, 59, 59, 999);
@@ -596,9 +624,8 @@ export async function fetchNativeDeviceCalendarEvents(
       const rawEvents: any[] = res.result || [];
       const meetings = rawEvents
         .filter((e) => {
-          if (!enabledIds || enabledIds.length === 0) return true;
-          const calId = e.calendarId || e.calendar_id;
-          return !calId || enabledIds.includes(String(calId));
+          const calId = e.calendarId ?? e.calendar_id;
+          return isEventEnabled(calId);
         })
         .map((e, idx) => {
           const start = new Date(e.startDate || e.start || startOfDay.getTime());
@@ -612,6 +639,14 @@ export async function fetchNativeDeviceCalendarEvents(
             start.getDay() === 5 &&
             (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
+          const rawCalId = e.calendarId ?? e.calendar_id;
+          const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
+            ? String(rawCalId)
+            : undefined;
+          const matchedCal = calIdStr ? calendarMap.get(calIdStr) : undefined;
+          const calendarName = matchedCal?.name || e.calendarName || e.calendarTitle || matchedCal?.accountName;
+          const calendarColor = matchedCal?.color || e.calendarColor || e.color || '#2D2D2D';
+
           return {
             id: String(e.id || `native-${idx + 1}`),
             title: e.title || '未命名會議',
@@ -622,9 +657,9 @@ export async function fetchNativeDeviceCalendarEvents(
             dateKey,
             isAllDay,
             source: 'synced' as const,
-            calendarId: e.calendarId ? String(e.calendarId) : undefined,
-            calendarName: e.calendarName || e.calendarTitle,
-            calendarColor: e.calendarColor || e.color,
+            calendarId: calIdStr,
+            calendarName,
+            calendarColor,
           };
         });
       return meetings;
@@ -644,8 +679,8 @@ export async function fetchNativeDeviceCalendarEvents(
 
     const meetings: CalendarMeeting[] = rawEvents
       .filter((e) => {
-        if (!enabledIds || enabledIds.length === 0) return true;
-        return !e.calendarId || enabledIds.includes(String(e.calendarId));
+        const calId = e.calendarId ?? e.calendar_id;
+        return isEventEnabled(calId);
       })
       .map((e, idx) => {
         const isAllDay = Boolean(e.isAllDay);
@@ -671,6 +706,14 @@ export async function fetchNativeDeviceCalendarEvents(
           evDate.getDay() === 5 &&
           (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
+        const rawCalId = e.calendarId ?? e.calendar_id;
+        const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
+          ? String(rawCalId)
+          : undefined;
+        const matchedCal = calIdStr ? calendarMap.get(calIdStr) : undefined;
+        const calendarName = matchedCal?.name || e.calendarName || matchedCal?.accountName;
+        const calendarColor = matchedCal?.color || e.calendarColor || '#2D2D2D';
+
         return {
           id: String(e.id || `device-${idx + 1}`),
           title: e.title || '未命名會議',
@@ -681,9 +724,9 @@ export async function fetchNativeDeviceCalendarEvents(
           dateKey,
           isAllDay,
           source: 'synced' as const,
-          calendarId: e.calendarId ? String(e.calendarId) : undefined,
-          calendarName: e.calendarName,
-          calendarColor: e.calendarColor,
+          calendarId: calIdStr,
+          calendarName,
+          calendarColor,
         };
       });
     return meetings;
