@@ -1,22 +1,54 @@
 package com.ganhuacalendar.app;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+    public static final String CHANNEL_ID_REMINDERS = "ganhua_calendar_reminders";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(GanhuaWidgetBridgePlugin.class);
         super.onCreate(savedInstanceState);
+        createNotificationChannel();
+        requestNotificationPermissionIfNeeded();
         if (bridge != null && bridge.getWebView() != null) {
             bridge.getWebView().addJavascriptInterface(new AndroidCalendarBridge(this), "AndroidCalendarBridge");
         }
         handleWidgetSelectDate(getIntent());
         syncSurvivedDatesToWebView();
         refreshWidgets();
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID_REMINDERS,
+                "幹話日曆行程提醒",
+                NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("社畜行程提醒與專屬毒舌吐槽通知");
+            channel.enableVibration(true);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 102);
+            }
+        }
     }
 
     @Override

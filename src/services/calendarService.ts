@@ -1,5 +1,13 @@
-import { CharacterType } from '../types/calendar';
+import { CharacterType, CalendarQuote, RawStaticQuote365 } from '../types/calendar';
 import { toLocalDateKey, parseLocalDateKey } from '../utils/dateUtils';
+import { formatQuoteFrom365 } from '../utils/quoteFormatter';
+import quotes365Raw from '../data/quotes365.json';
+
+export interface EventReminder {
+  id: string;
+  value: number; // e.g. 1, 15, 30, 2
+  unit: 'minutes' | 'hours' | 'days';
+}
 
 export interface CalendarMeeting {
   id: string;
@@ -15,6 +23,7 @@ export interface CalendarMeeting {
   calendarId?: string;
   calendarName?: string;
   calendarColor?: string;
+  reminders?: EventReminder[];
 }
 
 export interface CalendarRoastResult {
@@ -235,50 +244,144 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     }
   }
 
-  const count = events.length;
+  // 1. Separate timed meetings from all-day events
+  // Exclude All-Day Events from work meeting hours and corporate meeting density calculation!
+  const timedEvents = events.filter((e) => !e.isAllDay);
+  const allDayEvents = events.filter((e) => !!e.isAllDay);
+
   let totalMinutes = 0;
   let hasFridayLate = false;
   let hasReviewOr1on1 = false;
   let hasAllHands = false;
   let hasEarlyMonday = false;
   let hasParentOrSchool = false;
+  let hasBirthday = false;
+  let hasLessonOrMusic = false;
+  let hasWedding = false;
+  let hasDentistOrMedical = false;
+  let hasFamilyDinner = false;
+  let hasYearEndOrCompanyParty = false;
 
   const todayDay = new Date().getDay();
 
+  // Sum hours ONLY for timed meetings
+  timedEvents.forEach((ev) => {
+    totalMinutes += ev.durationMinutes || 0;
+  });
+
+  // Scan all events (both timed and all-day) for specific event keywords
   events.forEach((ev) => {
-    totalMinutes += ev.durationMinutes;
     const lowerTitle = (ev.title || '').toLowerCase();
     const lowerCalName = (ev.calendarName || '').toLowerCase();
     const combo = `${lowerTitle} ${lowerCalName}`;
 
+    // Birthday
+    if (
+      combo.includes('birthday') ||
+      combo.includes('bday') ||
+      combo.includes('生日') ||
+      combo.includes('壽星')
+    ) {
+      hasBirthday = true;
+    }
+
+    // Music / Cello / Piano / Talent Lessons
+    if (
+      combo.includes('cello') ||
+      combo.includes('piano') ||
+      combo.includes('lesson') ||
+      combo.includes('才藝') ||
+      combo.includes('音樂') ||
+      combo.includes('大提琴') ||
+      combo.includes('鋼琴') ||
+      combo.includes('畫畫')
+    ) {
+      hasLessonOrMusic = true;
+    }
+
+    // School / Parent / SchoolsBuddy / BSKL
     if (
       combo.includes('school') ||
       combo.includes('parent') ||
       combo.includes('schoolsbuddy') ||
+      combo.includes('bskl') ||
       combo.includes('家長') ||
       combo.includes('學校') ||
       combo.includes('班級') ||
       combo.includes('小孩') ||
-      combo.includes('家庭') ||
       combo.includes('家長會') ||
       combo.includes('聯絡簿') ||
       combo.includes('接送') ||
-      combo.includes('家長日')
+      combo.includes('家長日') ||
+      combo.includes('cross country') ||
+      combo.includes('book club') ||
+      combo.includes('football') ||
+      combo.includes('u15') ||
+      combo.includes('u18')
     ) {
       hasParentOrSchool = true;
     }
 
+    // Wedding / 喜酒 / 紅色炸彈
+    if (
+      combo.includes('wedding') ||
+      combo.includes('喜酒') ||
+      combo.includes('婚禮') ||
+      combo.includes('喜宴') ||
+      combo.includes('紅色炸彈')
+    ) {
+      hasWedding = true;
+    }
+
+    // Dentist / Medical / Health check
+    if (
+      combo.includes('dentist') ||
+      combo.includes('牙醫') ||
+      combo.includes('看牙') ||
+      combo.includes('洗牙') ||
+      combo.includes('健檢') ||
+      combo.includes('體檢') ||
+      combo.includes('診所') ||
+      combo.includes('醫院')
+    ) {
+      hasDentistOrMedical = true;
+    }
+
+    // Family Dinner
+    if (
+      combo.includes('family') ||
+      combo.includes('家庭聚餐') ||
+      combo.includes('家族') ||
+      combo.includes('親戚') ||
+      combo.includes('聚餐')
+    ) {
+      hasFamilyDinner = true;
+    }
+
+    // 1-on-1 / Review / 績效面談
     if (
       lowerTitle.includes('review') ||
       lowerTitle.includes('1-on-1') ||
       lowerTitle.includes('1:1') ||
       lowerTitle.includes('績效') ||
       lowerTitle.includes('考核') ||
+      lowerTitle.includes('考績') ||
       lowerTitle.includes('面談')
     ) {
       hasReviewOr1on1 = true;
     }
 
+    // Year-end / 尾牙 / 春酒
+    if (
+      combo.includes('尾牙') ||
+      combo.includes('春酒') ||
+      combo.includes('年會') ||
+      combo.includes('company party')
+    ) {
+      hasYearEndOrCompanyParty = true;
+    }
+
+    // All Hands / Town Hall
     if (
       lowerTitle.includes('all hands') ||
       lowerTitle.includes('town hall') ||
@@ -289,30 +392,75 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
       hasAllHands = true;
     }
 
-    if (
-      ev.isFridayAfterFour ||
-      (todayDay === 5 && (ev.startHour >= 16 || (ev.startHour === 15 && ev.startMinute >= 45))) ||
-      lowerTitle.includes('週五下班前') ||
-      lowerTitle.includes('friday')
-    ) {
-      hasFridayLate = true;
-    }
+    // Friday Late Meeting (only for timed meetings on Friday after 16:00)
+    if (!ev.isAllDay) {
+      if (
+        ev.isFridayAfterFour ||
+        (todayDay === 5 && (ev.startHour >= 16 || (ev.startHour === 15 && ev.startMinute >= 45))) ||
+        lowerTitle.includes('週五下班前') ||
+        (todayDay === 5 && lowerTitle.includes('friday'))
+      ) {
+        hasFridayLate = true;
+      }
 
-    if (
-      (todayDay === 1 || lowerTitle.includes('週一') || lowerTitle.includes('monday')) &&
-      ev.startHour <= 9
-    ) {
-      hasEarlyMonday = true;
+      // Monday Early Meeting (only for timed meetings on Monday <= 9:00)
+      if (
+        (todayDay === 1 || lowerTitle.includes('週一') || lowerTitle.includes('monday')) &&
+        ev.startHour <= 9
+      ) {
+        hasEarlyMonday = true;
+      }
     }
   });
 
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
-  const isBackToBack = count >= 4;
+  const timedCount = timedEvents.length;
+  const isBackToBack = timedCount >= 4;
 
-  // 1. Keyword: School / Parent / Family
+  // PRIORITY 1: Specific Event Keywords ALWAYS take precedence over Meeting Count!
+
+  // 1-A. Birthday (壽星避難)
+  if (hasBirthday) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🎂 偵測到【壽星/生日】專屬避難吐槽',
+      roastQuote: '壽星最大！今天誰敢找我開會，我就把蛋糕砸在誰的簡報投影幕上。',
+      roastSubtext: '又老了一歲，但離退休金又近了一步。今日宜帶薪吃蛋糕、不宜回覆任何工作訊息。',
+      yi: '吃雙倍草莓蛋糕・準時下班人間蒸發・放空耍廢',
+      ji: '在生日這天看公司群組・回覆同事「收到」・答應加班開會',
+      character: 'cat',
+      sceneId: 'cat_birthday',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '100% 100%',
+    };
+  }
+
+  // 1-B. Music / Cello / Talent Lessons (音樂才藝課)
+  if (hasLessonOrMusic) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🎻 偵測到【才藝課/音樂課】專屬吐槽',
+      roastQuote: '下班後的才藝課，根本不是培養氣質，是在考驗社畜最後殘存的耐心。',
+      roastSubtext: '白天拉皮條（工作專案），晚上拉大提琴。琴聲裡全是對生活的嘆息。',
+      yi: '假裝聽得懂節奏・下課立刻買珍奶犒賞自己',
+      ji: '在老師面前把休止符當成可以滑手機的意思',
+      character: 'cat',
+      sceneId: 'cat_zen_woodfish',
+      spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
+      spritePosition: '50% 100%',
+    };
+  }
+
+  // 1-C. School / Parent / Family
   if (hasParentOrSchool) {
     return {
-      meetingsCount: count,
+      meetingsCount: events.length,
       hasFridayLateMeeting: hasFridayLate,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
@@ -328,10 +476,67 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 2. Keyword: Performance Review / 1-on-1 / 面談
+  // 1-D. Wedding / 喜酒
+  if (hasWedding) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '💣 偵測到【紅色炸彈/喜酒】專屬吐槽',
+      roastQuote: '包出去的是禮金，收回來的是對愛情的懷疑與荷包的哀鳴。',
+      roastSubtext: '週末特地早起梳化，只為了去吃一桌永遠吃不飽的花好月圓。',
+      yi: '打包花好月圓炸湯圓・準時拿喜餅走人',
+      ji: '被長輩問「什麼時候換你」認真回答',
+      character: 'cat',
+      sceneId: 'cat_red_envelope',
+      spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
+      spritePosition: '0% 100%',
+    };
+  }
+
+  // 1-E. Dentist / Medical
+  if (hasDentistOrMedical) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🏥 偵測到【進廠維修/看診】專屬吐槽',
+      roastQuote: '聽到牙醫電鑽滋滋作響的那一刻，突然覺得上班好像也沒那麼痛苦了。',
+      roastSubtext: '躺在診療椅上任人宰割，嘴巴張得比老闆畫的大餅還大。',
+      yi: '乖乖漱口配合・深呼吸放鬆咬合肌',
+      ji: '企圖跟戴著口罩拿著器械的醫生聊天辯論',
+      character: 'cat',
+      sceneId: 'cat_office_cold',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '50% 100%',
+    };
+  }
+
+  // 1-F. Family Dinner
+  if (hasFamilyDinner) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🍲 偵測到【家庭聚餐】專屬吐槽',
+      roastQuote: '親戚聚餐的精髓：臉上笑嘻嘻，心裡默念三字經。',
+      roastSubtext: '從小比成績，長大比薪水，老了比血壓。這不是吃飯，是靈魂拷問現場。',
+      yi: '埋頭猛吃搶最後一塊肉・藉故上廁所滑手機',
+      ji: '認真回答「最近公司年終發幾個月」',
+      character: 'cat',
+      sceneId: 'cat_empty_wallet',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '0% 50%',
+    };
+  }
+
+  // 1-G. 1-on-1 / 績效面談
   if (hasReviewOr1on1) {
     return {
-      meetingsCount: count,
+      meetingsCount: events.length,
       hasFridayLateMeeting: hasFridayLate,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
@@ -347,16 +552,35 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 2. Keyword/Time: Friday late afternoon meeting
+  // 1-H. Year-end / 尾牙 / 春酒
+  if (hasYearEndOrCompanyParty) {
+    return {
+      meetingsCount: events.length,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: totalHours,
+      summaryBadge: '🍻 偵測到【公司尾牙/聚餐】專屬吐槽',
+      roastQuote: '尾牙最大的獎項不是特獎十萬，而是老闆中途有事先走。',
+      roastSubtext: '被迫看長官自嗨表演，敬酒還要排隊陪笑，這根本是帶薪受刑。',
+      yi: '專心吃大蝦與龍蝦・抽完安慰獎直接開溜',
+      ji: '喝醉跟大老闆勾肩搭背說真心話',
+      character: 'cat',
+      sceneId: 'cat_payday_king',
+      spriteSheet: '/assets/sheets/cat_sheet.jpg',
+      spritePosition: '0% 100%',
+    };
+  }
+
+  // 1-I. Friday late afternoon meeting
   if (hasFridayLate) {
     return {
-      meetingsCount: count,
+      meetingsCount: timedCount,
       hasFridayLateMeeting: true,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
-      summaryBadge: `📅 今日 ${count} 場會議・偵測到週五致命末班會`,
+      summaryBadge: `📅 今日 ${timedCount} 場會議・偵測到週五致命末班會`,
       roastQuote: '週五下午四點後安排會議的人，下輩子走路會踢到桌腳。',
-      roastSubtext: `明明可以用一封信講完的事，非要在週末前夕拉所有人陪葬。`,
+      roastSubtext: '明明可以用一封信講完的事，非要在週末前夕拉所有人陪葬。',
       yi: '假裝網路不順斷線退出・眼神渙散點頭',
       ji: '在 17:00 認真問「請問還有其他事項嗎」',
       character: 'cat',
@@ -366,10 +590,10 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 3. Keyword: All Hands / 全體大會
+  // 1-J. All Hands / 全體大會
   if (hasAllHands) {
     return {
-      meetingsCount: count,
+      meetingsCount: timedCount,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
@@ -385,14 +609,14 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 4. Monday morning meeting
+  // 1-K. Monday morning meeting
   if (hasEarlyMonday) {
     return {
-      meetingsCount: count,
+      meetingsCount: timedCount,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
-      summaryBadge: `📅 週一早會 (${count}場會議)：微弱電量掙扎中`,
+      summaryBadge: `📅 週一早會 (${timedCount}場會議)：微弱電量掙扎中`,
       roastQuote: '週一一早就開會？不如先開箱我微弱的求生意志。',
       roastSubtext: '鬧鐘響了五次，靈魂還在被窩，肉體已經在開晨會做功德。',
       yi: '準備滿杯冰美式・只回貼圖與收到',
@@ -404,16 +628,17 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 5. Meeting Hell: 5+ meetings or >= 4 hours
-  if (count >= 5 || totalHours >= 4.0) {
+  // PRIORITY 2: Meeting Hell: ONLY triggered when there are 4 or more timed meetings!
+  // Dynamic count inserted: "今天有 ${timedCount} 個會"
+  if (timedCount >= 4) {
     return {
-      meetingsCount: count,
+      meetingsCount: timedCount,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: true,
       totalMeetingHours: totalHours,
-      summaryBadge: `📅 今日 ${count} 場會議 (${totalHours}小時)｜觸發【會議地獄】`,
-      roastQuote: '今天有 6 個會。建議靈魂直接請假，留肉體在座位上點頭就好。',
-      roastSubtext: `累積共 ${count} 場會議、${totalHours} 小時通靈時間，薪水是拿來買精神撫慰金的。`,
+      summaryBadge: `📅 今日 ${timedCount} 場會議 (${totalHours}小時)｜觸發【會議地獄】`,
+      roastQuote: `今天有 ${timedCount} 個會。建議靈魂直接請假，留肉體在座位上點頭就好。`,
+      roastSubtext: `累積共 ${timedCount} 場會議、${totalHours} 小時通靈時間，薪水是拿來買精神撫慰金的。`,
       yi: '開啟通話自動靜音・關掉攝影機打瞌睡',
       ji: '相信這場會能得出任何有建設性的結論',
       character: 'cat',
@@ -423,16 +648,16 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 6. Moderate meetings: 1-4 meetings
-  if (count >= 1) {
+  // PRIORITY 3: Moderate timed meetings: 1 to 3 meetings
+  if (timedCount >= 1) {
     return {
-      meetingsCount: count,
+      meetingsCount: timedCount,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: false,
       totalMeetingHours: totalHours,
-      summaryBadge: `📅 今日 ${count} 場會議 (${totalHours}小時)：微弱電量掙扎中`,
+      summaryBadge: `📅 今日 ${timedCount} 場會議 (${totalHours}小時)：微弱電量掙扎中`,
       roastQuote: '能用一封 Email 講完的事，非要拉大家通靈一小時。',
-      roastSubtext: `今日排程 ${count} 場會議，社交電池已被榨乾到僅剩紅燈。`,
+      roastSubtext: `今日排程 ${timedCount} 場會議，社交電池已被榨乾到僅剩紅燈。`,
       yi: '準備滿杯冰美式・只回貼圖與收到',
       ji: '主動發言說「我來負責後續追蹤」',
       character: 'cat',
@@ -442,7 +667,27 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     };
   }
 
-  // 7. Zero meetings: Slack off day
+  // PRIORITY 4: All-day events only (0 timed meetings, 1+ all-day events)
+  if (allDayEvents.length > 0) {
+    const firstAllDay = allDayEvents[0];
+    return {
+      meetingsCount: 0,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: 0,
+      summaryBadge: `📅 今日全天活動【${firstAllDay.title || '全天行程'}】`,
+      roastQuote: '行事曆掛著全天行程，代表今天我的靈魂屬於自己，工作訊息一概不讀不回。',
+      roastSubtext: '全天活動已啟動，工作請自重，有事明天再說，沒事更不要找。',
+      yi: '專心享受全日生活・放下工作手機',
+      ji: '在休假日手癢打開公司 Slack / Teams',
+      character: 'cat',
+      sceneId: 'cat_sprint_home',
+      spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
+      spritePosition: '0% 0%',
+    };
+  }
+
+  // PRIORITY 5: Zero meetings (薪水小偷日)
   return {
     meetingsCount: 0,
     hasFridayLateMeeting: false,
@@ -457,6 +702,115 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     sceneId: 'cat_toilet_hide',
     spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
     spritePosition: '50% 0%',
+  };
+}
+
+export interface ResolveDayContentOptions {
+  quotes?: RawStaticQuote365[];
+  userBirthday?: { month: number; day: number } | null;
+  selectedThemeFilter?: CharacterType | 'all';
+  activePresetId?: string;
+  isPro?: boolean;
+}
+
+export interface ResolvedDayContent extends CalendarQuote {
+  hasRoastOverride: boolean;
+  roastBadge: string;
+  meetingsCount: number;
+  timedMeetingsCount: number;
+  totalMeetingHours: number;
+}
+
+/**
+ * Single Unified Resolver Function for Daily Card, Monthly View & Android Widgets
+ * Guarantees 100% identical quote, character, sprite sheet, position, yi, ji, and roast badge
+ * for any given date and its day events across all views.
+ */
+export function resolveDayContent(
+  targetDate: Date,
+  dayEvents: CalendarMeeting[] = [],
+  options: ResolveDayContentOptions = {}
+): ResolvedDayContent {
+  const targetMonth = targetDate.getMonth() + 1;
+  const targetDay = targetDate.getDate();
+  const dateStr = toLocalDateKey(targetDate);
+
+  // 1. Base 365 daily quote
+  const list = (options.quotes && options.quotes.length > 0 ? options.quotes : quotes365Raw) as RawStaticQuote365[];
+  const found = list.find((q) => q && q.month === targetMonth && q.day === targetDay) || list[0];
+  const base = formatQuoteFrom365(found, targetDate);
+
+  // Character theme override
+  if (options.selectedThemeFilter && options.selectedThemeFilter !== 'all') {
+    base.character = options.selectedThemeFilter;
+    base.illustrationSvg = `${options.selectedThemeFilter}_svg`;
+    base.spriteSheet = `/assets/sheets/${options.selectedThemeFilter}_sheet.jpg`;
+  }
+
+  const timedEvents = dayEvents.filter((e) => !e.isAllDay);
+
+  // 2. User Birthday Check
+  if (options.userBirthday && options.userBirthday.month === targetMonth && options.userBirthday.day === targetDay) {
+    const char = base.character;
+    return {
+      ...base,
+      id: `birthday-${dateStr}`,
+      quote: '壽星最大！今天誰敢找我開會，我就把蛋糕砸在誰的簡報投影幕上。',
+      subtext: '又老了一歲，但離退休金又近了一步。今日宜帶薪吃蛋糕、不宜回覆任何工作訊息。',
+      lunarDate: '🎂 壽星避難日・今日特權最大',
+      yi: '吃雙倍草莓蛋糕・準時下班人間蒸發・放空耍廢',
+      ji: '在生日這天看公司群組・回覆同事「收到」・答應加班開會',
+      character: char,
+      sceneId: `${char}_birthday`,
+      assetPath: `/assets/scenes/${char}_birthday.webp`,
+      spriteSheet: `/assets/sheets/${char}_sheet.jpg`,
+      spritePosition: '100% 100%',
+      eventLabel: '🎂 壽星避難模式',
+      eventType: 'birthday',
+      hasRoastOverride: true,
+      roastBadge: '🎂 壽星避難模式',
+      meetingsCount: dayEvents.length,
+      timedMeetingsCount: timedEvents.length,
+      totalMeetingHours: 0,
+    };
+  }
+
+  // 3. Preset Scenario or Calendar Events Roast Override
+  const hasEvents = dayEvents && dayEvents.length > 0;
+  const hasPreset = Boolean(options.activePresetId);
+
+  if (hasPreset || hasEvents) {
+    const roast = analyzeCalendarEvents(dayEvents, options.activePresetId);
+    const activeSceneId = roast.sceneId || base.sceneId;
+
+    return {
+      ...base,
+      quote: roast.roastQuote,
+      subtext: roast.roastSubtext,
+      yi: roast.yi || base.yi,
+      ji: roast.ji || base.ji,
+      character: roast.character || base.character,
+      sceneId: activeSceneId,
+      assetPath: activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : base.assetPath,
+      spriteSheet: roast.spriteSheet || base.spriteSheet,
+      spritePosition: roast.spritePosition || base.spritePosition,
+      eventLabel: roast.summaryBadge,
+      hasRoastOverride: true,
+      roastBadge: roast.summaryBadge,
+      meetingsCount: roast.meetingsCount,
+      timedMeetingsCount: timedEvents.length,
+      totalMeetingHours: roast.totalMeetingHours,
+    };
+  }
+
+  // 4. Default clean 365 daily quote (no meetings)
+  return {
+    ...base,
+    hasRoastOverride: false,
+    roastBadge: '',
+    meetingsCount: 0,
+    timedMeetingsCount: 0,
+    totalMeetingHours: 0,
   };
 }
 
@@ -1331,9 +1685,30 @@ export interface CustomCalendarEvent {
   createdAt?: number;
   calendarName?: string;
   calendarColor?: string;
+  reminders?: EventReminder[];
 }
 
 const CUSTOM_EVENTS_STORAGE_KEY = 'user_custom_events';
+
+export function scheduleEventNotificationsViaBridge(event: CustomCalendarEvent): void {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.scheduleEventNotifications) {
+      (window as any).AndroidCalendarBridge.scheduleEventNotifications(JSON.stringify(event));
+    }
+  } catch (err) {
+    console.warn('Failed to schedule event notifications via bridge:', err);
+  }
+}
+
+export function cancelEventNotificationsViaBridge(eventId: string): void {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.cancelEventNotifications) {
+      (window as any).AndroidCalendarBridge.cancelEventNotifications(eventId);
+    }
+  } catch (err) {
+    console.warn('Failed to cancel event notifications via bridge:', err);
+  }
+}
 
 export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
   const [y, m, d] = e.dateKey.split('-').map(Number);
@@ -1367,6 +1742,7 @@ export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
     source: 'local',
     calendarName: e.calendarName,
     calendarColor: e.calendarColor,
+    reminders: e.reminders,
   };
 }
 
@@ -1394,6 +1770,9 @@ export function saveCustomEvent(event: CustomCalendarEvent): void {
     updated = [event, ...events];
   }
   localStorage.setItem(CUSTOM_EVENTS_STORAGE_KEY, JSON.stringify(updated));
+
+  // Sync to native Android AlarmManager
+  scheduleEventNotificationsViaBridge(event);
 }
 
 export function deleteCustomEvent(id: string): void {
@@ -1401,6 +1780,9 @@ export function deleteCustomEvent(id: string): void {
   const events = getCustomEvents();
   const updated = events.filter((e) => e.id !== id);
   localStorage.setItem(CUSTOM_EVENTS_STORAGE_KEY, JSON.stringify(updated));
+
+  // Cancel native alarms
+  cancelEventNotificationsViaBridge(id);
 }
 
 export function getCustomEventsForDate(dateKey: string): CalendarMeeting[] {

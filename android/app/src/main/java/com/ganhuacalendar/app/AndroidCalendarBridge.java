@@ -1,12 +1,16 @@
 package com.ganhuacalendar.app;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.CalendarContract;
 import android.webkit.JavascriptInterface;
 import androidx.core.content.ContextCompat;
@@ -292,4 +296,137 @@ public class AndroidCalendarBridge {
         }
         return "ERROR: Too many redirects";
     }
+
+    /**
+     * Schedule up to 3 custom reminder notifications for an event via AlarmManager
+     */
+    @JavascriptInterface
+    public String scheduleEventNotifications(String eventJson) {
+        try {
+            JSONObject obj = new JSONObject(eventJson);
+            String id = obj.optString("id");
+            String title = obj.optString("title", "社畜行程");
+            String dateKey = obj.optString("dateKey");
+            int startHour = obj.optInt("startHour", 9);
+            int startMinute = obj.optInt("startMinute", 0);
+            boolean isAllDay = obj.optBoolean("isAllDay", false);
+            String roast = obj.optString("roast", "行程即將開始，深呼吸，靈魂請假，肉體出席就好。");
+
+            if (id == null || id.isEmpty() || dateKey == null || dateKey.isEmpty()) {
+                return "{\"error\": \"Invalid event data\"}";
+            }
+
+            // Always cancel existing reminders for this event first
+            cancelEventNotifications(id);
+
+            JSONArray reminders = obj.optJSONArray("reminders");
+            if (reminders == null || reminders.length() == 0) {
+                return "{\"scheduled\": 0, \"success\": true}";
+            }
+
+            String[] parts = dateKey.split("-");
+            if (parts.length < 3) return "{\"error\": \"Invalid dateKey format\"}";
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]) - 1;
+            int day = Integer.parseInt(parts[2]);
+
+            Calendar eventTime = Calendar.getInstance();
+            eventTime.set(year, month, day, isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute, 0);
+            eventTime.set(Calendar.MILLISECOND, 0);
+            long eventStartMs = eventTime.getTimeInMillis();
+
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (am == null) return "{\"error\": \"AlarmManager unavailable\"}";
+
+            int scheduledCount = 0;
+            int maxReminders = Math.min(reminders.length(), 3);
+
+            for (int i = 0; i < maxReminders; i++) {
+                JSONObject rem = reminders.getJSONObject(i);
+                int val = rem.optInt("value", 1);
+                String unit = rem.optString("unit", "hours");
+
+                long offsetMs = 0;
+                String unitText;
+                if ("minutes".equals(unit)) {
+                    offsetMs = (long) val * 60 * 1000L;
+                    unitText = val + " 分鐘前";
+                } else if ("days".equals(unit)) {
+                    offsetMs = (long) val * 86400 * 1000L;
+                    unitText = val + " 天前";
+                } else {
+                    offsetMs = (long) val * 3600 * 1000L;
+                    unitText = val + " 小時前";
+                }
+
+                long triggerMs = eventStartMs - offsetMs;
+                if (triggerMs <= System.currentTimeMillis()) {
+                    // Trigger time has already passed
+                    continue;
+                }
+
+                Intent intent = new Intent(context, EventReminderReceiver.class);
+                intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
+                intent.putExtra("eventId", id);
+                intent.putExtra("reminderIndex", i);
+                intent.putExtra("title", title);
+                intent.putExtra("dateKey", dateKey);
+                intent.putExtra("timeStr", String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute));
+                intent.putExtra("reminderText", unitText);
+                intent.putExtra("roast", roast);
+
+                int requestCode = (id + "_" + i).hashCode();
+                int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
+                }
+
+                PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMs, pi);
+                } else {
+                    am.setExact(AlarmManager.RTC_WAKEUP, triggerMs, pi);
+                }
+                scheduledCount++;
+            }
+
+            return "{\"scheduled\": " + scheduledCount + ", \"success\": true}";
+        } catch (Exception e) {
+            return "{\"error\": \"" + e.getMessage() + "\"}";
+        }
+    }
+
+    /**
+     * Cancel all active reminder notifications for an event
+     */
+    @JavascriptInterface
+    public String cancelEventNotifications(String eventId) {
+        if (eventId == null || eventId.isEmpty()) {
+            return "{\"cancelled\": false}";
+        }
+        try {
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (am != null) {
+                for (int i = 0; i < 3; i++) {
+                    int requestCode = (eventId + "_" + i).hashCode();
+                    Intent intent = new Intent(context, EventReminderReceiver.class);
+                    intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
+                    int pendingFlag = PendingIntent.FLAG_NO_CREATE;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
+                    }
+                    PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
+                    if (pi != null) {
+                        am.cancel(pi);
+                        pi.cancel();
+                    }
+                }
+            }
+            return "{\"cancelled\": true}";
+        } catch (Exception e) {
+            return "{\"error\": \"" + e.getMessage() + "\"}";
+        }
+    }
 }
+

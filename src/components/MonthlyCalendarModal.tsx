@@ -13,7 +13,13 @@ import {
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
 import { toLocalDateKey } from '../utils/dateUtils';
-import { CalendarMeeting, CustomCalendarEvent, getMergedEvents } from '../services/calendarService';
+import {
+  CalendarMeeting,
+  CustomCalendarEvent,
+  getMergedEvents,
+  resolveDayContent,
+  ResolvedDayContent,
+} from '../services/calendarService';
 import quotes365Raw from '../data/quotes365.json';
 import { formatQuoteFrom365 } from '../hooks/useTodayQuote';
 import { CharacterIllustration } from './CharacterIllustration';
@@ -96,39 +102,12 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     return getMergedEvents(masterEvents, pickedDateStr);
   }, [masterEvents, customEvents, pickedDateStr]);
 
-  // Find Gàn-huà quote and illustration for selected date with strict fallback
+  // Unified Gàn-huà quote and illustration for selected date matching Daily Card & Widgets 100%!
   const pickedMonth = pickedDate.getMonth() + 1;
   const pickedDay = pickedDate.getDate();
-  const pickedQuote = useMemo<CalendarQuote>(() => {
-    try {
-      const list = (quotes && quotes.length > 0 ? quotes : (quotes365Raw as RawStaticQuote365[])) || [];
-      const found = list.find((q) => q && q.month === pickedMonth && q.day === pickedDay) || list[0];
-      if (found) {
-        return formatQuoteFrom365(found, pickedDate);
-      }
-    } catch (err) {
-      console.warn('Error resolving picked quote in MonthlyCalendarModal:', err);
-    }
-
-    return {
-      id: `fallback-${pickedMonth}-${pickedDay}`,
-      date: `${pickedDate.getFullYear()}-${String(pickedMonth).padStart(2, '0')}-${String(pickedDay).padStart(2, '0')}`,
-      month: pickedMonth,
-      day: pickedDay,
-      quote: '今天行事曆一片淨土，適合安靜當個薪水小偷。',
-      subtext: '沒有會議就是最好的會議，趁主管沒發現前靜靜地把薪水領走。',
-      character: 'cat',
-      category: 'workplace',
-      lunarDate: '農曆九月廿二',
-      yi: '帶薪上廁所・安靜地當一塊沒用的爛泥',
-      ji: '在群組問「今天大家好像很閒」',
-      illustrationSvg: 'cat_svg',
-      sceneId: 'cat_coffee',
-      assetPath: '/assets/scenes/cat_coffee.webp',
-      spriteSheet: '/assets/sheets/cat_sheet.jpg',
-      spritePosition: '0% 0%',
-    };
-  }, [quotes, pickedMonth, pickedDay, pickedDate]);
+  const pickedQuote = useMemo<ResolvedDayContent>(() => {
+    return resolveDayContent(pickedDate, pickedDayEvents, { quotes });
+  }, [quotes, pickedDate, pickedDayEvents]);
 
   // Navigation handlers
   const handlePrevMonth = () => {
@@ -534,6 +513,14 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                               </span>
                             )}
                             <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
+                            {m.reminders && m.reminders.length > 0 && (
+                              <span
+                                className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shrink-0"
+                                title={`已設定 ${m.reminders.length} 組提醒`}
+                              >
+                                🔔 x{m.reminders.length}
+                              </span>
+                            )}
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
                                 <Edit2 className="w-2.5 h-2.5" /> 自訂
@@ -562,6 +549,11 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0 space-y-0.5">
+                    {pickedQuote?.roastBadge && (
+                      <span className="inline-block text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-[#C83E31]/10 text-[#C83E31] border border-[#C83E31]/20 truncate max-w-full">
+                        {pickedQuote.roastBadge}
+                      </span>
+                    )}
                     <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
                       {pickedQuote?.quote || '今天行事曆一片淨土，適合安靜當個薪水小偷。'}
                     </p>
@@ -644,6 +636,14 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                               </span>
                             )}
                             <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
+                            {m.reminders && m.reminders.length > 0 && (
+                              <span
+                                className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shrink-0"
+                                title={`已設定 ${m.reminders.length} 組提醒`}
+                              >
+                                🔔 x{m.reminders.length}
+                              </span>
+                            )}
                             {isCustom && (
                               <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
                                 <Edit2 className="w-2.5 h-2.5" /> 自訂

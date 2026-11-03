@@ -204,6 +204,14 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
+                        {evt.reminders && evt.reminders.length > 0 && (
+                          <span
+                            className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold flex items-center gap-0.5 shadow-2xs"
+                            title={`已設定 ${evt.reminders.length} 組提醒`}
+                          >
+                            🔔 x{evt.reminders.length}
+                          </span>
+                        )}
                         <span className="text-[#6E6A63] font-medium text-[10px]">
                           ({tag})
                         </span>

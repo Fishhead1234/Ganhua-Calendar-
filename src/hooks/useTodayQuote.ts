@@ -6,7 +6,7 @@ import {
   QuoteCategory,
 } from '../types/calendar';
 import { CalendarRoastResult } from '../services/calendarRoastService';
-import { CalendarMeeting } from '../services/calendarService';
+import { CalendarMeeting, resolveDayContent, ResolvedDayContent } from '../services/calendarService';
 import { contentSyncService } from '../services/contentSyncService';
 import {
   matchSpecialEventRoast,
@@ -15,86 +15,8 @@ import {
   SpecialEventQuote,
 } from '../utils/eventRoastMatcher';
 
-// Lunar date lookup helpers for authentic Taiwanese desk calendar feel
-const LUNAR_MONTHS = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
-const LUNAR_DAYS = [
-  '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
-  '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
-  '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十',
-];
-
-const YI_SAMPLES = [
-  '喝大杯冰美式・準時打卡下班',
-  '帶薪上廁所十五分鐘・安靜放空',
-  '戴抗噪耳機裝忙・只回貼圖與收到',
-  '點全糖黑糖珍奶・開啟勿擾模式',
-  '把今天的工作留給明天的自己',
-  '假裝在深入思考系統架構',
-  '準時關機人間蒸發',
-  '逛網購清空購物車・午休睡飽',
-];
-
-const JI_SAMPLES = [
-  '在週五下午四點答應「順便開個會」',
-  '認真打開銀行帳戶看存款餘額',
-  '相信共體時艱與明年調薪大餅',
-  '在下班前五分鐘主動問「還有事嗎」',
-  '接聽沒有事先傳訊息預告的電話',
-  '在週五下午五點進行正式環境部署',
-  '睡前滑手機不小心點開公司群組',
-  '相信「這場會只要十分鐘就結束」',
-];
-
-function getFallbackLunarDate(targetDate: Date): string {
-  // Simple cyclic mapping for desk calendar aesthetic
-  const day = targetDate.getDate();
-  const m = targetDate.getMonth();
-  const lunarDay = LUNAR_DAYS[(day + 8) % 30];
-  const lunarMonth = LUNAR_MONTHS[m % 12];
-  return `農曆 ${lunarMonth}月${lunarDay}`;
-}
-
-export function formatQuoteFrom365(
-  raw: RawStaticQuote365,
-  dateObj: Date
-): CalendarQuote {
-  const yyyy = dateObj.getFullYear();
-  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const dd = String(dateObj.getDate()).padStart(2, '0');
-  const dateStr = `${yyyy}-${mm}-${dd}`;
-
-  // Theme mapping to category
-  let category: QuoteCategory = 'workplace';
-  if (raw.theme === 'layflat' || raw.theme === 'laziness') category = 'laziness';
-  else if (raw.theme === 'social_battery') category = 'social_battery';
-  else if (raw.theme === 'money') category = 'money';
-  else if (raw.theme === 'seasonal') category = 'seasonal';
-
-  // Seeded pick for Yi / Ji based on day of year
-  const seed = raw.dayOfYear || (raw.month * 31 + raw.day);
-  const yi = raw.yi || YI_SAMPLES[seed % YI_SAMPLES.length];
-  const ji = raw.ji || JI_SAMPLES[(seed + 3) % JI_SAMPLES.length];
-  const lunarDate = raw.lunarDate || getFallbackLunarDate(dateObj);
-
-  return {
-    id: `q365-${raw.dateKey || `${raw.month}-${raw.day}`}`,
-    date: dateStr,
-    month: raw.month,
-    day: raw.day,
-    quote: raw.quote,
-    subtext: raw.subtext,
-    character: raw.character as CharacterType,
-    category,
-    lunarDate,
-    yi,
-    ji,
-    illustrationSvg: `${raw.character}_svg`,
-    sceneId: raw.sceneId,
-    assetPath: raw.assetPath,
-    spriteSheet: raw.spriteSheet || `/assets/sheets/${raw.character}_sheet.jpg`,
-    spritePosition: raw.spritePosition || '0% 0%',
-  };
-}
+import { formatQuoteFrom365 } from '../utils/quoteFormatter';
+export { formatQuoteFrom365 };
 
 interface UseTodayQuoteOptions {
   dateOffset: number; // 0 = today, -1 = yesterday, -2 = 2 days ago ...
@@ -107,6 +29,7 @@ interface UseTodayQuoteOptions {
   birthday?: { month: number; day: number } | null;
   calendarEvents?: CalendarMeeting[];
   specialQuoteCycleIndex?: number;
+  activePresetId?: string;
 }
 
 export function useTodayQuote({
@@ -120,8 +43,9 @@ export function useTodayQuote({
   birthday = null,
   calendarEvents = [],
   specialQuoteCycleIndex = 0,
+  activePresetId,
 }: UseTodayQuoteOptions): {
-  currentQuote: CalendarQuote;
+  currentQuote: ResolvedDayContent;
   nextQuotePreview: CalendarQuote;
   isToday: boolean;
   isPastDate: boolean;
@@ -180,116 +104,25 @@ export function useTodayQuote({
     calendarConnected,
   ]);
 
-  // Priority Resolution for Daily Quote:
-  // 1. User Birthday Override
-  // 2. Synced Calendar Event Keyword Match
-  // 3. Lunar / Solar Holiday Match
-  // 4. Meeting Count Fallback
-  // 5. Default Daily Quote
-  const baseQuote: CalendarQuote = useMemo(() => {
-    // Priority 1: User Birthday Override
-    if (isBirthday) {
-      const bList =
-        selectedThemeFilter !== 'all'
-          ? birthdayQuotesList.filter((b) => b.character === selectedThemeFilter)
-          : birthdayQuotesList;
-      const bIndex = (targetDate.getFullYear() + targetMonth * 31 + targetDay) % (bList.length || 1);
-      const selectedBday = bList[bIndex] || birthdayQuotesList[0];
-      const charType = (selectedThemeFilter !== 'all' ? selectedThemeFilter : selectedBday.character) as CharacterType;
-
-      return {
-        id: selectedBday.id,
-        date: `${targetDate.getFullYear()}-${String(targetMonth).padStart(2, '0')}-${String(targetDay).padStart(2, '0')}`,
-        month: targetMonth,
-        day: targetDay,
-        quote: selectedBday.quote,
-        subtext: selectedBday.subtext,
-        character: charType,
-        category: 'workplace',
-        lunarDate: '🎂 壽星避難日・今日特權最大',
-        yi: '吃整顆草莓蛋糕・準時下班人間蒸發・放空耍廢',
-        ji: '在生日這天看公司群組・回覆同事工作訊息・答應加班開會',
-        illustrationSvg: `${charType}_svg`,
-        sceneId: selectedBday.sceneId || `${charType}_birthday`,
-        assetPath: selectedBday.assetPath || `/assets/scenes/${charType}_birthday.webp`,
-        spriteSheet: `/assets/sheets/${charType}_sheet.jpg`,
-        spritePosition: selectedBday.spritePosition || '100% 100%',
-        eventLabel: '🎂 壽星避難模式',
-        eventType: 'birthday',
-      };
-    }
-
-    // Default base quote from quotes365.json
-    const match =
-      quotesList.find((q) => q.month === targetMonth && q.day === targetDay) || quotesList[0];
-    const formatted = formatQuoteFrom365(match, targetDate);
-
-    // If user filtered by specific character, apply preference
-    if (selectedThemeFilter !== 'all') {
-      formatted.character = selectedThemeFilter;
-      formatted.illustrationSvg = `${selectedThemeFilter}_svg`;
-      formatted.spriteSheet = `/assets/sheets/${selectedThemeFilter}_sheet.jpg`;
-    }
-
-    // Priority 2 & 3: Calendar Event Keyword Match OR Lunar/Solar Holiday Match
-    if (
-      (specialEventResult.matchedSource === 'calendar_keyword' ||
-        specialEventResult.matchedSource === 'holiday') &&
-      specialEventResult.selectedQuote
-    ) {
-      return applySpecialEventToQuote(
-        formatted,
-        specialEventResult.selectedQuote,
-        specialEventResult.totalCandidates,
-        specialEventResult.selectedIndex
-      );
-    }
-
-    // Priority 4: Meeting Count Fallback (Density Rule / Dynamic Roast)
-    if (
-      specialEventResult.matchedSource === 'meeting_density' &&
-      specialEventResult.selectedQuote
-    ) {
-      return applySpecialEventToQuote(
-        formatted,
-        specialEventResult.selectedQuote,
-        specialEventResult.totalCandidates,
-        specialEventResult.selectedIndex
-      );
-    }
-
-    if (dateOffset === 0 && isPro && calendarConnected && roastResult) {
-      const activeSceneId = roastResult.sceneId || formatted.sceneId;
-      return {
-        ...formatted,
-        quote: roastResult.roastQuote,
-        subtext: roastResult.roastSubtext,
-        yi: roastResult.yi,
-        ji: roastResult.ji,
-        character: roastResult.character || formatted.character,
-        sceneId: activeSceneId,
-        assetPath: activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : formatted.assetPath,
-        spriteSheet: roastResult.spriteSheet || formatted.spriteSheet,
-        spritePosition: roastResult.spritePosition || formatted.spritePosition,
-        eventLabel: roastResult.summaryBadge,
-      };
-    }
-
-    // Priority 5: Default Daily Quote
-    return formatted;
+  // Single Source of Truth: resolveDayContent
+  // Guarantees 100% identical quote, scene, character, and roast badge across Daily Card, Monthly View & Widgets
+  const baseQuote: ResolvedDayContent = useMemo(() => {
+    return resolveDayContent(targetDate, calendarEvents, {
+      quotes: quotesList,
+      userBirthday: birthday,
+      selectedThemeFilter,
+      activePresetId: dateOffset === 0 ? activePresetId : undefined,
+      isPro,
+    });
   }, [
-    isBirthday,
-    quotesList,
-    birthdayQuotesList,
-    targetMonth,
-    targetDay,
     targetDate,
+    calendarEvents,
+    quotesList,
+    birthday,
     selectedThemeFilter,
     dateOffset,
+    activePresetId,
     isPro,
-    calendarConnected,
-    roastResult,
-    specialEventResult,
   ]);
 
   // Next quote preview (for under-sheet peeling preview)

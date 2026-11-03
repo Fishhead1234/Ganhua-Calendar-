@@ -90,11 +90,25 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_survival_stamp_info" />
         </receiver>
+
+        <!-- Native Appointment Reminder Receiver -->
+        <receiver
+            android:name=".EventReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.ganhuacalendar.app.ACTION_EVENT_REMINDER" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

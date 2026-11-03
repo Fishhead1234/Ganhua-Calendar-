@@ -266,6 +266,7 @@ export const App: React.FC = () => {
     birthday: persisted.birthday || null,
     calendarEvents: effectiveMeetings,
     specialQuoteCycleIndex,
+    activePresetId: activePresetId || undefined,
   });
 
   const syncAllCalendarSources = async (): Promise<CalendarMeeting[]> => {
