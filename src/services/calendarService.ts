@@ -492,8 +492,41 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
   const win = typeof window !== 'undefined' ? (window as any) : {};
   let calendars: DeviceCalendarSource[] = [];
 
-  // 1. Try CapacitorCalendar if available
-  if (win.Capacitor?.Plugins?.CapacitorCalendar?.listCalendars) {
+  // 1. Try AndroidCalendarBridge first (Direct Native CalendarContract query without filters)
+  if (win.AndroidCalendarBridge?.getCalendarsJson) {
+    try {
+      const jsonStr = win.AndroidCalendarBridge.getCalendarsJson();
+      const list = JSON.parse(jsonStr || '[]');
+      if (Array.isArray(list) && list.length > 0) {
+        calendars = list.map((c: any) => {
+          let name = c.name || c.title || '未命名日曆';
+          const accountName = c.accountName || '';
+          const lowerStr = (name + ' ' + accountName).toLowerCase();
+          if (lowerStr.includes('schoolsbuddy')) {
+            name = '🏫 SchoolsBuddy (學校日曆)';
+          } else if (lowerStr.includes('bskl')) {
+            name = '🏫 BSKL (英國國際學校)';
+          } else if (lowerStr.includes('parent')) {
+            name = '🏫 Parent Calendar (學校家長聯絡簿)';
+          } else if (name.startsWith('http://') || name.startsWith('https://')) {
+            name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
+          }
+          return {
+            id: String(c.id),
+            name,
+            accountName,
+            color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
+            isPrimary: Boolean(c.isPrimary),
+          };
+        });
+      }
+    } catch (e) {
+      console.warn('AndroidCalendarBridge.getCalendarsJson error:', e);
+    }
+  }
+
+  // 2. Try CapacitorCalendar if available
+  if (calendars.length === 0 && win.Capacitor?.Plugins?.CapacitorCalendar?.listCalendars) {
     try {
       const res = await win.Capacitor.Plugins.CapacitorCalendar.listCalendars();
       const list = res.result || res.calendars || [];
@@ -503,6 +536,10 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
         const lowerStr = (name + ' ' + accountName).toLowerCase();
         if (lowerStr.includes('schoolsbuddy')) {
           name = '🏫 SchoolsBuddy (學校日曆)';
+        } else if (lowerStr.includes('bskl')) {
+          name = '🏫 BSKL (英國國際學校)';
+        } else if (lowerStr.includes('parent')) {
+          name = '🏫 Parent Calendar (學校家長聯絡簿)';
         } else if (name.startsWith('http://') || name.startsWith('https://')) {
           name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
         }
@@ -510,7 +547,7 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
           id: String(c.id),
           name,
           accountName,
-          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : '#2D2D2D'),
+          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
           isPrimary: Boolean(c.isPrimary),
         };
       });
@@ -519,7 +556,7 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     }
   }
 
-  // 2. Try GanhuaWidgetBridge
+  // 3. Try GanhuaWidgetBridge
   if (calendars.length === 0 && win.Capacitor?.Plugins?.GanhuaWidgetBridge?.listCalendars) {
     try {
       const res = await win.Capacitor.Plugins.GanhuaWidgetBridge.listCalendars();
@@ -530,6 +567,10 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
         const lowerStr = (name + ' ' + accountName).toLowerCase();
         if (lowerStr.includes('schoolsbuddy')) {
           name = '🏫 SchoolsBuddy (學校日曆)';
+        } else if (lowerStr.includes('bskl')) {
+          name = '🏫 BSKL (英國國際學校)';
+        } else if (lowerStr.includes('parent')) {
+          name = '🏫 Parent Calendar (學校家長聯絡簿)';
         } else if (name.startsWith('http://') || name.startsWith('https://')) {
           name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
         }
@@ -537,7 +578,7 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
           id: String(c.id),
           name,
           accountName,
-          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : '#2D2D2D'),
+          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
           isPrimary: Boolean(c.isPrimary),
         };
       });
@@ -546,13 +587,13 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     }
   }
 
-  // 3. Fallback for Web browser preview / test
+  // 4. Fallback for Web browser preview / test
   if (calendars.length === 0) {
     calendars = [
       { id: 'cal_work', name: '工作會議 (Google Calendar)', accountName: 'work@corp.com', color: '#4285F4', isPrimary: true },
-      { id: 'cal_parent', name: '學校與家長聯絡簿 (SchoolsBuddy)', accountName: 'parents@school.edu', color: '#0F9D58' },
+      { id: 'cal_bskl', name: 'BSKL 英國學校日曆 (Parent Calendar)', accountName: 'bskl@school.edu', color: '#1E3A8A' },
+      { id: 'cal_parent', name: '學校課表與社團 (SchoolsBuddy)', accountName: 'parents@schoolsbuddy.com', color: '#0F9D58' },
       { id: 'cal_family', name: '家庭日曆 (Family)', accountName: 'home@family.net', color: '#EA4335' },
-      { id: 'cal_personal', name: '個人行程 (Personal)', accountName: 'me@gmail.com', color: '#FBBC05' },
     ];
   }
 
@@ -626,7 +667,62 @@ export async function fetchNativeDeviceCalendarEvents(
   const startOfDay = options?.startDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() - 30, 0, 0, 0, 0);
   const endOfDay = options?.endDate || new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 60, 23, 59, 59, 999);
 
-  // 1. Try @ebarooni/capacitor-calendar if available in plugins
+  // 1. Try AndroidCalendarBridge.getEventsInstancesJson first!
+  // This queries CalendarContract.Instances across [startMs, endMs], expanding:
+  // - Recurring weekly school events (Book Club, Cross Country, Football, U15 & U18)
+  // - Subscribed .ics calendars (BSKL Main, Parent Calendar, SchoolsBuddy)
+  // - All-day UTC midnight format so dates never shift!
+  if (win.AndroidCalendarBridge?.getEventsInstancesJson) {
+    try {
+      const jsonStr = win.AndroidCalendarBridge.getEventsInstancesJson(
+        startOfDay.getTime(),
+        endOfDay.getTime()
+      );
+      const rawEvents: any[] = JSON.parse(jsonStr || '[]');
+      if (Array.isArray(rawEvents) && rawEvents.length > 0) {
+        const meetings: CalendarMeeting[] = rawEvents
+          .filter((e) => isEventEnabled(e.calendarId))
+          .map((e, idx) => {
+            const rawCalId = e.calendarId;
+            const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
+              ? String(rawCalId)
+              : undefined;
+            const matchedCal = calIdStr ? calendarMap.get(calIdStr) : undefined;
+            const calendarName = matchedCal?.name || e.calendarName || matchedCal?.accountName || '手機日曆';
+            const calendarColor = matchedCal?.color || e.calendarColor || '#2D2D2D';
+
+            return {
+              id: String(e.id || `native-inst-${idx + 1}`),
+              title: e.title || '未命名行程',
+              startHour: Number(e.startHour ?? 9),
+              startMinute: Number(e.startMinute ?? 0),
+              durationMinutes: Number(e.durationMinutes ?? 60),
+              isFridayAfterFour: Boolean(e.isFridayAfterFour),
+              dateKey: e.dateKey,
+              isAllDay: Boolean(e.isAllDay),
+              source: 'synced' as const,
+              calendarId: calIdStr,
+              calendarName,
+              calendarColor,
+              notes: e.notes || e.location,
+            };
+          });
+
+        meetings.sort((a, b) => {
+          if ((a.dateKey || '') !== (b.dateKey || '')) {
+            return (a.dateKey || '').localeCompare(b.dateKey || '');
+          }
+          return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
+        });
+
+        return meetings;
+      }
+    } catch (e) {
+      console.warn('AndroidCalendarBridge.getEventsInstancesJson error:', e);
+    }
+  }
+
+  // 2. Try @ebarooni/capacitor-calendar if available in plugins
   if (win.Capacitor?.Plugins?.CapacitorCalendar) {
     try {
       const plugin = win.Capacitor.Plugins.CapacitorCalendar;
@@ -1006,49 +1102,54 @@ export function parseJsonMeetings(data: any[], targetDate: Date = new Date()): C
 }
 
 /**
- * Universal Live Calendar Feed Fetcher
- * Automatically detects and parses:
- * 1. SchoolsBuddy / iCal / webcal feeds (BEGIN:VCALENDAR)
- * 2. Google Apps Script JSON
- * With CORS proxy fallback for browser security restrictions.
+ * Fetches and parses a single calendar URL (iCal, webcal, or JSON)
+ * Uses native AndroidCalendarBridge.fetchIcsUrl on Android to bypass WebView CORS completely!
  */
-export async function fetchLiveCalendarFeed(
-  rawUrl?: string,
+export async function fetchSingleCalendarUrl(
+  rawUrl: string,
   targetDate: Date = new Date()
 ): Promise<CalendarMeeting[]> {
-  const url =
-    rawUrl?.trim() ||
-    (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : null);
-
-  if (!url) {
-    throw new Error('請輸入日曆網址（支援 SchoolsBuddy、Google/Apple iCal 或 Apps Script）！');
-  }
-
-  // Normalize webcal:// to https://
-  const cleanUrl = url.trim().replace(/^webcal:\/\//i, 'https://');
-
+  const cleanUrl = rawUrl.trim().replace(/^webcal:\/\//i, 'https://');
+  const win = typeof window !== 'undefined' ? (window as any) : {};
   let text = '';
   let fetchErrorMsg = '';
 
-  // 1. Attempt direct fetch
-  try {
-    const res = await fetch(cleanUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'text/calendar, application/json, text/plain, */*',
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (res.ok) {
-      text = await res.text();
-    } else {
-      fetchErrorMsg = `HTTP ${res.status}`;
+  // 1. On Android: Use native AndroidCalendarBridge.fetchIcsUrl to bypass WebView CORS!
+  if (win.AndroidCalendarBridge?.fetchIcsUrl) {
+    try {
+      const nativeText = win.AndroidCalendarBridge.fetchIcsUrl(cleanUrl);
+      if (nativeText && !nativeText.startsWith('ERROR:') && (nativeText.includes('BEGIN:VCALENDAR') || nativeText.includes('BEGIN:VEVENT') || nativeText.trim().startsWith('['))) {
+        text = nativeText;
+      } else if (nativeText && nativeText.startsWith('ERROR:')) {
+        fetchErrorMsg = nativeText;
+      }
+    } catch (e: any) {
+      console.warn('Native fetchIcsUrl exception:', e);
+      fetchErrorMsg = e?.message || 'Native fetch error';
     }
-  } catch (err: any) {
-    fetchErrorMsg = err?.message || 'CORS 或連線中斷';
   }
 
-  // 2. Fallback to CORS proxies if direct fetch was blocked (common in web browsers)
+  // 2. Direct fetch (if not fetched by native bridge or on web)
+  if (!text) {
+    try {
+      const res = await fetch(cleanUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'text/calendar, application/json, text/plain, */*',
+        },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) {
+        text = await res.text();
+      } else {
+        fetchErrorMsg = `HTTP ${res.status}`;
+      }
+    } catch (err: any) {
+      fetchErrorMsg = err?.message || 'CORS 或連線中斷';
+    }
+  }
+
+  // 3. Fallback to CORS proxies if direct fetch was blocked (common in web browsers)
   if (!text) {
     const proxyUrls = [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(cleanUrl)}`,
@@ -1072,17 +1173,24 @@ export async function fetchLiveCalendarFeed(
   }
 
   if (!text) {
-    throw new Error(`無法讀取日曆網址（${fetchErrorMsg}）。請確認網址正確且公開可用，或已授權學校/行事曆訂閱。`);
+    throw new Error(`無法讀取日曆網址（${cleanUrl} - ${fetchErrorMsg}）。請確認網址正確且公開可用。`);
   }
 
-  const isSchoolsBuddy = cleanUrl.toLowerCase().includes('schoolsbuddy');
-  const defaultName = isSchoolsBuddy ? '🏫 SchoolsBuddy' : '🌐 訂閱日曆';
+  const lowerUrl = cleanUrl.toLowerCase();
+  let defaultName = '🌐 訂閱日曆';
+  if (lowerUrl.includes('schoolsbuddy')) {
+    defaultName = '🏫 SchoolsBuddy';
+  } else if (lowerUrl.includes('bskl')) {
+    defaultName = '🏫 BSKL (英國國際學校)';
+  } else if (lowerUrl.includes('parent')) {
+    defaultName = '🏫 Parent Calendar';
+  }
 
-  // Format 1: iCalendar (.ics / webcal / SchoolsBuddy)
+  // Format 1: iCalendar (.ics / webcal / SchoolsBuddy / BSKL)
   if (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT')) {
     const meetings = parseICSToMeetings(text, defaultName);
     if (meetings.length === 0) {
-      throw new Error('已連線至 iCal 日曆，但近期未發現任何有效行程。');
+      throw new Error(`已連線至 iCal 日曆（${cleanUrl}），但近期未發現任何有效行程。`);
     }
     return meetings;
   }
@@ -1097,7 +1205,70 @@ export async function fetchLiveCalendarFeed(
     // not JSON
   }
 
-  throw new Error('無法識別回傳的日曆格式，請確認是否為 SchoolsBuddy iCal 或 Google Apps Script JSON。');
+  throw new Error(`無法識別回傳的日曆格式（${cleanUrl}），請確認是否為標準 iCal (.ics) 或 Google Apps Script JSON。`);
+}
+
+/**
+ * Universal Live Calendar Feed Fetcher
+ * Supports linking MULTIPLE iCal / webcal / GAS URLs simultaneously (e.g. BSKL + SchoolsBuddy).
+ * Bypasses CORS via native AndroidCalendarBridge on mobile.
+ */
+export async function fetchLiveCalendarFeed(
+  rawUrl?: string,
+  targetDate: Date = new Date()
+): Promise<CalendarMeeting[]> {
+  const urlInput =
+    rawUrl?.trim() ||
+    (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : null);
+
+  if (!urlInput) {
+    throw new Error('請輸入日曆網址（支援 SchoolsBuddy、BSKL、Google/Apple iCal 或 Apps Script）！');
+  }
+
+  // Split multiple URLs separated by newline, comma, or semicolon
+  const urls = urlInput
+    .split(/[\r\n,;]+/)
+    .map((u) => u.trim())
+    .filter((u) => u.length > 0 && !u.startsWith('#'));
+
+  if (urls.length === 0) {
+    throw new Error('請輸入有效的日曆網址！');
+  }
+
+  const allMeetings: CalendarMeeting[] = [];
+  const seenKeys = new Set<string>();
+  let lastError: any = null;
+  let successCount = 0;
+
+  for (const singleUrl of urls) {
+    try {
+      const meetings = await fetchSingleCalendarUrl(singleUrl, targetDate);
+      successCount++;
+      for (const m of meetings) {
+        const key = `${m.dateKey || ''}_${m.title}_${m.startHour}_${m.startMinute}`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          allMeetings.push(m);
+        }
+      }
+    } catch (err: any) {
+      console.warn(`Failed to fetch calendar from ${singleUrl}:`, err);
+      lastError = err;
+    }
+  }
+
+  if (successCount === 0 && lastError) {
+    throw lastError;
+  }
+
+  allMeetings.sort((a, b) => {
+    if ((a.dateKey || '') !== (b.dateKey || '')) {
+      return (a.dateKey || '').localeCompare(b.dateKey || '');
+    }
+    return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
+  });
+
+  return allMeetings;
 }
 
 /**

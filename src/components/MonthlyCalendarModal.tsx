@@ -26,6 +26,7 @@ interface MonthlyCalendarModalProps {
   today?: Date;
   survivedDates?: string[];
   activeMeetings?: CalendarMeeting[];
+  allEvents?: CalendarMeeting[]; // Full 90-day synced + custom events list
   customEvents?: CustomCalendarEvent[];
   quotes?: RawStaticQuote365[];
   onSelectDate: (targetDate: Date) => void;
@@ -40,6 +41,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   today = new Date(),
   survivedDates = [],
   activeMeetings = [],
+  allEvents = [],
   customEvents = [],
   quotes,
   onSelectDate,
@@ -84,9 +86,15 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     return toLocalDateKey(pickedDate);
   }, [pickedDate]);
 
+  // Master events covering the full 90-day window (synced BSKL, SchoolsBuddy, Family + custom events)
+  const masterEvents = useMemo(() => {
+    return allEvents && allEvents.length > 0 ? allEvents : activeMeetings;
+  }, [allEvents, activeMeetings]);
+
+  // Filter bookings immediately on first tap without leaving modal!
   const pickedDayEvents = useMemo<CalendarMeeting[]>(() => {
-    return getMergedEvents(activeMeetings, pickedDateStr);
-  }, [activeMeetings, customEvents, pickedDateStr]);
+    return getMergedEvents(masterEvents, pickedDateStr);
+  }, [masterEvents, customEvents, pickedDateStr]);
 
   // Find Gàn-huà quote and illustration for selected date with strict fallback
   const pickedMonth = pickedDate.getMonth() + 1;
@@ -381,35 +389,40 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     {lunarTag}
                   </span>
 
-                  {/* Stamp or Dot Indicators */}
-                  <div className="flex items-center gap-0.5 h-2">
-                    {hasSurvived && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full bg-[#C83E31] ring-1 ring-white"
-                        title="此日已平安生還"
-                      />
-                    )}
-                    {cell.isToday && !hasSurvived && (
-                      <span className="w-1 h-1 rounded-full bg-[#D4B483]" />
-                    )}
-                    {cell.isCurrentMonth && (
-                      (() => {
+                    {/* Booking Dots & Stamp Indicators */}
+                    <div className="flex items-center gap-0.5 h-2">
+                      {hasSurvived && (
+                        <span
+                          className="w-1.5 h-1.5 rounded-full bg-[#C83E31] ring-1 ring-white shrink-0"
+                          title="此日已平安生還"
+                        />
+                      )}
+                      {cell.isToday && !hasSurvived && (
+                        <span className="w-1 h-1 rounded-full bg-[#D4B483] shrink-0" />
+                      )}
+                      {cell.isCurrentMonth && (() => {
                         const cellDateStr = cell.ymd;
-                        const hasEvent =
-                          customEvents?.some((e) => e.dateKey === cellDateStr) ||
-                          activeMeetings?.some((m) => m.dateKey === cellDateStr);
-                        if (hasEvent) {
+                        const dayEvents = masterEvents.filter((m) => m.dateKey === cellDateStr);
+                        if (dayEvents.length > 0) {
                           return (
-                            <span
-                              className="w-1.5 h-1.5 rounded-full bg-[#2D2D2D]/80 ring-0.5 ring-stone-400"
-                              title="此日有排定行程"
-                            />
+                            <div className="flex items-center gap-0.5 justify-center max-w-full overflow-hidden">
+                              {dayEvents.slice(0, 3).map((ev, i) => (
+                                <span
+                                  key={ev.id || i}
+                                  className="w-1.5 h-1.5 rounded-full shadow-xs border border-black/15 shrink-0"
+                                  style={{ backgroundColor: ev.calendarColor || '#2D2D2D' }}
+                                  title={`${ev.calendarName ? `[${ev.calendarName}] ` : ''}${ev.title}`}
+                                />
+                              ))}
+                              {dayEvents.length > 3 && (
+                                <span className="w-1 h-1 rounded-full bg-stone-400 shrink-0" />
+                              )}
+                            </div>
                           );
                         }
                         return null;
-                      })()
-                    )}
-                  </div>
+                      })()}
+                    </div>
                 </button>
               );
             })}

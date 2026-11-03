@@ -11,6 +11,9 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(GanhuaWidgetBridgePlugin.class);
         super.onCreate(savedInstanceState);
+        if (bridge != null && bridge.getWebView() != null) {
+            bridge.getWebView().addJavascriptInterface(new AndroidCalendarBridge(this), "AndroidCalendarBridge");
+        }
         handleWidgetSelectDate(getIntent());
         syncSurvivedDatesToWebView();
         refreshWidgets();

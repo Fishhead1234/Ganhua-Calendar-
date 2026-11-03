@@ -927,7 +927,8 @@ export const App: React.FC = () => {
         currentDate={currentDateObj}
         today={new Date()}
         survivedDates={persisted.survivedDates || []}
-        activeMeetings={effectiveMeetings || []}
+        allEvents={allAppointments}
+        activeMeetings={allAppointments}
         customEvents={customEvents}
         quotes={contentSyncService.getQuotes365()}
         onSelectDate={handleJumpToDate}

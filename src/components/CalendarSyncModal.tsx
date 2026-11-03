@@ -220,10 +220,10 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     }
   };
 
-  // --- Method 2: Live Universal Calendar Feed Sync (SchoolsBuddy / iCal / webcal / GAS) ---
+  // --- Method 2: Live Universal Calendar Feed Sync (SchoolsBuddy / BSKL / iCal / webcal / GAS) ---
   const handleLiveJsonSync = async () => {
     if (!liveJsonUrl.trim()) {
-      setErrorMsg('請先輸入日曆網址（支援 SchoolsBuddy、Google/Apple iCal 或 Apps Script）');
+      setErrorMsg('請先輸入日曆網址（支援 SchoolsBuddy、BSKL、Google/Apple iCal 或 Apps Script）');
       return;
     }
 
@@ -236,8 +236,8 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
       const meetings = await fetchLiveCalendarFeed(liveJsonUrl.trim());
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
-      const isSchoolsBuddy = liveJsonUrl.toLowerCase().includes('schoolsbuddy');
-      setSuccessMsg(`🌐 ${isSchoolsBuddy ? 'SchoolsBuddy 學校日曆' : '日曆網址'}連線成功！共抓取 ${meetings.length} 場行程。`);
+      const urlCount = liveJsonUrl.split(/[\r\n,;]+/).filter((u) => u.trim().length > 0).length;
+      setSuccessMsg(`🌐 日曆連線成功！已同步 ${urlCount} 個日曆網址來源，共抓取 ${meetings.length} 場行程。`);
     } catch (err: any) {
       setErrorMsg(err.message || '連線失敗，請確認日曆網址是否正確且公開可用。');
     } finally {
@@ -635,37 +635,42 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: Live Universal Calendar Feed (SchoolsBuddy / iCal / webcal / GAS) */}
+          {/* TAB 3: Live Universal Calendar Feed (SchoolsBuddy / BSKL / iCal / webcal / GAS) */}
           {activeTab === 'live_json' && (
             <div className="space-y-4">
               <div className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-sans font-bold text-[#2D2D2D] flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-[#C83E31]" />
-                    <span>貼上 SchoolsBuddy 或 iCal / webcal / GAS 網址</span>
+                    <span>貼上日曆網址（支援多個網址，一行一個）</span>
                   </label>
                   <span className="text-[10px] font-sans text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-bold">
-                    全格式自動解析
+                    原生零 CORS
                   </span>
                 </div>
 
-                <div className="flex gap-2">
-                  <input
-                    type="url"
+                <div className="space-y-2">
+                  <textarea
+                    rows={3}
                     value={liveJsonUrl}
                     onChange={(e) => setLiveJsonUrl(e.target.value)}
-                    placeholder="https://asia1schoolsbuddy.com/... 或 webcal://..."
-                    className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31]"
+                    placeholder={"https://asia1schoolsbuddy.azurewebsites.net/...\nhttps://bskl.org.my/calendar.ics"}
+                    className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31] leading-relaxed resize-y"
                   />
-                  <button
-                    type="button"
-                    onClick={handleLiveJsonSync}
-                    disabled={isLoading || isSyncing}
-                    className="px-4 py-2 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer disabled:opacity-50 shrink-0 shadow-xs flex items-center gap-1"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isSyncing ? 'animate-spin' : ''}`} />
-                    <span>同步讀取</span>
-                  </button>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-sans text-[#6E6A63]">
+                      💡 支援同時輸入 BSKL 與 SchoolsBuddy 等多個訂閱連結
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleLiveJsonSync}
+                      disabled={isLoading || isSyncing}
+                      className="px-4 py-2 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer disabled:opacity-50 shrink-0 shadow-xs flex items-center gap-1.5 active:scale-95"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isSyncing ? 'animate-spin' : ''}`} />
+                      <span>{isLoading || isSyncing ? '同步中...' : '一鍵同步所有網址'}</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Clear Explanations for SchoolsBuddy and iCal */}
@@ -674,15 +679,15 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                   <ul className="space-y-1.5 text-[11px] leading-relaxed">
                     <li className="flex items-start gap-1.5">
                       <span className="text-[#C83E31] font-bold">●</span>
-                      <span><strong>SchoolsBuddy 學校日曆：</strong>直接貼上以 <code>https://asia1schoolsbuddy.com/...</code> 開頭的個人行事曆訂閱網址，系統將自動解析全月所有學生課程、活動與課後社團。</span>
+                      <span><strong>BSKL / 學校日曆：</strong>直接貼上 BSKL 學校日曆 <code>.ics</code> 或 <code>webcal://</code> 網址，系統原生連線無 CORS 限制。</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-[#C83E31] font-bold">●</span>
-                      <span><strong>Apple iCal / Google 日曆 / webcal：</strong>支援 <code>webcal://</code> 與 <code>.ics</code> 公開或私密日曆訂閱連結。</span>
+                      <span><strong>SchoolsBuddy 學校系統：</strong>支援 <code>https://asia1schoolsbuddy...</code> 學生個人活動、社團與比賽日程訂閱。</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-[#C83E31] font-bold">●</span>
-                      <span><strong>自架 Google Apps Script：</strong>亦可使用自架的 GAS 網路應用程式回傳 JSON 陣列。</span>
+                      <span><strong>多網址自動合併：</strong>可一次貼上多個日曆（一行一個），系統將自動排重合併呈現。</span>
                     </li>
                   </ul>
 
