@@ -6,7 +6,12 @@ import {
   QuoteCategory,
 } from '../types/calendar';
 import { CalendarRoastResult } from '../services/calendarRoastService';
-import { CalendarMeeting, resolveDayContent, ResolvedDayContent } from '../services/calendarService';
+import {
+  CalendarMeeting,
+  resolveDayContent,
+  ResolvedDayContent,
+  isUserOwnBirthday,
+} from '../services/calendarService';
 import { contentSyncService } from '../services/contentSyncService';
 import {
   matchSpecialEventRoast,
@@ -82,8 +87,8 @@ export function useTodayQuote({
   const targetDay = targetDate.getDate(); // 1-31
 
   const isBirthday = useMemo(() => {
-    return Boolean(birthday && birthday.month === targetMonth && birthday.day === targetDay);
-  }, [birthday, targetMonth, targetDay]);
+    return isUserOwnBirthday(targetDate, birthday);
+  }, [birthday, targetDate]);
 
   // Special Event Match Result
   const specialEventResult: MatchSpecialEventResult = useMemo(() => {
@@ -113,6 +118,7 @@ export function useTodayQuote({
       selectedThemeFilter,
       activePresetId: dateOffset === 0 ? activePresetId : undefined,
       isPro,
+      cycleIndex: specialQuoteCycleIndex,
     });
   }, [
     targetDate,
@@ -123,6 +129,7 @@ export function useTodayQuote({
     dateOffset,
     activePresetId,
     isPro,
+    specialQuoteCycleIndex,
   ]);
 
   // Next quote preview (for under-sheet peeling preview)

@@ -594,5 +594,93 @@
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
     "spritePosition": "0% 0%",
     "assetPath": "/assets/scenes/cat_coffee.webp"
+  },
+  {
+    "id": "evt_other_bday_01",
+    "eventType": "other_person_birthday",
+    "eventLabel": "🎁 社交慶生營業模式",
+    "triggerKeywords": [
+      "birthday",
+      "bday",
+      "生日",
+      "慶生"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "在群組排隊打『+1 生日快樂🎉』，是我對同事社交禮儀的最大極限。",
+    "subtext": "連貼圖都是挑最上面不用滑的那張，深怕多花一秒社交電量。",
+    "yi": "在群組跟風刷生日快樂・準時吃免費切片蛋糕",
+    "ji": "被拱主揪買禮物・自告奮勇上台唱生日快樂歌",
+    "character": "cat",
+    "sceneId": "cat_fake_smile",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "50% 50%",
+    "assetPath": "/assets/scenes/cat_fake_smile.webp"
+  },
+  {
+    "id": "evt_other_bday_02",
+    "eventType": "other_person_birthday",
+    "eventLabel": "🎁 社交慶生營業模式",
+    "triggerKeywords": [
+      "birthday",
+      "bday",
+      "生日",
+      "慶生"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "別人生日最大的意義，就是辦公室茶水間終於有免費的下午茶蛋糕可以蹭。",
+    "subtext": "嘴裡吃著別人的蛋糕，心裡盤算著自己離退休金還有幾年。",
+    "yi": "精準出現在蛋糕分切現場・默默拿走最大塊水果蛋糕",
+    "ji": "為了分攤禮物錢認真打開網銀轉帳兩百元",
+    "character": "capybara",
+    "sceneId": "capy_phone_scroll",
+    "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
+    "spritePosition": "0% 50%",
+    "assetPath": "/assets/scenes/capy_phone_scroll.webp"
+  },
+  {
+    "id": "evt_other_bday_03",
+    "eventType": "other_person_birthday",
+    "eventLabel": "🎁 社交慶生營業模式",
+    "triggerKeywords": [
+      "birthday",
+      "bday",
+      "生日",
+      "慶生"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "臉上掛著標準營業用假笑拍手唱生日歌，心裡只想著這場尷尬的儀式何時結束。",
+    "subtext": "社恐人的渡劫時刻：站在一群不熟的人中間拍手搖擺，靈魂已提前下班。",
+    "yi": "站在最外圍假裝熱情拍手・眼神放空裝忙",
+    "ji": "吹蠟燭時突然跟主管對到眼被點名發言致詞",
+    "character": "ghost",
+    "sceneId": "ghost_umbrella_shield",
+    "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
+    "spritePosition": "50% 0%",
+    "assetPath": "/assets/scenes/ghost_umbrella_shield.webp"
+  },
+  {
+    "id": "evt_other_bday_04",
+    "eventType": "other_person_birthday",
+    "eventLabel": "🎁 社交慶生營業模式",
+    "triggerKeywords": [
+      "birthday",
+      "bday",
+      "生日",
+      "慶生"
+    ],
+    "solarDates": [],
+    "lunarDates": [],
+    "quote": "好朋友生日：送禮物心在淌血，但在卡片上寫滿損友毒舌是免費的。",
+    "subtext": "『恭喜你離入土又近了一年』—— 這是成年人最真摯且不花錢的祝福。",
+    "yi": "一鍵複製損友祝賀詞交差・拍照專挑對方的黑歷史醜照發限動",
+    "ji": "認真準備感人肺腑的長篇抒情文在群組肉麻",
+    "character": "cat",
+    "sceneId": "cat_empty_wallet",
+    "spriteSheet": "/assets/sheets/cat_sheet.jpg",
+    "spritePosition": "0% 50%",
+    "assetPath": "/assets/scenes/cat_empty_wallet.webp"
   }
 ]

@@ -40,7 +40,144 @@ export interface CalendarRoastResult {
   sceneId?: string;
   spriteSheet?: string;
   spritePosition?: string;
+  eventType?: string;
+  extractedName?: string;
 }
+
+/**
+ * Extracts person's name from a birthday calendar event title.
+ * Examples: "Yoo Jung's birthday" -> "Yoo Jung", "Tom's Bday" -> "Tom", "小明的生日" -> "小明"
+ */
+export function extractBirthdayPersonName(rawTitle: string): string {
+  if (!rawTitle) return '壽星';
+  let t = rawTitle.trim();
+  // Remove leading "全天" / "整天" / "All Day" or brackets
+  t = t.replace(/^(全天|整天|All\s*Day)\s*[:：\-]?\s*/i, '');
+  t = t.replace(/^\[[^\]]+\]\s*/, '');
+
+  // 1. "Name's Birthday" or "Name's bday"
+  const possessiveMatch = t.match(/^([^'’]+)['’]s\s*(?:birthday|bday|生日|慶生)/i);
+  if (possessiveMatch && possessiveMatch[1].trim()) {
+    return possessiveMatch[1].trim();
+  }
+
+  // 2. "XXX的生日" or "XXX的慶生"
+  const deMatch = t.match(/^([^的]+)的(?:生日|慶生|bday|birthday)/i);
+  if (deMatch && deMatch[1].trim()) {
+    return deMatch[1].trim();
+  }
+
+  // 3. "Birthday - Name" or "Birthday: Name" or "生日 - Name"
+  const prefixMatch = t.match(/^(?:birthday|bday|生日|慶生)\s*[:：\-–—]\s*(.+)$/i);
+  if (prefixMatch && prefixMatch[1].trim()) {
+    return prefixMatch[1].trim();
+  }
+
+  // 4. "Name Birthday" or "Name bday" or "Name 生日" or "Name 慶生"
+  const suffixMatch = t.match(/^(.+?)\s+(?:birthday|bday|生日|慶生)/i);
+  if (suffixMatch && suffixMatch[1].trim()) {
+    return suffixMatch[1].trim();
+  }
+
+  // 5. "帮/幫 XXX 慶生" or "祝 XXX 生日快樂"
+  const wishMatch = t.match(/(?:幫|帮|祝|給|给)\s*([^\s,，!！~]+)\s*(?:慶生|過生日|生日)/i);
+  if (wishMatch && wishMatch[1].trim()) {
+    return wishMatch[1].trim();
+  }
+
+  // 6. Just contains "生日" or "birthday" without obvious prefix/suffix
+  const stripped = t.replace(/(?:'s\s*)?(?:birthday|bday|生日|慶生|happy\s*birthday)/gi, '').trim();
+  if (stripped && stripped.length <= 15) {
+    return stripped;
+  }
+
+  return '壽星朋友';
+}
+
+/**
+ * Checks whether the target date strictly equals the user's saved birthday (MM-DD)
+ */
+export function isUserOwnBirthday(
+  targetDate: Date,
+  userBirthday?: { month: number; day: number } | null
+): boolean {
+  const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+  const d = String(targetDate.getDate()).padStart(2, '0');
+  const targetMMDD = `${m}-${d}`;
+
+  if (userBirthday && typeof userBirthday.month === 'number' && typeof userBirthday.day === 'number') {
+    const bdayMMDD = `${String(userBirthday.month).padStart(2, '0')}-${String(userBirthday.day).padStart(2, '0')}`;
+    if (bdayMMDD === targetMMDD) return true;
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('user_birthday');
+      if (stored && stored.trim() === targetMMDD) {
+        return true;
+      }
+      const persistedRaw = localStorage.getItem('ganhua_persisted_state_v1');
+      if (persistedRaw) {
+        const parsed = JSON.parse(persistedRaw);
+        if (parsed?.birthday?.month && parsed?.birthday?.day) {
+          const pMMDD = `${String(parsed.birthday.month).padStart(2, '0')}-${String(parsed.birthday.day).padStart(2, '0')}`;
+          if (pMMDD === targetMMDD) return true;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return false;
+}
+
+export const OTHER_PERSON_BIRTHDAY_QUOTES = [
+  {
+    id: 'evt_other_bday_01',
+    quote: '在群組排隊打『+1 生日快樂🎉』，是我對同事社交禮儀的最大極限。',
+    subtext: '連貼圖都是挑最上面不用滑的那張，深怕多花一秒社交電量。',
+    yi: '在群組跟風刷生日快樂・準時吃免費切片蛋糕',
+    ji: '被拱主揪買禮物・自告奮勇上台唱生日快樂歌',
+    character: 'cat' as CharacterType,
+    sceneId: 'cat_fake_smile',
+    spriteSheet: '/assets/sheets/cat_sheet.jpg',
+    spritePosition: '50% 50%',
+  },
+  {
+    id: 'evt_other_bday_02',
+    quote: '別人生日最大的意義，就是辦公室茶水間終於有免費的下午茶蛋糕可以蹭。',
+    subtext: '嘴裡吃著別人的蛋糕，心裡盤算著自己離退休金還有幾年。',
+    yi: '精準出現在蛋糕分切現場・默默拿走最大塊水果蛋糕',
+    ji: '為了分攤禮物錢認真打開網銀轉帳兩百元',
+    character: 'capybara' as CharacterType,
+    sceneId: 'capy_phone_scroll',
+    spriteSheet: '/assets/sheets/capybara_sheet.jpg',
+    spritePosition: '0% 50%',
+  },
+  {
+    id: 'evt_other_bday_03',
+    quote: '臉上掛著標準營業用假笑拍手唱生日歌，心裡只想著這場尷尬的儀式何時結束。',
+    subtext: '社恐人的渡劫時刻：站在一群不熟的人中間拍手搖擺，靈魂已提前下班。',
+    yi: '站在最外圍假裝熱情拍手・眼神放空裝忙',
+    ji: '吹蠟燭時突然跟主管對到眼被點名發言致詞',
+    character: 'ghost' as CharacterType,
+    sceneId: 'ghost_umbrella_shield',
+    spriteSheet: '/assets/sheets/ghost_sheet_2.jpg',
+    spritePosition: '50% 0%',
+  },
+  {
+    id: 'evt_other_bday_04',
+    quote: '好朋友生日：送禮物心在淌血，但在卡片上寫滿損友毒舌是免費的。',
+    subtext: '『恭喜你離入土又近了一年』—— 這是成年人最真摯且不花錢的祝福。',
+    yi: '一鍵複製損友祝賀詞交差・拍照專挑對方的黑歷史醜照發限動',
+    ji: '認真準備感人肺腑的長篇抒情文在群組肉麻',
+    character: 'cat' as CharacterType,
+    sceneId: 'cat_empty_wallet',
+    spriteSheet: '/assets/sheets/cat_sheet.jpg',
+    spritePosition: '0% 50%',
+  },
+];
 
 export interface CalendarPresetScenario {
   id: string;
@@ -217,7 +354,11 @@ export const MOCK_CALENDAR_PRESETS = SCENARIO_PRESETS;
  * Intelligent Calendar Roast Analyzer
  * Matches meeting counts, keywords (Review, 1-on-1, All Hands, 開會, 面談), and timing
  */
-export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: string): CalendarRoastResult {
+export function analyzeCalendarEvents(
+  events: CalendarMeeting[],
+  presetId?: string,
+  cycleIndex: number = 0
+): CalendarRoastResult {
   // Check if a preset is active with a forced roast
   if (presetId) {
     const foundPreset = SCENARIO_PRESETS.find((p) => p.id === presetId);
@@ -255,7 +396,8 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
   let hasAllHands = false;
   let hasEarlyMonday = false;
   let hasParentOrSchool = false;
-  let hasBirthday = false;
+  let hasOtherPersonBirthday = false;
+  let otherPersonBirthdayTitle = '';
   let hasLessonOrMusic = false;
   let hasWedding = false;
   let hasDentistOrMedical = false;
@@ -275,14 +417,17 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
     const lowerCalName = (ev.calendarName || '').toLowerCase();
     const combo = `${lowerTitle} ${lowerCalName}`;
 
-    // Birthday
+    // Other Person's Birthday (e.g. "Yoo Jung's birthday", "Amy 生日", "慶生")
     if (
       combo.includes('birthday') ||
       combo.includes('bday') ||
       combo.includes('生日') ||
-      combo.includes('壽星')
+      combo.includes('慶生')
     ) {
-      hasBirthday = true;
+      hasOtherPersonBirthday = true;
+      if (!otherPersonBirthdayTitle) {
+        otherPersonBirthdayTitle = ev.title || '';
+      }
     }
 
     // Music / Cello / Piano / Talent Lessons
@@ -419,22 +564,31 @@ export function analyzeCalendarEvents(events: CalendarMeeting[], presetId?: stri
 
   // PRIORITY 1: Specific Event Keywords ALWAYS take precedence over Meeting Count!
 
-  // 1-A. Birthday (壽星避難)
-  if (hasBirthday) {
+  // 1-A. Friends / Colleagues' Birthday ("🎁 社交慶生營業模式")
+  if (hasOtherPersonBirthday) {
+    const extractedName = extractBirthdayPersonName(otherPersonBirthdayTitle);
+    const badge = `🎁 社交慶生營業模式（偵測到壽星：${extractedName}）`;
+    const bdayIndex =
+      ((cycleIndex % OTHER_PERSON_BIRTHDAY_QUOTES.length) + OTHER_PERSON_BIRTHDAY_QUOTES.length) %
+      OTHER_PERSON_BIRTHDAY_QUOTES.length;
+    const selected = OTHER_PERSON_BIRTHDAY_QUOTES[bdayIndex];
+
     return {
       meetingsCount: events.length,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: false,
       totalMeetingHours: totalHours,
-      summaryBadge: '🎂 偵測到【壽星/生日】專屬避難吐槽',
-      roastQuote: '壽星最大！今天誰敢找我開會，我就把蛋糕砸在誰的簡報投影幕上。',
-      roastSubtext: '又老了一歲，但離退休金又近了一步。今日宜帶薪吃蛋糕、不宜回覆任何工作訊息。',
-      yi: '吃雙倍草莓蛋糕・準時下班人間蒸發・放空耍廢',
-      ji: '在生日這天看公司群組・回覆同事「收到」・答應加班開會',
-      character: 'cat',
-      sceneId: 'cat_birthday',
-      spriteSheet: '/assets/sheets/cat_sheet.jpg',
-      spritePosition: '100% 100%',
+      summaryBadge: badge,
+      roastQuote: selected.quote,
+      roastSubtext: selected.subtext,
+      yi: selected.yi,
+      ji: selected.ji,
+      character: selected.character,
+      sceneId: selected.sceneId,
+      spriteSheet: selected.spriteSheet,
+      spritePosition: selected.spritePosition,
+      eventType: 'other_person_birthday',
+      extractedName,
     };
   }
 
@@ -711,6 +865,7 @@ export interface ResolveDayContentOptions {
   selectedThemeFilter?: CharacterType | 'all';
   activePresetId?: string;
   isPro?: boolean;
+  cycleIndex?: number;
 }
 
 export interface ResolvedDayContent extends CalendarQuote {
@@ -719,6 +874,7 @@ export interface ResolvedDayContent extends CalendarQuote {
   meetingsCount: number;
   timedMeetingsCount: number;
   totalMeetingHours: number;
+  extractedName?: string;
 }
 
 /**
@@ -750,7 +906,10 @@ export function resolveDayContent(
   const timedEvents = dayEvents.filter((e) => !e.isAllDay);
 
   // 2. User Birthday Check
-  if (options.userBirthday && options.userBirthday.month === targetMonth && options.userBirthday.day === targetDay) {
+  // STRICT RULE: ONLY trigger user birthday mode when the selected date strictly equals user's birthday!
+  // NEVER trigger user's own birthday from calendar event titles!
+  const isUserBirthday = isUserOwnBirthday(targetDate, options.userBirthday);
+  if (isUserBirthday) {
     const char = base.character;
     return {
       ...base,
@@ -765,10 +924,10 @@ export function resolveDayContent(
       assetPath: `/assets/scenes/${char}_birthday.webp`,
       spriteSheet: `/assets/sheets/${char}_sheet.jpg`,
       spritePosition: '100% 100%',
-      eventLabel: '🎂 壽星避難模式',
+      eventLabel: '🎂 本日壽星最大',
       eventType: 'birthday',
       hasRoastOverride: true,
-      roastBadge: '🎂 壽星避難模式',
+      roastBadge: '🎂 本日壽星最大',
       meetingsCount: dayEvents.length,
       timedMeetingsCount: timedEvents.length,
       totalMeetingHours: 0,
@@ -780,8 +939,9 @@ export function resolveDayContent(
   const hasPreset = Boolean(options.activePresetId);
 
   if (hasPreset || hasEvents) {
-    const roast = analyzeCalendarEvents(dayEvents, options.activePresetId);
+    const roast = analyzeCalendarEvents(dayEvents, options.activePresetId, options.cycleIndex || 0);
     const activeSceneId = roast.sceneId || base.sceneId;
+    const isOtherPersonBday = roast.eventType === 'other_person_birthday';
 
     return {
       ...base,
@@ -795,6 +955,12 @@ export function resolveDayContent(
       spriteSheet: roast.spriteSheet || base.spriteSheet,
       spritePosition: roast.spritePosition || base.spritePosition,
       eventLabel: roast.summaryBadge,
+      eventType: roast.eventType,
+      extractedName: roast.extractedName,
+      specialEventCandidatesCount: isOtherPersonBday ? 4 : base.specialEventCandidatesCount,
+      specialEventIndex: isOtherPersonBday
+        ? (((options.cycleIndex || 0) % 4) + 4) % 4
+        : base.specialEventIndex,
       hasRoastOverride: true,
       roastBadge: roast.summaryBadge,
       meetingsCount: roast.meetingsCount,

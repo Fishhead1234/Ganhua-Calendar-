@@ -82,12 +82,30 @@ function loadPersistedState(): PersistedState {
         offWorkHour: typeof parsed.offWorkHour === 'number' ? parsed.offWorkHour : 18,
         artStyle: parsed.artStyle === 'svg' ? 'svg' : 'original',
         calendarConnected: Boolean(parsed.calendarConnected),
-        birthday:
-          parsed.birthday &&
-          typeof parsed.birthday.month === 'number' &&
-          typeof parsed.birthday.day === 'number'
-            ? parsed.birthday
-            : null,
+        birthday: (() => {
+          let b =
+            parsed.birthday &&
+            typeof parsed.birthday.month === 'number' &&
+            typeof parsed.birthday.day === 'number'
+              ? parsed.birthday
+              : null;
+          if (!b) {
+            try {
+              const stored = localStorage.getItem('user_birthday');
+              if (stored && stored.includes('-')) {
+                const [m, d] = stored.split('-').map(Number);
+                if (m && d) b = { month: m, day: d };
+              }
+            } catch {}
+          } else {
+            try {
+              const mm = String(b.month).padStart(2, '0');
+              const dd = String(b.day).padStart(2, '0');
+              localStorage.setItem('user_birthday', `${mm}-${dd}`);
+            } catch {}
+          }
+          return b;
+        })(),
         lastOpenedDateStr: todayYmd,
       };
     }
@@ -766,6 +784,7 @@ export const App: React.FC = () => {
               onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
               onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
               onBackToToday={handleBackToToday}
+              onShowToast={showToast}
             />
 
             {/* Daily Agenda & Sarcastic Timeline Strip */}
@@ -1046,8 +1065,16 @@ export const App: React.FC = () => {
         onSaveBirthday={(bday) => {
           setPersisted((prev) => ({ ...prev, birthday: bday }));
           if (bday) {
+            try {
+              const mm = String(bday.month).padStart(2, '0');
+              const dd = String(bday.day).padStart(2, '0');
+              localStorage.setItem('user_birthday', `${mm}-${dd}`);
+            } catch {}
             showToast(`🎂 已成功設定生日為 ${bday.month} 月 ${bday.day} 日！`);
           } else {
+            try {
+              localStorage.removeItem('user_birthday');
+            } catch {}
             showToast('已清除生日紀錄');
           }
         }}

@@ -82,3 +82,4 @@ export function formatQuoteFrom365(
     spritePosition: raw.spritePosition || '0% 0%',
   };
 }
+

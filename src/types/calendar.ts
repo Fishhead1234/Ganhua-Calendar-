@@ -22,6 +22,7 @@ export interface RawStaticQuote365 {
   eventType?: string;
   specialEventCandidatesCount?: number;
   specialEventIndex?: number;
+  extractedName?: string;
 }
 
 export interface CalendarQuote {
@@ -45,6 +46,7 @@ export interface CalendarQuote {
   eventType?: string;
   specialEventCandidatesCount?: number;
   specialEventIndex?: number;
+  extractedName?: string;
 }
 
 export interface CharacterMeta {

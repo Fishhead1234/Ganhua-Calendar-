@@ -1,5 +1,9 @@
 import specialEventsData from '../data/special_events_quotes.json';
-import { CalendarMeeting } from '../services/calendarService';
+import {
+  CalendarMeeting,
+  isUserOwnBirthday,
+  extractBirthdayPersonName,
+} from '../services/calendarService';
 import { CalendarQuote, CharacterType } from '../types/calendar';
 import { getLunarDetails } from './lunarUtils';
 
@@ -38,6 +42,7 @@ export interface MatchSpecialEventResult {
   eventType?: string;
   totalCandidates: number;
   selectedIndex: number;
+  extractedName?: string;
 }
 
 /**
@@ -63,13 +68,13 @@ export function matchSpecialEventRoast({
   const dd = String(targetDay).padStart(2, '0');
   const dateKey = `${mm}-${dd}`;
 
-  // 1. User Birthday Override
-  if (userBirthday && userBirthday.month === targetMonth && userBirthday.day === targetDay) {
+  // 1. User Birthday Override (Strictly User's Own Birthday)
+  if (isUserOwnBirthday(targetDate, userBirthday)) {
     return {
       matchedSource: 'birthday',
       matchedQuotes: [],
       selectedQuote: null,
-      eventLabel: '🎂 壽星避難模式',
+      eventLabel: '🎂 本日壽星最大',
       eventType: 'birthday',
       totalCandidates: 1,
       selectedIndex: 0,
@@ -104,14 +109,29 @@ export function matchSpecialEventRoast({
       const normalizedIndex = ((cycleIndex % totalCandidates) + totalCandidates) % totalCandidates;
       const selected = candidates[normalizedIndex];
 
+      let label = selected.eventLabel;
+      let extractedName: string | undefined;
+
+      if (selected.eventType === 'other_person_birthday') {
+        const bdayEvt = calendarEvents.find((evt) => {
+          const t = `${evt.title || ''} ${evt.calendarName || ''}`.toLowerCase();
+          return ['birthday', 'bday', '生日', '慶生'].some((k) => t.includes(k));
+        });
+        if (bdayEvt) {
+          extractedName = extractBirthdayPersonName(bdayEvt.title || '');
+          label = `🎁 社交慶生營業模式（偵測到壽星：${extractedName}）`;
+        }
+      }
+
       return {
         matchedSource: 'calendar_keyword',
         matchedQuotes: candidates,
         selectedQuote: selected,
-        eventLabel: selected.eventLabel,
+        eventLabel: label,
         eventType: selected.eventType,
         totalCandidates,
         selectedIndex: normalizedIndex,
+        extractedName,
       };
     }
   }

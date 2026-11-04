@@ -85,3 +85,4 @@ public class EventReminderReceiver extends BroadcastReceiver {
         notificationManager.notify(notifId, builder.build());
     }
 }
+

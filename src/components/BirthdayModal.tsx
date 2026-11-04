@@ -33,17 +33,36 @@ export const BirthdayModal: React.FC<BirthdayModalProps> = ({
 
   const handleSave = () => {
     const validDay = Math.min(day, maxDays);
+    try {
+      const mm = String(month).padStart(2, '0');
+      const dd = String(validDay).padStart(2, '0');
+      localStorage.setItem('user_birthday', `${mm}-${dd}`);
+    } catch {
+      // ignore
+    }
     onSaveBirthday({ month, day: validDay });
     onClose();
   };
 
   const handleClear = () => {
+    try {
+      localStorage.removeItem('user_birthday');
+    } catch {
+      // ignore
+    }
     onSaveBirthday(null);
     onClose();
   };
 
   const handlePreview = () => {
     const validDay = Math.min(day, maxDays);
+    try {
+      const mm = String(month).padStart(2, '0');
+      const dd = String(validDay).padStart(2, '0');
+      localStorage.setItem('user_birthday', `${mm}-${dd}`);
+    } catch {
+      // ignore
+    }
     onSaveBirthday({ month, day: validDay });
     onPreviewBirthdayQuote(month, validDay);
     onClose();
