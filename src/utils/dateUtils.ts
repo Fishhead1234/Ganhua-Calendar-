@@ -44,3 +44,26 @@ export function isSameLocalDate(d1: Date, d2: Date): boolean {
   );
 }
 
+/**
+ * Calculates day of the year (1 - 366) in local time.
+ */
+export function getDayOfYear(d: Date): number {
+  const start = new Date(d.getFullYear(), 0, 0);
+  const diff =
+    d.getTime() - start.getTime() + (start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000;
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay);
+}
+
+/**
+ * Anti-Fatigue Rule:
+ * For school / kids recurring events, limit main card override to Monday (1) and Thursday (4).
+ * On Tuesday (2), Wednesday (3), Friday (5), default to keeping the normal daily quote and 54-pose illustration from quotes365.json.
+ * Weekend events (Saturday / Sunday) can also show roast if scheduled.
+ */
+export function isSchoolRoastDayOfWeek(targetDate: Date): boolean {
+  const day = targetDate.getDay(); // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+  return day === 1 || day === 4 || day === 0 || day === 6;
+}
+
+

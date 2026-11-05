@@ -124,11 +124,17 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   }, [masterEvents, customEvents, pickedDateStr]);
 
   // Unified Gàn-huà quote and illustration for selected date matching Daily Card & Widgets 100%!
+  const [modalCardViewModeMap, setModalCardViewModeMap] = useState<Record<string, 'roast' | 'original'>>({});
+  const pickedCardMode = modalCardViewModeMap[pickedDateStr];
+
   const pickedMonth = pickedDate.getMonth() + 1;
   const pickedDay = pickedDate.getDate();
   const pickedQuote = useMemo<ResolvedDayContent>(() => {
-    return resolveDayContent(pickedDate, pickedDayEvents, { quotes });
-  }, [quotes, pickedDate, pickedDayEvents]);
+    return resolveDayContent(pickedDate, pickedDayEvents, {
+      quotes,
+      userCardMode: pickedCardMode,
+    });
+  }, [quotes, pickedDate, pickedDayEvents, pickedCardMode]);
 
   // Navigation handlers
   const handlePrevMonth = () => {
@@ -570,11 +576,30 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0 space-y-0.5">
-                    {pickedQuote?.roastBadge && (
-                      <span className="inline-block text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-[#C83E31]/10 text-[#C83E31] border border-[#C83E31]/20 truncate max-w-full">
-                        {pickedQuote.roastBadge}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {pickedQuote?.hasRoastOverride && pickedQuote?.roastBadge && (
+                        <span className="inline-block text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-[#C83E31]/10 text-[#C83E31] border border-[#C83E31]/20 truncate max-w-full">
+                          {pickedQuote.roastBadge}
+                        </span>
+                      )}
+                      {pickedQuote?.canToggleRoast && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const currentMode =
+                              pickedQuote.currentMode ||
+                              (pickedQuote.hasRoastOverride ? 'roast' : 'original');
+                            const nextMode = currentMode === 'roast' ? 'original' : 'roast';
+                            setModalCardViewModeMap((prev) => ({ ...prev, [pickedDateStr]: nextMode }));
+                          }}
+                          className="inline-flex items-center gap-0.5 text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-white hover:bg-[#F3EFE6] text-[#6E6A63] border border-[#2D2D2D]/20 cursor-pointer active:scale-95 transition"
+                          title="切換原創幹話與行程吐槽"
+                        >
+                          <span>{pickedQuote.hasRoastOverride ? '🔀 換回每日原創' : '🎒 查看行程吐槽'}</span>
+                        </button>
+                      )}
+                    </div>
                     <p className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D] leading-snug line-clamp-2">
                       {pickedQuote?.quote || '今天行事曆一片淨土，適合安靜當個薪水小偷。'}
                     </p>

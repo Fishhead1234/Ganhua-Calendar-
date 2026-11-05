@@ -1,7 +1,17 @@
 import { CharacterType, CalendarQuote, RawStaticQuote365 } from '../types/calendar';
-import { toLocalDateKey, parseLocalDateKey } from '../utils/dateUtils';
+import {
+  toLocalDateKey,
+  parseLocalDateKey,
+  getDayOfYear,
+  isSchoolRoastDayOfWeek,
+} from '../utils/dateUtils';
 import { formatQuoteFrom365 } from '../utils/quoteFormatter';
 import quotes365Raw from '../data/quotes365.json';
+import specialEventsQuotesData from '../data/special_events_quotes.json';
+
+export const SCHOOL_PARENT_QUOTES = (specialEventsQuotesData as any[]).filter(
+  (q) => q.eventType === 'school_parent'
+);
 
 export interface EventReminder {
   id: string;
@@ -38,6 +48,7 @@ export interface CalendarRoastResult {
   ji: string;
   character?: CharacterType;
   sceneId?: string;
+  assetPath?: string;
   spriteSheet?: string;
   spritePosition?: string;
   eventType?: string;
@@ -357,7 +368,8 @@ export const MOCK_CALENDAR_PRESETS = SCENARIO_PRESETS;
 export function analyzeCalendarEvents(
   events: CalendarMeeting[],
   presetId?: string,
-  cycleIndex: number = 0
+  cycleIndex: number = 0,
+  targetDate: Date = new Date()
 ): CalendarRoastResult {
   // Check if a preset is active with a forced roast
   if (presetId) {
@@ -404,7 +416,7 @@ export function analyzeCalendarEvents(
   let hasFamilyDinner = false;
   let hasYearEndOrCompanyParty = false;
 
-  const todayDay = new Date().getDay();
+  const todayDay = targetDate.getDay();
 
   // Sum hours ONLY for timed meetings
   timedEvents.forEach((ev) => {
@@ -592,41 +604,48 @@ export function analyzeCalendarEvents(
     };
   }
 
-  // 1-B. Music / Cello / Talent Lessons (音樂才藝課)
-  if (hasLessonOrMusic) {
-    return {
-      meetingsCount: events.length,
-      hasFridayLateMeeting: false,
-      hasBackToBackMeetings: false,
-      totalMeetingHours: totalHours,
-      summaryBadge: '🎻 偵測到【才藝課/音樂課】專屬吐槽',
-      roastQuote: '下班後的才藝課，根本不是培養氣質，是在考驗社畜最後殘存的耐心。',
-      roastSubtext: '白天拉皮條（工作專案），晚上拉大提琴。琴聲裡全是對生活的嘆息。',
-      yi: '假裝聽得懂節奏・下課立刻買珍奶犒賞自己',
-      ji: '在老師面前把休止符當成可以滑手機的意思',
-      character: 'cat',
-      sceneId: 'cat_zen_woodfish',
-      spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
-      spritePosition: '50% 100%',
-    };
-  }
+  // 1-C. School / Parent / Kids Activities / Lessons (Cycles through 10 quotes with different characters & poses)
+  if (hasParentOrSchool || hasLessonOrMusic) {
+    const schoolQuotes =
+      SCHOOL_PARENT_QUOTES.length > 0
+        ? SCHOOL_PARENT_QUOTES
+        : [
+            {
+              quote: '下班不是自由的開始，而是小孩專屬司機兼活動贊助商的兼職開工。',
+              subtext: '正職是社畜，兼職是隨傳隨到的私家車司機',
+              character: 'cat' as CharacterType,
+              sceneId: 'cat_sprint_home',
+              spriteSheet: '/assets/sheets/cat_sheet_2.jpg',
+              spritePosition: '0% 0%',
+              yi: '在車上安靜放空・偷吸手搖飲',
+              ji: '問小孩今天在學校學了什麼',
+              eventLabel: '🎒 小孩/學校活動行程',
+            },
+          ];
 
-  // 1-C. School / Parent / Family
-  if (hasParentOrSchool) {
+    const dayOfYear = getDayOfYear(targetDate);
+    const schoolIndex =
+      (((dayOfYear + cycleIndex) % schoolQuotes.length) + schoolQuotes.length) % schoolQuotes.length;
+    const selected = schoolQuotes[schoolIndex];
+
     return {
       meetingsCount: events.length,
       hasFridayLateMeeting: hasFridayLate,
       hasBackToBackMeetings: isBackToBack,
       totalMeetingHours: totalHours,
-      summaryBadge: '🎒 偵測到【學校/家長行程】專屬吐槽',
-      roastQuote: '自己當社畜就算了，下班還要當小孩的專屬司機兼書僮。',
-      roastSubtext: '白天被老闆KPI折磨，晚上被學校聯絡簿與家長會群組二度審查。',
-      yi: '假笑點頭兼準時接送・深呼吸修煉脾氣',
-      ji: '在班級家長群組手滑誤傳上班幹話・忘簽聯絡簿',
-      character: 'cat',
-      sceneId: 'cat_coffee',
-      spriteSheet: '/assets/sheets/cat_sheet.jpg',
-      spritePosition: '0% 0%',
+      summaryBadge: selected.eventLabel || '🎒 小孩/學校活動行程',
+      roastQuote: selected.quote,
+      roastSubtext: selected.subtext,
+      yi: selected.yi,
+      ji: selected.ji,
+      character: selected.character || 'cat',
+      sceneId: selected.sceneId || 'cat_sprint_home',
+      assetPath:
+        selected.assetPath ||
+        (selected.sceneId ? `/assets/scenes/${selected.sceneId}.webp` : undefined),
+      spriteSheet: selected.spriteSheet || '/assets/sheets/cat_sheet_2.jpg',
+      spritePosition: selected.spritePosition || '0% 0%',
+      eventType: 'school_parent',
     };
   }
 
@@ -802,22 +821,72 @@ export function analyzeCalendarEvents(
     };
   }
 
-  // PRIORITY 3: Moderate timed meetings: 1 to 3 meetings
+  // PRIORITY 3: Moderate timed meetings: 1 to 3 meetings (Diverse quotes to prevent repetitive cat_coffee)
   if (timedCount >= 1) {
+    const meetingQuotes = [
+      {
+        quote: '能用一封 Email 講完的事，非要拉大家通靈一小時。',
+        subtext: `今日排程 ${timedCount} 場會議，社交電池已被榨乾到僅剩紅燈。`,
+        sceneId: 'cat_coffee',
+        character: 'cat' as CharacterType,
+        spriteSheet: '/assets/sheets/cat_sheet.jpg',
+        spritePosition: '0% 0%',
+        yi: '準備滿杯冰美式・只回貼圖與收到',
+        ji: '主動發言說「我來負責後續追蹤」',
+      },
+      {
+        quote: '開會最大的產出，就是約定好下一次什麼時候再開會。',
+        subtext: `排定 ${timedCount} 場會，只要會開得夠多，就永遠不用真正開始做事情。`,
+        sceneId: 'capy_computer_blank',
+        character: 'capybara' as CharacterType,
+        spriteSheet: '/assets/sheets/capybara_sheet.jpg',
+        spritePosition: '50% 0%',
+        yi: '開雙螢幕假裝很忙・鏡頭前認真點頭',
+        ji: '在靜音時忘記關麥克風嘆大氣',
+      },
+      {
+        quote: '肉體端坐在會議室裡微笑，靈魂早已在下班的捷運上狂奔。',
+        subtext: `今日 ${timedCount} 場會議，建議靈魂先下班，留肉體在座位上當人形立牌就好。`,
+        sceneId: 'ghost_soul_exit',
+        character: 'ghost' as CharacterType,
+        spriteSheet: '/assets/sheets/ghost_sheet.jpg',
+        spritePosition: '0% 100%',
+        yi: '眼神失焦假裝深思熟慮・默默喝水消磨時間',
+        ji: '被主席問「你有什麼想法」隨便亂答',
+      },
+      {
+        quote: '今天這場會如果沒有我，地球依然會轉動，甚至轉得更快。',
+        subtext: `今天 ${timedCount} 場會議，我在此時此刻唯一的作用，就是充當出席率的分子。`,
+        sceneId: 'cat_meeting_loading',
+        character: 'cat' as CharacterType,
+        spriteSheet: '/assets/sheets/cat_sheet.jpg',
+        spritePosition: '100% 50%',
+        yi: '全程靜音當個安靜的美男子・準時按離開會議',
+        ji: '認真做會議紀錄結果被指派全套 Action Items',
+      },
+    ];
+
+    const dayOfYear = getDayOfYear(targetDate);
+    const mIndex =
+      (((dayOfYear + cycleIndex) % meetingQuotes.length) + meetingQuotes.length) %
+      meetingQuotes.length;
+    const selectedMeeting = meetingQuotes[mIndex];
+
     return {
       meetingsCount: timedCount,
       hasFridayLateMeeting: false,
       hasBackToBackMeetings: false,
       totalMeetingHours: totalHours,
       summaryBadge: `📅 今日 ${timedCount} 場會議 (${totalHours}小時)：微弱電量掙扎中`,
-      roastQuote: '能用一封 Email 講完的事，非要拉大家通靈一小時。',
-      roastSubtext: `今日排程 ${timedCount} 場會議，社交電池已被榨乾到僅剩紅燈。`,
-      yi: '準備滿杯冰美式・只回貼圖與收到',
-      ji: '主動發言說「我來負責後續追蹤」',
-      character: 'cat',
-      sceneId: 'cat_coffee',
-      spriteSheet: '/assets/sheets/cat_sheet.jpg',
-      spritePosition: '0% 0%',
+      roastQuote: selectedMeeting.quote,
+      roastSubtext: selectedMeeting.subtext,
+      yi: selectedMeeting.yi,
+      ji: selectedMeeting.ji,
+      character: selectedMeeting.character,
+      sceneId: selectedMeeting.sceneId,
+      spriteSheet: selectedMeeting.spriteSheet,
+      spritePosition: selectedMeeting.spritePosition,
+      eventType: 'meeting_density',
     };
   }
 
@@ -866,6 +935,7 @@ export interface ResolveDayContentOptions {
   activePresetId?: string;
   isPro?: boolean;
   cycleIndex?: number;
+  userCardMode?: 'roast' | 'original';
 }
 
 export interface ResolvedDayContent extends CalendarQuote {
@@ -875,6 +945,10 @@ export interface ResolvedDayContent extends CalendarQuote {
   timedMeetingsCount: number;
   totalMeetingHours: number;
   extractedName?: string;
+  roastAvailable?: boolean;
+  availableRoastBadge?: string;
+  canToggleRoast?: boolean;
+  currentMode?: 'roast' | 'original';
 }
 
 /**
@@ -928,6 +1002,10 @@ export function resolveDayContent(
       eventType: 'birthday',
       hasRoastOverride: true,
       roastBadge: '🎂 本日壽星最大',
+      roastAvailable: true,
+      availableRoastBadge: '🎂 本日壽星最大',
+      canToggleRoast: false,
+      currentMode: 'roast',
       meetingsCount: dayEvents.length,
       timedMeetingsCount: timedEvents.length,
       totalMeetingHours: 0,
@@ -939,34 +1017,88 @@ export function resolveDayContent(
   const hasPreset = Boolean(options.activePresetId);
 
   if (hasPreset || hasEvents) {
-    const roast = analyzeCalendarEvents(dayEvents, options.activePresetId, options.cycleIndex || 0);
+    const roast = analyzeCalendarEvents(dayEvents, options.activePresetId, options.cycleIndex || 0, targetDate);
     const activeSceneId = roast.sceneId || base.sceneId;
     const isOtherPersonBday = roast.eventType === 'other_person_birthday';
+    const isSchoolEvent = roast.eventType === 'school_parent';
 
-    return {
-      ...base,
-      quote: roast.roastQuote,
-      subtext: roast.roastSubtext,
-      yi: roast.yi || base.yi,
-      ji: roast.ji || base.ji,
-      character: roast.character || base.character,
-      sceneId: activeSceneId,
-      assetPath: activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : base.assetPath,
-      spriteSheet: roast.spriteSheet || base.spriteSheet,
-      spritePosition: roast.spritePosition || base.spritePosition,
-      eventLabel: roast.summaryBadge,
-      eventType: roast.eventType,
-      extractedName: roast.extractedName,
-      specialEventCandidatesCount: isOtherPersonBday ? 4 : base.specialEventCandidatesCount,
-      specialEventIndex: isOtherPersonBday
-        ? (((options.cycleIndex || 0) % 4) + 4) % 4
-        : base.specialEventIndex,
-      hasRoastOverride: true,
-      roastBadge: roast.summaryBadge,
-      meetingsCount: roast.meetingsCount,
-      timedMeetingsCount: timedEvents.length,
-      totalMeetingHours: roast.totalMeetingHours,
-    };
+    // Anti-Fatigue Rule:
+    // Limit school roasts to Monday (1) and Thursday (4) (and weekend events if present).
+    // On Tue, Wed, Fri, default to NOT overriding the main card (fallback to quotes365.json).
+    const defaultShouldOverride = isSchoolEvent
+      ? isSchoolRoastDayOfWeek(targetDate)
+      : true;
+
+    // Check user toggle preference (if user explicitly toggled between roast and original)
+    const shouldOverride =
+      options.userCardMode === 'original'
+        ? false
+        : options.userCardMode === 'roast'
+        ? true
+        : defaultShouldOverride;
+
+    const totalSchoolCount = SCHOOL_PARENT_QUOTES.length || 10;
+    const candidatesCount = isSchoolEvent
+      ? totalSchoolCount
+      : isOtherPersonBday
+      ? 4
+      : (roast.eventType === 'meeting_density' ? 4 : (base.specialEventCandidatesCount || 1));
+
+    const dayOfYear = getDayOfYear(targetDate);
+    const candidateIndex = isSchoolEvent
+      ? ((((dayOfYear + (options.cycleIndex || 0)) % totalSchoolCount) + totalSchoolCount) % totalSchoolCount)
+      : isOtherPersonBday
+      ? ((((options.cycleIndex || 0) % 4) + 4) % 4)
+      : (roast.eventType === 'meeting_density'
+        ? ((((dayOfYear + (options.cycleIndex || 0)) % 4) + 4) % 4)
+        : (base.specialEventIndex || 0));
+
+    if (shouldOverride) {
+      return {
+        ...base,
+        quote: roast.roastQuote,
+        subtext: roast.roastSubtext,
+        yi: roast.yi || base.yi,
+        ji: roast.ji || base.ji,
+        character: roast.character || base.character,
+        sceneId: activeSceneId,
+        assetPath: roast.assetPath || (activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : base.assetPath),
+        spriteSheet: roast.spriteSheet || base.spriteSheet,
+        spritePosition: roast.spritePosition || base.spritePosition,
+        eventLabel: roast.summaryBadge,
+        eventType: roast.eventType,
+        extractedName: roast.extractedName,
+        specialEventCandidatesCount: candidatesCount,
+        specialEventIndex: candidateIndex,
+        hasRoastOverride: true,
+        roastBadge: roast.summaryBadge,
+        roastAvailable: true,
+        availableRoastBadge: roast.summaryBadge,
+        canToggleRoast: true,
+        currentMode: 'roast',
+        meetingsCount: roast.meetingsCount,
+        timedMeetingsCount: timedEvents.length,
+        totalMeetingHours: roast.totalMeetingHours,
+      };
+    } else {
+      // Anti-fatigue fallback or user toggled to original: Keep normal daily quote & 54-pose illustration from quotes365.json
+      return {
+        ...base,
+        hasRoastOverride: false,
+        roastBadge: '',
+        eventLabel: undefined,
+        roastAvailable: true,
+        availableRoastBadge: roast.summaryBadge,
+        canToggleRoast: true,
+        currentMode: 'original',
+        meetingsCount: roast.meetingsCount,
+        timedMeetingsCount: timedEvents.length,
+        totalMeetingHours: roast.totalMeetingHours,
+        extractedName: roast.extractedName,
+        specialEventCandidatesCount: candidatesCount,
+        specialEventIndex: candidateIndex,
+      };
+    }
   }
 
   // 4. Default clean 365 daily quote (no meetings)
@@ -977,6 +1109,9 @@ export function resolveDayContent(
     meetingsCount: 0,
     timedMeetingsCount: 0,
     totalMeetingHours: 0,
+    roastAvailable: false,
+    canToggleRoast: false,
+    currentMode: 'original',
   };
 }
 

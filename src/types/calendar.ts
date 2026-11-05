@@ -23,6 +23,14 @@ export interface RawStaticQuote365 {
   specialEventCandidatesCount?: number;
   specialEventIndex?: number;
   extractedName?: string;
+  hasRoastOverride?: boolean;
+  roastAvailable?: boolean;
+  availableRoastBadge?: string;
+  canToggleRoast?: boolean;
+  currentMode?: 'roast' | 'original';
+  meetingsCount?: number;
+  timedMeetingsCount?: number;
+  totalMeetingHours?: number;
 }
 
 export interface CalendarQuote {
@@ -47,6 +55,14 @@ export interface CalendarQuote {
   specialEventCandidatesCount?: number;
   specialEventIndex?: number;
   extractedName?: string;
+  hasRoastOverride?: boolean;
+  roastAvailable?: boolean;
+  availableRoastBadge?: string;
+  canToggleRoast?: boolean;
+  currentMode?: 'roast' | 'original';
+  meetingsCount?: number;
+  timedMeetingsCount?: number;
+  totalMeetingHours?: number;
 }
 
 export interface CharacterMeta {

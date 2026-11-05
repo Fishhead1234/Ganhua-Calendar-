@@ -37,6 +37,7 @@ interface DeskCalendarProps {
   onCycleSpecialQuote?: () => void;
   onBackToToday?: () => void;
   onShowToast?: (msg: string) => void;
+  onToggleRoastMode?: () => void;
 }
 
 export const DeskCalendar: React.FC<DeskCalendarProps> = ({
@@ -58,6 +59,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   onCycleSpecialQuote,
   onBackToToday,
   onShowToast,
+  onToggleRoastMode,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [tearDirection, setTearDirection] = useState<'tear_away' | 'flip_right'>('tear_away');
@@ -516,32 +518,68 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                 幹話日曆
               </div>
 
-              {quote.eventLabel && (
-                <div className="flex items-center gap-1.5 flex-wrap justify-center animate-in fade-in">
+              <div className="flex items-center gap-1.5 flex-wrap justify-center animate-in fade-in">
+                {/* 1. Special Event Badge (when roast is active) */}
+                {quote.hasRoastOverride && quote.eventLabel && (
                   <span className="px-3 py-0.5 rounded-full bg-[#C83E31] text-white text-[11px] font-serif font-black shadow-sm flex items-center gap-1 tracking-wider border border-[#C83E31]">
                     {quote.eventLabel}
                   </span>
+                )}
 
-                  {onCycleSpecialQuote && (quote.specialEventCandidatesCount || 0) > 1 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCycleSpecialQuote();
-                      }}
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F0] border border-[#C83E31] text-[#C83E31] hover:bg-[#C83E31] hover:text-white text-[10px] font-sans font-bold shadow-sm transition cursor-pointer active:scale-95"
-                      title={quote.eventType === 'other_person_birthday' ? '點擊換一句社交慶生幹話' : '點擊換一句防禦幹話'}
-                    >
-                      <RefreshCw className="w-3 h-3" />
-                      <span>
-                        {quote.eventType === 'other_person_birthday'
-                          ? `🔄 換一句社交慶生幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`
-                          : `換一句防禦幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`}
-                      </span>
-                    </button>
-                  )}
-                </div>
-              )}
+                {/* 2. Cycle Button (when roast is active and has multiple candidates) */}
+                {quote.hasRoastOverride && onCycleSpecialQuote && (quote.specialEventCandidatesCount || 0) > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCycleSpecialQuote();
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F0] border border-[#C83E31] text-[#C83E31] hover:bg-[#C83E31] hover:text-white text-[10px] font-sans font-bold shadow-sm transition cursor-pointer active:scale-95"
+                    title={quote.eventType === 'other_person_birthday' ? '點擊換一句社交慶生幹話' : '點擊換一句防禦幹話'}
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>
+                      {quote.eventType === 'other_person_birthday'
+                        ? `🔄 換一句社交慶生幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`
+                        : `換一句防禦幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`}
+                    </span>
+                  </button>
+                )}
+
+                {/* 3. 1-Tap Toggle Pill: [ 🔀 換回每日原創幹話 ] (when roast is overriding) */}
+                {quote.hasRoastOverride && onToggleRoastMode && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleRoastMode();
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F0] border border-[#2D2D2D]/25 hover:border-[#2D2D2D] text-[#555] hover:text-[#2D2D2D] text-[10px] font-sans font-bold shadow-xs transition cursor-pointer active:scale-95"
+                    title="點擊換回當日 365 每日原創幹話與 54 插畫"
+                  >
+                    <span>🔀 換回每日原創幹話</span>
+                  </button>
+                )}
+
+                {/* 4. 1-Tap Toggle Pill: [ 🎒 查看行程吐槽 ] / [ 📅 查看行程吐槽 ] (when normal quote is shown, but roast is available) */}
+                {!quote.hasRoastOverride && (quote.roastAvailable || (quote.meetingsCount && quote.meetingsCount > 0)) && onToggleRoastMode && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleRoastMode();
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF8EB] border border-[#C83E31] text-[#C83E31] hover:bg-[#C83E31] hover:text-white text-[10px] font-sans font-bold shadow-xs transition cursor-pointer active:scale-95 animate-in fade-in"
+                    title="點擊查看今日行事曆專屬毒舌吐槽"
+                  >
+                    <span>
+                      {quote.availableRoastBadge?.includes('🎒') || (quote.availableRoastBadge?.includes('學校') || quote.availableRoastBadge?.includes('家長'))
+                        ? '🎒 查看行程吐槽'
+                        : '📅 查看行程吐槽'}
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Traditional Taiwanese Desk Calendar Date Header (Pixel-perfect to Mockup) */}

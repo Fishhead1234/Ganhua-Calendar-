@@ -184,6 +184,10 @@ export const App: React.FC = () => {
     return toLocalDateKey(currentDateObj);
   }, [currentDateObj]);
 
+  // User-toggled card view mode ('roast' vs 'original') per date
+  const [cardViewModeMap, setCardViewModeMap] = useState<Record<string, 'roast' | 'original'>>({});
+  const currentCardViewMode = cardViewModeMap[currentDateKey];
+
   // Custom Appointments State
   const [customEvents, setCustomEvents] = useState<CustomCalendarEvent[]>(() => getCustomEvents());
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
@@ -285,6 +289,7 @@ export const App: React.FC = () => {
     calendarEvents: effectiveMeetings,
     specialQuoteCycleIndex,
     activePresetId: activePresetId || undefined,
+    userCardMode: currentCardViewMode,
   });
 
   const syncAllCalendarSources = async (): Promise<CalendarMeeting[]> => {
@@ -785,6 +790,15 @@ export const App: React.FC = () => {
               onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
               onBackToToday={handleBackToToday}
               onShowToast={showToast}
+              onToggleRoastMode={() => {
+                const currentMode = currentQuote?.currentMode || (currentQuote?.hasRoastOverride ? 'roast' : 'original');
+                const nextMode = currentMode === 'roast' ? 'original' : 'roast';
+                setCardViewModeMap((prev) => ({
+                  ...prev,
+                  [currentDateKey]: nextMode,
+                }));
+                showToast(nextMode === 'original' ? '已換回每日原創幹話' : '已切換為行程專屬吐槽');
+              }}
             />
 
             {/* Daily Agenda & Sarcastic Timeline Strip */}

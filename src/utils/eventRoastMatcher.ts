@@ -6,6 +6,7 @@ import {
 } from '../services/calendarService';
 import { CalendarQuote, CharacterType } from '../types/calendar';
 import { getLunarDetails } from './lunarUtils';
+import { getDayOfYear, isSchoolRoastDayOfWeek } from './dateUtils';
 
 export interface SpecialEventQuote {
   id: string;
@@ -43,6 +44,7 @@ export interface MatchSpecialEventResult {
   totalCandidates: number;
   selectedIndex: number;
   extractedName?: string;
+  isSuppressedByAntiFatigue?: boolean;
 }
 
 /**
@@ -106,7 +108,9 @@ export function matchSpecialEventRoast({
       const candidates = allForCategory.length > 0 ? allForCategory : keywordMatches;
 
       const totalCandidates = candidates.length;
-      const normalizedIndex = ((cycleIndex % totalCandidates) + totalCandidates) % totalCandidates;
+      const dayOfYear = getDayOfYear(targetDate);
+      const normalizedIndex =
+        (((dayOfYear + cycleIndex) % totalCandidates) + totalCandidates) % totalCandidates;
       const selected = candidates[normalizedIndex];
 
       let label = selected.eventLabel;
@@ -123,6 +127,9 @@ export function matchSpecialEventRoast({
         }
       }
 
+      const isSchoolEvent = selected.eventType === 'school_parent';
+      const isSuppressedByAntiFatigue = isSchoolEvent && !isSchoolRoastDayOfWeek(targetDate);
+
       return {
         matchedSource: 'calendar_keyword',
         matchedQuotes: candidates,
@@ -132,6 +139,7 @@ export function matchSpecialEventRoast({
         totalCandidates,
         selectedIndex: normalizedIndex,
         extractedName,
+        isSuppressedByAntiFatigue,
       };
     }
   }

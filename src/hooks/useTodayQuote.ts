@@ -35,6 +35,7 @@ interface UseTodayQuoteOptions {
   calendarEvents?: CalendarMeeting[];
   specialQuoteCycleIndex?: number;
   activePresetId?: string;
+  userCardMode?: 'roast' | 'original';
 }
 
 export function useTodayQuote({
@@ -49,6 +50,7 @@ export function useTodayQuote({
   calendarEvents = [],
   specialQuoteCycleIndex = 0,
   activePresetId,
+  userCardMode,
 }: UseTodayQuoteOptions): {
   currentQuote: ResolvedDayContent;
   nextQuotePreview: CalendarQuote;
@@ -119,6 +121,7 @@ export function useTodayQuote({
       activePresetId: dateOffset === 0 ? activePresetId : undefined,
       isPro,
       cycleIndex: specialQuoteCycleIndex,
+      userCardMode,
     });
   }, [
     targetDate,
@@ -130,6 +133,7 @@ export function useTodayQuote({
     activePresetId,
     isPro,
     specialQuoteCycleIndex,
+    userCardMode,
   ]);
 
   // Next quote preview (for under-sheet peeling preview)
