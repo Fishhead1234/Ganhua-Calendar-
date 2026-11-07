@@ -12,13 +12,17 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -426,6 +430,81 @@ public class AndroidCalendarBridge {
             return "{\"cancelled\": true}";
         } catch (Exception e) {
             return "{\"error\": \"" + e.getMessage() + "\"}";
+        }
+    }
+
+    /**
+     * Share high-resolution 9:16 story/post directly to Instagram
+     */
+    @JavascriptInterface
+    public boolean shareToInstagram(String base64Data, String caption) {
+        try {
+            if (base64Data == null || base64Data.isEmpty()) {
+                return false;
+            }
+            String cleanB64 = base64Data;
+            if (cleanB64.contains(",")) {
+                cleanB64 = cleanB64.substring(cleanB64.indexOf(",") + 1);
+            }
+            byte[] decoded = Base64.decode(cleanB64, Base64.DEFAULT);
+
+            // Write image to internal cache directory (configured in file_paths.xml)
+            File cacheDir = context.getCacheDir();
+            File shareFile = new File(cacheDir, "ganhua_share_story.png");
+            FileOutputStream fos = new FileOutputStream(shareFile);
+            fos.write(decoded);
+            fos.flush();
+            fos.close();
+
+            // Obtain FileProvider URI
+            Uri contentUri = FileProvider.getUriForFile(
+                context,
+                context.getPackageName() + ".fileprovider",
+                shareFile
+            );
+
+            PackageManager pm = context.getPackageManager();
+
+            // 1. Direct to Instagram Story
+            Intent storyIntent = new Intent("com.instagram.share.ADD_TO_STORY");
+            storyIntent.setDataAndType(contentUri, "image/png");
+            storyIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            if (storyIntent.resolveActivity(pm) != null) {
+                context.startActivity(storyIntent);
+                return true;
+            }
+
+            // 2. Direct to Instagram Feed / Post
+            Intent igSendIntent = new Intent(Intent.ACTION_SEND);
+            igSendIntent.setType("image/png");
+            igSendIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            if (caption != null && !caption.isEmpty()) {
+                igSendIntent.putExtra(Intent.EXTRA_TEXT, caption);
+            }
+            igSendIntent.setPackage("com.instagram.android");
+            igSendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            if (igSendIntent.resolveActivity(pm) != null) {
+                context.startActivity(igSendIntent);
+                return true;
+            }
+
+            // 3. Fallback: Native system share sheet with Instagram and other social apps
+            Intent chooserIntent = new Intent(Intent.ACTION_SEND);
+            chooserIntent.setType("image/png");
+            chooserIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            if (caption != null && !caption.isEmpty()) {
+                chooserIntent.putExtra(Intent.EXTRA_TEXT, caption);
+            }
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent chooser = Intent.createChooser(chooserIntent, "分享幹話日曆");
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(chooser);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

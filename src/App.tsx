@@ -907,6 +907,7 @@ export const App: React.FC = () => {
           setIsIgModalOpen(false);
           setIsPaywallOpen(true);
         }}
+        onShowToast={showToast}
       />
 
       {/* Paywall Modal */}
