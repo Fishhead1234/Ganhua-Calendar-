@@ -28,6 +28,7 @@ export interface CalendarMeeting {
   isFridayAfterFour?: boolean;
   dateKey?: string; // YYYY-MM-DD
   notes?: string;
+  location?: string;
   isAllDay?: boolean;
   source?: 'local' | 'synced' | 'preset';
   calendarId?: string;
@@ -1359,7 +1360,8 @@ export async function fetchNativeDeviceCalendarEvents(
               calendarId: calIdStr,
               calendarName,
               calendarColor,
-              notes: e.notes || e.location,
+              notes: e.notes || undefined,
+              location: e.location || undefined,
             };
           });
 
@@ -1626,6 +1628,12 @@ export function parseICSToMeetings(
                 source: 'synced',
                 calendarName: calName,
                 calendarColor: '#0F9D58',
+                notes: currentEvent.description
+                  ? currentEvent.description.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+                  : undefined,
+                location: currentEvent.location
+                  ? currentEvent.location.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+                  : undefined,
               });
             }
           } else {
@@ -1659,6 +1667,12 @@ export function parseICSToMeetings(
               source: 'synced',
               calendarName: calName,
               calendarColor: '#0F9D58',
+              notes: currentEvent.description
+                ? currentEvent.description.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+                : undefined,
+              location: currentEvent.location
+                ? currentEvent.location.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+                : undefined,
             });
           }
         }
@@ -1749,6 +1763,8 @@ export function parseJsonMeetings(data: any[], targetDate: Date = new Date()): C
       source: 'synced',
       calendarName: item.calendarName,
       calendarColor: item.calendarColor,
+      notes: item.notes || item.description || undefined,
+      location: item.location || undefined,
     });
   });
 
@@ -1982,6 +1998,7 @@ export interface CustomCalendarEvent {
   durationMinutes: number;
   isAllDay: boolean;
   notes?: string;
+  location?: string;
   source: 'local';
   createdAt?: number;
   calendarName?: string;
@@ -2039,6 +2056,7 @@ export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
     isFridayAfterFour,
     dateKey: e.dateKey,
     notes: e.notes,
+    location: e.location,
     isAllDay: e.isAllDay,
     source: 'local',
     calendarName: e.calendarName,

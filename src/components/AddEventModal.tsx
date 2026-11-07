@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Bell,
   Plus,
+  MapPin,
 } from 'lucide-react';
 import { CustomCalendarEvent, EventReminder } from '../services/calendarService';
 import specialEventsData from '../data/special_events_quotes.json';
@@ -74,6 +75,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   const [isAllDay, setIsAllDay] = useState(false);
   const [startTime, setStartTime] = useState(() => getUpcomingDefaultTimes().start);
   const [endTime, setEndTime] = useState(() => getUpcomingDefaultTimes().end);
+  const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [reminders, setReminders] = useState<EventReminder[]>([
@@ -96,6 +98,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
         const eH = String(Math.floor((totalMinutes / 60) % 24)).padStart(2, '0');
         const eM = String(totalMinutes % 60).padStart(2, '0');
         setEndTime(`${eH}:${eM}`);
+        setLocation(editingEvent.location || '');
         setNotes(editingEvent.notes || '');
         setReminders(
           editingEvent.reminders && editingEvent.reminders.length > 0
@@ -109,6 +112,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
         setIsAllDay(false);
         setStartTime(defaults.start);
         setEndTime(defaults.end);
+        setLocation('');
         setNotes('');
         setReminders([{ id: 'rem_1', value: 1, unit: 'hours' }]);
       }
@@ -192,6 +196,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       startMinute: isAllDay ? 0 : startMinute,
       durationMinutes: isAllDay ? 480 : durationMinutes,
       isAllDay,
+      location: location.trim() || undefined,
       notes: notes.trim() || undefined,
       reminders,
       source: 'local',
@@ -345,16 +350,31 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
             />
           </div>
 
-          {/* 5. Optional Notes / Location */}
+          {/* 5. Optional Location */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#C83E31]" />
+              <span>地點（選填）</span>
+            </label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="例如：3 樓第一會議室、學校操場、Zoom 線上..."
+              className="w-full px-3.5 py-2 rounded-xl border-2 border-[#2D2D2D] bg-[#F9F6F0] text-xs font-sans text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#D4B483]"
+            />
+          </div>
+
+          {/* 6. Optional Notes */}
           <div className="space-y-1.5">
             <label className="block text-xs font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-[#6E6A63]" />
-              <span>備註或地點（選填）</span>
+              <span>備忘與詳細說明（選填）</span>
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="輸入備註、會議室地點或提醒事項..."
+              placeholder="輸入備忘事項、討論題綱、提醒或重要資訊..."
               rows={2}
               className="w-full px-3.5 py-2 rounded-xl border-2 border-[#2D2D2D] bg-[#F9F6F0] text-xs font-sans text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#D4B483] resize-none"
             />

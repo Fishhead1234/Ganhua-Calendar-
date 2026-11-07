@@ -808,6 +808,7 @@ export const App: React.FC = () => {
               onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
               onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
               onEditEvent={handleEditMeeting}
+              onShowToast={showToast}
             />
 
         {/* C. 3-Logo Horizontal Action Dock */}
@@ -824,13 +825,12 @@ export const App: React.FC = () => {
                   ? 'ring-2 ring-[#C83E31] shadow-md'
                   : 'group-hover:border-[#2D2D2D]/30'
               }`}
-              style={{
-                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
-                backgroundSize: '380% auto',
-                backgroundPosition: '10% 50%',
-                backgroundRepeat: 'no-repeat',
-              }}
             >
+              <img
+                src="/assets/icons/action_icon_survived.png"
+                alt="今日已生還"
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
               {persisted.survivedDates.includes(currentQuote.date) && (
                 <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full bg-[#C83E31] text-[#FAF7F0] text-[9px] font-sans font-black shadow-xs flex items-center gap-0.5 animate-in fade-in zoom-in duration-150">
                   <span>✓ 已蓋章</span>
@@ -850,13 +850,13 @@ export const App: React.FC = () => {
           >
             <div
               className="w-20 h-20 rounded-2xl shadow-sm border border-[#2D2D2D]/15 overflow-hidden transition-all group-hover:border-[#2D2D2D]/30"
-              style={{
-                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
-                backgroundSize: '380% auto',
-                backgroundPosition: '50% 50%',
-                backgroundRepeat: 'no-repeat',
-              }}
-            />
+            >
+              <img
+                src="/assets/icons/action_icon_ig.png"
+                alt="分享 IG 限動"
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
             <span className="font-sans font-bold text-xs text-[#2D2D2D] group-hover:text-[#C83E31] transition-colors truncate max-w-full">
               分享 IG 限動
             </span>
@@ -870,13 +870,13 @@ export const App: React.FC = () => {
           >
             <div
               className="w-20 h-20 rounded-2xl shadow-sm border border-[#2D2D2D]/15 overflow-hidden transition-all group-hover:border-[#2D2D2D]/30"
-              style={{
-                backgroundImage: 'url(/assets/icons/action_icons.jpg)',
-                backgroundSize: '380% auto',
-                backgroundPosition: '90% 50%',
-                backgroundRepeat: 'no-repeat',
-              }}
-            />
+            >
+              <img
+                src="/assets/icons/action_icon_calendar.png"
+                alt="生還月曆"
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+            </div>
             <span className="font-sans font-bold text-xs text-[#2D2D2D] group-hover:text-[#C83E31] transition-colors truncate max-w-full">
               生還月曆 ({persisted.streakCount}天)
             </span>
@@ -968,6 +968,7 @@ export const App: React.FC = () => {
         onSelectDate={handleJumpToDate}
         onOpenAddEvent={(dateStr) => handleOpenAddEvent(dateStr)}
         onEditEvent={handleEditMeeting}
+        onShowToast={showToast}
       />
 
       {/* Add / Edit Appointment Modal */}

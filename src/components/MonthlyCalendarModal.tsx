@@ -3,6 +3,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Lock,
   Calendar,
   Sparkles,
@@ -11,6 +13,12 @@ import {
   Plus,
   Edit2,
   Copy,
+  Check,
+  Clock,
+  MapPin,
+  FileText,
+  Tag,
+  Bell,
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
 import { toLocalDateKey } from '../utils/dateUtils';
@@ -39,6 +47,7 @@ interface MonthlyCalendarModalProps {
   onSelectDate: (targetDate: Date) => void;
   onOpenAddEvent?: (dateStr: string) => void;
   onEditEvent?: (event: CalendarMeeting) => void;
+  onShowToast?: (msg: string) => void;
 }
 
 export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
@@ -54,6 +63,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   onSelectDate,
   onOpenAddEvent,
   onEditEvent,
+  onShowToast,
 }) => {
   // Validate and sanitize dates
   const safeCurrentDate = useMemo(() => {
@@ -167,6 +177,303 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     const hourStr = String(m?.startHour ?? 9).padStart(2, '0');
     const minStr = String(m?.startMinute ?? 0).padStart(2, '0');
     return `${hourStr}:${minStr}`;
+  };
+
+  // Expandable events detail state
+  const [expandedEventIds, setExpandedEventIds] = useState<Set<string>>(new Set());
+  const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
+
+  const toggleExpandEvent = (eventId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setExpandedEventIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(eventId)) {
+        next.delete(eventId);
+      } else {
+        next.add(eventId);
+      }
+      return next;
+    });
+  };
+
+  const toggleExpandAllEvents = (events: CalendarMeeting[]) => {
+    if (expandedEventIds.size === events.length) {
+      setExpandedEventIds(new Set());
+    } else {
+      setExpandedEventIds(new Set(events.map((e) => e.id)));
+    }
+  };
+
+  const handleCopyEventDetails = (m: CalendarMeeting, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const timeStr = m.isAllDay
+      ? '全天活動 (All Day)'
+      : `${String(m.startHour ?? 9).padStart(2, '0')}:${String(m.startMinute ?? 0).padStart(2, '0')} (${m.durationMinutes ?? 60} 分鐘)`;
+    const parts = [
+      `📅 行程：${m.title || '未命名行程'}`,
+      `⏰ 時間：${timeStr}`,
+    ];
+    if (m.calendarName) {
+      parts.push(`🏷️ 日曆：${m.calendarName} (${m.source === 'local' ? '本地自訂' : '手機系統同步'})`);
+    }
+    if (m.location) {
+      parts.push(`📍 地點：${m.location}`);
+    }
+    if (m.notes) {
+      parts.push(`📝 備註：${m.notes}`);
+    }
+    const text = parts.join('\n');
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedEventId(m.id);
+      if (onShowToast) {
+        onShowToast('📋 行程明細已複製到剪貼簿！');
+      }
+      setTimeout(() => setCopiedEventId(null), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  const renderEventsList = (events: CalendarMeeting[], isFuture: boolean) => {
+    if (events.length === 0) return null;
+    const allExpanded = events.length > 0 && expandedEventIds.size === events.length;
+
+    return (
+      <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1.5 border border-[#2D2D2D]/10">
+        <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
+          <span className="flex items-center gap-1.5">
+            <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
+            <span>{isFuture ? '預排行程' : '當日排定行程'}</span>
+            <span className="text-[10px] text-[#6E6A63] font-normal font-mono">
+              ({events.length} 場)
+            </span>
+          </span>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => toggleExpandAllEvents(events)}
+              className="px-2 py-0.5 rounded-full bg-white border border-[#2D2D2D]/20 hover:border-[#2D2D2D] text-[#6E6A63] hover:text-[#2D2D2D] text-[10px] font-sans font-bold transition cursor-pointer active:scale-95"
+            >
+              <span>{allExpanded ? '全部收合' : '展開明細'}</span>
+            </button>
+            {onOpenAddEvent && (
+              <button
+                type="button"
+                onClick={() => onOpenAddEvent(pickedDateStr)}
+                className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] text-[10px] font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer active:scale-95"
+                title="新增行程"
+              >
+                <Plus className="w-2.5 h-2.5 text-[#D4B483]" />
+                <span>新增</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-1.5 pt-0.5">
+          {events.map((m) => {
+            const isCustom = m.source === 'local';
+            const isExpanded = expandedEventIds.has(m.id);
+            const isCopied = copiedEventId === m.id;
+
+            return (
+              <div
+                key={m.id}
+                className={`rounded-lg border transition-all overflow-hidden ${
+                  isExpanded
+                    ? 'bg-white border-[#2D2D2D] shadow-xs'
+                    : 'bg-white/70 border-[#2D2D2D]/10 hover:border-[#2D2D2D]/30 hover:bg-white'
+                }`}
+              >
+                {/* Header row: clickable to toggle */}
+                <div
+                  onClick={() => toggleExpandEvent(m.id)}
+                  className="flex items-center justify-between py-1.5 px-2 cursor-pointer transition select-none text-xs font-sans text-[#2D2D2D]"
+                  title={isExpanded ? '點擊收合詳細資訊' : '點擊展開查看完整資訊與備忘'}
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1 pr-1.5">
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                        isCustom ? 'bg-[#D4B483]' : 'bg-[#C83E31]'
+                      }`}
+                    />
+                    <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
+                      {formatEventTime(m)}
+                    </span>
+                    {m.calendarName && (
+                      <span
+                        className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[80px] truncate border"
+                        style={{
+                          backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
+                          borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
+                          color: m.calendarColor || '#2D2D2D',
+                        }}
+                        title={m.calendarName}
+                      >
+                        {m.calendarName}
+                      </span>
+                    )}
+                    <span className={`font-medium text-[#2D2D2D] ${isExpanded ? 'break-words' : 'truncate'}`}>
+                      {m?.title || '未命名行程'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    {m.reminders && m.reminders.length > 0 && (
+                      <span
+                        className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shrink-0"
+                        title={`已設定 ${m.reminders.length} 組提醒`}
+                      >
+                        🔔 x{m.reminders.length}
+                      </span>
+                    )}
+                    {isCustom && !isExpanded && (
+                      <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0">
+                        自訂
+                      </span>
+                    )}
+                    <div
+                      className={`p-0.5 text-[#6E6A63] transition-transform duration-200 ${
+                        isExpanded ? 'rotate-180 text-[#C83E31]' : ''
+                      }`}
+                    >
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Details Pane */}
+                {isExpanded && (
+                  <div className="px-2.5 pb-2.5 pt-1 border-t border-[#2D2D2D]/10 bg-[#FAF7F0]/70 space-y-2 text-xs font-sans animate-in fade-in duration-150 select-text">
+                    {/* Full Untruncated Title */}
+                    <div className="space-y-0.5 pt-0.5">
+                      <div className="text-[9px] font-sans font-bold text-[#8C877D] flex items-center gap-1">
+                        <Tag className="w-2.5 h-2.5 text-[#C83E31]" />
+                        <span>完整行程標題</span>
+                      </div>
+                      <p className="font-serif font-black text-xs text-[#2D2D2D] leading-snug break-words">
+                        {m.title || '未命名行程'}
+                      </p>
+                    </div>
+
+                    {/* Time & Duration */}
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#2D2D2D]">
+                      <Clock className="w-3 h-3 text-[#6E6A63] shrink-0" />
+                      <span className="font-mono font-bold">
+                        {m.isAllDay
+                          ? '全天活動 (All Day)'
+                          : `${String(m.startHour ?? 9).padStart(2, '0')}:${String(m.startMinute ?? 0).padStart(2, '0')} (約 ${m.durationMinutes ?? 60} 分鐘)`}
+                      </span>
+                    </div>
+
+                    {/* Calendar origin */}
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#6E6A63] flex-wrap">
+                      <Calendar className="w-3 h-3 text-[#6E6A63] shrink-0" />
+                      <span className="font-medium">所屬：</span>
+                      <span
+                        className="px-1.5 py-0.2 rounded font-bold border text-[9px]"
+                        style={{
+                          backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
+                          borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
+                          color: m.calendarColor || '#2D2D2D',
+                        }}
+                      >
+                        {m.calendarName || (isCustom ? '本地自訂行程' : '手機系統行事曆')}
+                      </span>
+                      <span className="text-[#8C877D]">
+                        ({isCustom ? '本地自訂' : '手機系統同步'})
+                      </span>
+                    </div>
+
+                    {/* Location (if present) */}
+                    {m.location && (
+                      <div className="flex items-start gap-1.5 text-[11px] text-[#2D2D2D] bg-white p-1.5 rounded-lg border border-[#2D2D2D]/10">
+                        <MapPin className="w-3 h-3 text-[#C83E31] shrink-0 mt-0.5" />
+                        <div className="min-w-0 flex-1">
+                          <span className="font-bold text-[#6E6A63] text-[9px] block">活動地點</span>
+                          <span className="font-medium text-[#2D2D2D] break-words">
+                            {m.location}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notes (if present) */}
+                    {m.notes && (
+                      <div className="space-y-0.5">
+                        <div className="text-[9px] font-sans font-bold text-[#8C877D] flex items-center gap-1">
+                          <FileText className="w-2.5 h-2.5 text-[#6E6A63]" />
+                          <span>詳細備忘 / 內文</span>
+                        </div>
+                        <div className="bg-white p-2 rounded-lg border border-[#2D2D2D]/10 font-sans text-[11px] text-[#2D2D2D] leading-relaxed whitespace-pre-wrap break-words max-h-36 overflow-y-auto">
+                          {m.notes}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reminders List (if present) */}
+                    {m.reminders && m.reminders.length > 0 && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">
+                        <Bell className="w-3 h-3 text-amber-700 shrink-0" />
+                        <span>已設定提醒：</span>
+                        <div className="flex gap-1 flex-wrap">
+                          {m.reminders.map((r, idx) => (
+                            <span key={r.id || idx} className="font-mono font-bold">
+                              {r.value}{' '}
+                              {r.unit === 'hours' ? '小時' : r.unit === 'days' ? '天' : '分鐘'}前
+                              {idx < (m.reminders?.length || 1) - 1 ? '、' : ''}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-[#2D2D2D]/10">
+                      <button
+                        type="button"
+                        onClick={(e) => handleCopyEventDetails(m, e)}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-[#2D2D2D]/20 hover:border-[#2D2D2D] text-[#2D2D2D] text-[10px] font-sans font-bold transition shadow-2xs active:scale-95 cursor-pointer"
+                        title="複製完整行程內容"
+                      >
+                        {isCopied ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span className="text-emerald-700">已複製！</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 text-[#6E6A63]" />
+                            <span>複製行程</span>
+                          </>
+                        )}
+                      </button>
+
+                      {isCustom && onEditEvent && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditEvent(m);
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4B483]/30 hover:bg-[#D4B483]/50 border border-[#D4B483] text-[#5A4228] text-[10px] font-sans font-bold transition shadow-2xs active:scale-95 cursor-pointer"
+                          title="編輯此自訂行程"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                          <span>編輯行程</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   // Generate 7-column calendar matrix safely
@@ -491,74 +798,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 </div>
 
                 {/* Future Schedule Preview (Planner Mode) */}
-                {pickedDayEvents.length > 0 && (
-                  <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
-                    <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
-                      <span className="flex items-center gap-1">
-                        <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
-                        <span>預排行程</span>
-                      </span>
-                      <span className="text-[10px] text-[#6E6A63]">
-                        {pickedDayEvents.length} 場行程
-                      </span>
-                    </div>
-                    {pickedDayEvents.map((m) => {
-                      const isCustom = m.source === 'local';
-                      return (
-                        <div
-                          key={m.id}
-                          onClick={() => {
-                            if (isCustom && onEditEvent) {
-                              onEditEvent(m);
-                            }
-                          }}
-                          className={`text-xs font-sans text-[#2D2D2D] flex items-center justify-between py-1 px-1.5 rounded-md transition ${
-                            isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
-                          }`}
-                          title={isCustom ? '點擊編輯此行程' : undefined}
-                        >
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                isCustom ? 'bg-[#D4B483]' : 'bg-[#6E6A63]'
-                              }`}
-                            />
-                            <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
-                              {formatEventTime(m)}
-                            </span>
-                            {m.calendarName && (
-                              <span
-                                className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[80px] truncate border"
-                                style={{
-                                  backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
-                                  borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
-                                  color: m.calendarColor || '#2D2D2D',
-                                }}
-                                title={m.calendarName}
-                              >
-                                {m.calendarName}
-                              </span>
-                            )}
-                            <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
-                            {m.reminders && m.reminders.length > 0 && (
-                              <span
-                                className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shrink-0"
-                                title={`已設定 ${m.reminders.length} 組提醒`}
-                              >
-                                🔔 x{m.reminders.length}
-                              </span>
-                            )}
-                            {isCustom && (
-                              <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
-                                <Edit2 className="w-2.5 h-2.5" /> 自訂
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                {renderEventsList(pickedDayEvents, true)}
               </div>
             ) : (
               /* Past or Today Preview: Mini Character Thumbnail + Main Quote + Subtext + 宜/忌 + Synced Events */
@@ -682,74 +922,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 </div>
 
                 {/* Day meetings */}
-                {pickedDayEvents.length > 0 && (
-                  <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1">
-                    <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
-                      <span className="flex items-center gap-1">
-                        <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
-                        <span>當日排定行程</span>
-                      </span>
-                      <span className="text-[10px] text-[#6E6A63]">
-                        {pickedDayEvents.length} 場行程
-                      </span>
-                    </div>
-                    {pickedDayEvents.map((m) => {
-                      const isCustom = m.source === 'local';
-                      return (
-                        <div
-                          key={m.id}
-                          onClick={() => {
-                            if (isCustom && onEditEvent) {
-                              onEditEvent(m);
-                            }
-                          }}
-                          className={`text-xs font-sans text-[#2D2D2D] flex items-center justify-between py-1 px-1.5 rounded-md transition ${
-                            isCustom ? 'hover:bg-[#EAE3D5] cursor-pointer' : ''
-                          }`}
-                          title={isCustom ? '點擊編輯此行程' : undefined}
-                        >
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                isCustom ? 'bg-[#D4B483]' : 'bg-[#C83E31]'
-                              }`}
-                            />
-                            <span className="text-[11px] text-[#6E6A63] shrink-0 font-mono font-bold">
-                              {formatEventTime(m)}
-                            </span>
-                            {m.calendarName && (
-                              <span
-                                className="text-[9px] px-1.5 py-0.2 rounded font-sans font-medium shrink-0 max-w-[80px] truncate border"
-                                style={{
-                                  backgroundColor: m.calendarColor ? `${m.calendarColor}18` : '#2D2D2D10',
-                                  borderColor: m.calendarColor ? `${m.calendarColor}50` : '#2D2D2D25',
-                                  color: m.calendarColor || '#2D2D2D',
-                                }}
-                                title={m.calendarName}
-                              >
-                                {m.calendarName}
-                              </span>
-                            )}
-                            <span className="truncate font-medium text-[#2D2D2D]">{m?.title || '未命名行程'}</span>
-                            {m.reminders && m.reminders.length > 0 && (
-                              <span
-                                className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold shrink-0"
-                                title={`已設定 ${m.reminders.length} 組提醒`}
-                              >
-                                🔔 x{m.reminders.length}
-                              </span>
-                            )}
-                            {isCustom && (
-                              <span className="text-[9px] px-1 rounded bg-[#D4B483]/20 text-[#785A3C] font-bold shrink-0 flex items-center gap-0.5">
-                                <Edit2 className="w-2.5 h-2.5" /> 自訂
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                {renderEventsList(pickedDayEvents, false)}
               </div>
             )}
 
