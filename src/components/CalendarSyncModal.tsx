@@ -16,6 +16,7 @@ import {
   Check,
   RefreshCw,
   ExternalLink,
+  Bell,
 } from 'lucide-react';
 import {
   CalendarMeeting,
@@ -32,6 +33,9 @@ import {
   fetchDeviceCalendars,
   getEnabledCalendarIds,
   saveEnabledCalendarIds,
+  sendTestNotificationViaBridge,
+  openExactAlarmSettingsViaBridge,
+  syncAllCalendarRemindersViaBridge,
 } from '../services/calendarService';
 
 interface CalendarSyncModalProps {
@@ -212,7 +216,8 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
       const meetings = await fetchNativeDeviceCalendarEvents();
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
-      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場會議行程。`);
+      syncAllCalendarRemindersViaBridge(meetings);
+      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場會議行程，並已為所有行程排定提醒通知。`);
     } catch (err: any) {
       setErrorMsg(err.message || '讀取手機行事曆失敗，請確認已授權日曆讀取權限。');
     } finally {
@@ -236,8 +241,9 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
       const meetings = await fetchLiveCalendarFeed(liveJsonUrl.trim());
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
+      syncAllCalendarRemindersViaBridge(meetings);
       const urlCount = liveJsonUrl.split(/[\r\n,;]+/).filter((u) => u.trim().length > 0).length;
-      setSuccessMsg(`🌐 日曆連線成功！已同步 ${urlCount} 個日曆網址來源，共抓取 ${meetings.length} 場行程。`);
+      setSuccessMsg(`🌐 日曆連線成功！已同步 ${urlCount} 個日曆網址來源，共抓取 ${meetings.length} 場行程，並已排定提醒通知。`);
     } catch (err: any) {
       setErrorMsg(err.message || '連線失敗，請確認日曆網址是否正確且公開可用。');
     } finally {
@@ -261,6 +267,17 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_SAMPLE);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
+  };
+
+  // Immediate Notification Test (3s)
+  const handleSendTestNotification = () => {
+    const success = sendTestNotificationViaBridge(3);
+    if (success) {
+      setSuccessMsg('🔔 測試提醒已排定！3 秒後將跳出帶有聲音與震動的社畜行程提醒，請稍候查看！');
+    } else {
+      setSuccessMsg('🔔 測試提醒已送出！若未出現，請至 Android 系統設定確認「通知」權限已開啟。');
+    }
+    setTimeout(() => setSuccessMsg(null), 5000);
   };
 
   // --- Custom Meeting Handlers ---
@@ -842,6 +859,33 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
               </div>
             </div>
           )}
+        </div>
+
+        {/* Notification Reminder & Test Card */}
+        <div className="mx-4 sm:mx-6 mb-3 p-3 rounded-2xl border border-[#2D2D2D]/15 bg-white/90 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+              <Bell className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-sans font-bold text-xs text-[#2D2D2D] truncate">
+                行程即時提醒（如同 Google 日曆）
+              </h4>
+              <p className="font-sans text-[11px] text-[#6E6A63] leading-tight">
+                行程開始前 10 分鐘自動跳出高優先級通知與社畜吐槽建議
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSendTestNotification}
+            className="px-3 py-1.5 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#2D2D2D] hover:text-[#FAF7F0] text-[#2D2D2D] text-xs font-sans font-bold transition cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0 shadow-2xs"
+            title="測試通知功能（3秒後發送）"
+          >
+            <Bell className="w-3.5 h-3.5 text-amber-600" />
+            <span>測試提醒 (3秒)</span>
+          </button>
         </div>
 
         {/* Footer */}

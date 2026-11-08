@@ -1,11 +1,15 @@
 package com.ganhuacalendar.app;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
@@ -36,6 +40,17 @@ public class MainActivity extends BridgeActivity {
             );
             channel.setDescription("社畜行程提醒與專屬毒舌吐槽通知");
             channel.enableVibration(true);
+            channel.setVibrationPattern(new long[]{0, 250, 150, 250});
+            channel.setShowBadge(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                .build();
+            channel.setSound(defaultSoundUri, audioAttributes);
+
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);

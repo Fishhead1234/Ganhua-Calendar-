@@ -2028,6 +2028,51 @@ export function cancelEventNotificationsViaBridge(eventId: string): void {
   }
 }
 
+/**
+ * Sync and schedule reminders for ALL upcoming calendar events (Google / BSKL / SchoolsBuddy / Custom)
+ */
+export function syncAllCalendarRemindersViaBridge(meetings: CalendarMeeting[]): void {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.syncAllEventReminders) {
+      if (!meetings || meetings.length === 0) return;
+      const todayKey = toLocalDateKey(new Date());
+      // Filter upcoming events from today up to next 14 days
+      const upcoming = meetings.filter((m) => !m.dateKey || m.dateKey >= todayKey);
+      (window as any).AndroidCalendarBridge.syncAllEventReminders(JSON.stringify(upcoming));
+    }
+  } catch (err) {
+    console.warn('Failed to sync all event reminders via bridge:', err);
+  }
+}
+
+/**
+ * Send an immediate test notification via native AlarmManager
+ */
+export function sendTestNotificationViaBridge(delaySeconds: number = 3): boolean {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.sendTestNotification) {
+      return (window as any).AndroidCalendarBridge.sendTestNotification(delaySeconds);
+    }
+  } catch (err) {
+    console.warn('Failed to send test notification via bridge:', err);
+  }
+  return false;
+}
+
+/**
+ * Open Android system settings to grant exact alarm permission on Android 12+ (API 31+)
+ */
+export function openExactAlarmSettingsViaBridge(): boolean {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.openExactAlarmSettings) {
+      return (window as any).AndroidCalendarBridge.openExactAlarmSettings();
+    }
+  } catch (err) {
+    console.warn('Failed to open exact alarm settings:', err);
+  }
+  return false;
+}
+
 export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
   const [y, m, d] = e.dateKey.split('-').map(Number);
   const dateObj = new Date(y, (m || 1) - 1, d || 1);

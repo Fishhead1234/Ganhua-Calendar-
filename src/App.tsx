@@ -46,6 +46,8 @@ import {
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
   pushEventToGoogleAppsScript,
+  syncAllCalendarRemindersViaBridge,
+  sendTestNotificationViaBridge,
 } from './services/calendarService';
 
 const STORAGE_KEY = 'ganhua_calendar_state_v3';
@@ -407,7 +409,7 @@ export const App: React.FC = () => {
     }
   }, [isBirthday, isToday]);
 
-  // Sync to native Android widget whenever quote or streak updates
+  // Sync to native Android widget & schedule calendar alarms whenever quote or appointments update
   useEffect(() => {
     if (currentQuote) {
       syncNativeWidgetData(
@@ -418,6 +420,9 @@ export const App: React.FC = () => {
         effectiveMeetings,
         allAppointments
       );
+    }
+    if (allAppointments && allAppointments.length > 0) {
+      syncAllCalendarRemindersViaBridge(allAppointments);
     }
   }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings, allAppointments]);
 
