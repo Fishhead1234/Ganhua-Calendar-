@@ -667,7 +667,6 @@ public class AndroidCalendarBridge {
             return "{\"error\": \"" + e.getMessage() + "\"}";
         }
     }
-    }
 
     /**
      * Cancel all active reminder notifications for an event
