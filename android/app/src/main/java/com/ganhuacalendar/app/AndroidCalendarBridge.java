@@ -730,45 +730,67 @@ public class AndroidCalendarBridge {
                 shareFile
             );
 
-            PackageManager pm = context.getPackageManager();
+            // Grant read permission explicitly to Instagram
+            try {
+                context.grantUriPermission("com.instagram.android", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } catch (Exception ignored) {}
 
-            // 1. Direct to Instagram Story
-            Intent storyIntent = new Intent("com.instagram.share.ADD_TO_STORY");
-            storyIntent.setDataAndType(contentUri, "image/png");
-            storyIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            if (storyIntent.resolveActivity(pm) != null) {
+            // 1. Direct Instagram Story Intent
+            try {
+                Intent storyIntent = new Intent("com.instagram.share.ADD_TO_STORY");
+                storyIntent.setDataAndType(contentUri, "image/png");
+                storyIntent.putExtra("source_application", context.getPackageName());
+                storyIntent.setPackage("com.instagram.android");
+                storyIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(storyIntent);
                 return true;
+            } catch (Exception e1) {
+                // If story intent fails, continue to feed/direct intent
             }
 
-            // 2. Direct to Instagram Feed / Post
-            Intent igSendIntent = new Intent(Intent.ACTION_SEND);
-            igSendIntent.setType("image/png");
-            igSendIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-            if (caption != null && !caption.isEmpty()) {
-                igSendIntent.putExtra(Intent.EXTRA_TEXT, caption);
-            }
-            igSendIntent.setPackage("com.instagram.android");
-            igSendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            if (igSendIntent.resolveActivity(pm) != null) {
+            // 2. Direct Instagram Post / Share (ACTION_SEND targeting com.instagram.android)
+            try {
+                Intent igSendIntent = new Intent(Intent.ACTION_SEND);
+                igSendIntent.setType("image/png");
+                igSendIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                if (caption != null && !caption.isEmpty()) {
+                    igSendIntent.putExtra(Intent.EXTRA_TEXT, caption);
+                }
+                igSendIntent.setPackage("com.instagram.android");
+                igSendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(igSendIntent);
                 return true;
+            } catch (Exception e2) {
+                // If package intent fails, continue
             }
 
-            // 3. Fallback: Native system share sheet with Instagram and other social apps
-            Intent chooserIntent = new Intent(Intent.ACTION_SEND);
-            chooserIntent.setType("image/png");
-            chooserIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-            if (caption != null && !caption.isEmpty()) {
-                chooserIntent.putExtra(Intent.EXTRA_TEXT, caption);
+            // 3. Fallback: Instagram Deep-link URI scheme
+            try {
+                Intent igUriIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("instagram://story-camera"));
+                igUriIntent.setPackage("com.instagram.android");
+                igUriIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(igUriIntent);
+                return true;
+            } catch (Exception e3) {
+                // If scheme fails, continue to chooser
             }
-            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Intent chooser = Intent.createChooser(chooserIntent, "分享幹話日曆");
-            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(chooser);
-            return true;
+
+            // 4. Fallback: Native system share chooser
+            try {
+                Intent chooserIntent = new Intent(Intent.ACTION_SEND);
+                chooserIntent.setType("image/png");
+                chooserIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                if (caption != null && !caption.isEmpty()) {
+                    chooserIntent.putExtra(Intent.EXTRA_TEXT, caption);
+                }
+                chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent chooser = Intent.createChooser(chooserIntent, "分享至 Instagram");
+                chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(chooser);
+                return true;
+            } catch (Exception e4) {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;

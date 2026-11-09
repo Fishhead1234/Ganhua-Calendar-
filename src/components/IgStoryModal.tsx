@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Download, Copy, Check, Share2, Sparkles, Lock } from 'lucide-react';
+import { X, Share2, Sparkles, Lock, Check } from 'lucide-react';
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { REFERENCE_CROP_MAP } from './CharacterIllustration';
 import { parseQuoteDateDisplay } from './DeskCalendarCard';
@@ -31,7 +31,6 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
 }) => {
   const [bgStyle, setBgStyle] = useState<StoryBgStyle>('wood');
   const [isExporting, setIsExporting] = useState(false);
-  const [copiedImg, setCopiedImg] = useState(false);
 
   if (!isOpen) return null;
 
@@ -238,41 +237,6 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
     return canvas;
   };
 
-  const handleDownloadStoryPng = async () => {
-    setIsExporting(true);
-    try {
-      const canvas = await renderStoryCanvas();
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `幹話日曆_${quote.date}_${quote.character}${isPro ? '_Pro' : ''}.png`;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleCopyStoryImage = async () => {
-    setIsExporting(true);
-    try {
-      const canvas = await renderStoryCanvas();
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          setCopiedImg(true);
-          setTimeout(() => setCopiedImg(false), 2500);
-        } catch {
-          handleDownloadStoryPng();
-        }
-      }, 'image/png');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const handleShareToInstagram = async () => {
     setIsExporting(true);
     try {
@@ -280,17 +244,18 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
       const dataUrl = canvas.toDataURL('image/png');
       const caption = `🔥 今日平安生還！連續生還 ${streakCount} 天 • #幹話日曆 #${charMeta.nameZh}`;
 
-      // 1. Android Capacitor WebView native bridge (Calls direct Instagram Story / Feed Intent)
+      // 1. Android Native Bridge (Direct Instagram Story / Feed Intent via FileProvider)
       const bridge = (window as any).AndroidCalendarBridge;
       if (bridge && typeof bridge.shareToInstagram === 'function') {
         const handled = bridge.shareToInstagram(dataUrl, caption);
         if (handled) {
-          if (onShowToast) onShowToast('📸 已為您開啟 Instagram！');
+          if (onShowToast) onShowToast('📸 已為您開啟 Instagram 發布！');
+          onClose();
           return;
         }
       }
 
-      // 2. Web Share API with File (Mobile Chrome on Android / Safari on iOS)
+      // 2. Mobile Web Share API with File (Chrome on Android / Safari on iOS)
       if (navigator.canShare) {
         try {
           const blob = await new Promise<Blob | null>((resolve) =>
@@ -305,6 +270,7 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
                 text: caption,
               });
               if (onShowToast) onShowToast('✨ 已開啟分享面板');
+              onClose();
               return;
             }
           }
@@ -315,31 +281,18 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
         }
       }
 
-      // 3. Fallback: Copy to clipboard and launch Instagram App via URL scheme
-      try {
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve, 'image/png')
-        );
-        if (blob && navigator.clipboard && navigator.clipboard.write) {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          setCopiedImg(true);
-          setTimeout(() => setCopiedImg(false), 2500);
-        }
-      } catch {
-        // clipboard error
-      }
-
-      // Attempt to launch Instagram app story camera or feed
+      // 3. Fallback: Launch Instagram App via URL scheme
       window.location.href = 'instagram://story-camera';
       setTimeout(() => {
         window.location.href = 'instagram://share';
       }, 600);
       if (onShowToast) {
-        onShowToast('📋 限動圖已複製到剪貼簿，正在為您開啟 Instagram...');
+        onShowToast('📸 正在為您開啟 Instagram...');
       }
+      onClose();
     } catch (err) {
       console.error('Share to Instagram error:', err);
-      await handleDownloadStoryPng();
+      if (onShowToast) onShowToast('開啟 Instagram 失敗，請確認已安裝 Instagram');
     } finally {
       setIsExporting(false);
     }
@@ -491,50 +444,17 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-2">
-            {/* 1. Primary Direct Instagram Launch & Share */}
+          {/* Action Button: Exclusive Instagram Share */}
+          <div className="pt-1">
             <button
               type="button"
               disabled={isExporting}
               onClick={handleShareToInstagram}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:opacity-95 text-white font-sans font-black text-sm shadow-md cursor-pointer transition active:scale-98"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:opacity-95 text-white font-sans font-black text-sm sm:text-base shadow-lg cursor-pointer transition active:scale-98 disabled:opacity-50"
             >
-              <Share2 className="w-4 h-4" />
-              <span>{isExporting ? '準備分享中...' : '📸 一鍵開啟 Instagram 發布'}</span>
+              <Share2 className="w-5 h-5" />
+              <span>{isExporting ? '準備分享中...' : '📸 分享至 Instagram 限時動態'}</span>
             </button>
-
-            {/* 2. Secondary Utility Buttons */}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                disabled={isExporting}
-                onClick={handleDownloadStoryPng}
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#F9F6F0] font-sans font-bold text-xs shadow-xs cursor-pointer transition active:scale-95"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>{isExporting ? '產生中...' : '下載高清圖'}</span>
-              </button>
-
-              <button
-                type="button"
-                disabled={isExporting}
-                onClick={handleCopyStoryImage}
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#2D2D2D]/20 bg-[#FAF7F0] hover:bg-[#F3EFE6] text-[#2D2D2D] font-sans font-bold text-xs cursor-pointer transition active:scale-95"
-              >
-                {copiedImg ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-700" />
-                    <span className="text-emerald-700">已複製！</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5 text-[#6E6A63]" />
-                    <span>複製圖片</span>
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       </div>

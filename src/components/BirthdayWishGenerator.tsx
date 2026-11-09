@@ -246,3 +246,4 @@ export const BirthdayWishGenerator: React.FC<BirthdayWishGeneratorProps> = ({
     </div>
   );
 };
+
