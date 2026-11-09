@@ -3,9 +3,9 @@
     android:description="@string/widget_desk_card_description"
     android:initialLayout="@layout/widget_desk_card"
     android:minWidth="250dp"
-    android:minHeight="310dp"
+    android:minHeight="380dp"
     android:minResizeWidth="200dp"
-    android:minResizeHeight="250dp"
+    android:minResizeHeight="300dp"
     android:maxResizeWidth="600dp"
     android:maxResizeHeight="800dp"
     android:targetCellWidth="4"
@@ -14,3 +14,4 @@
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen">
 </appwidget-provider>
+
