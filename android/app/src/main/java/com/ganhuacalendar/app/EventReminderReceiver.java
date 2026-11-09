@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -88,8 +90,14 @@ public class EventReminderReceiver extends BroadcastReceiver {
         String contentTitle = "🔔【" + reminderText + "】" + title;
         String contentText = (timeStr != null && !timeStr.isEmpty() ? timeStr + " • " : "") + roast;
 
+        Bitmap largeIcon = null;
+        try {
+            largeIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+        } catch (Exception ignored) {}
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REMINDERS)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setColor(0xFFC62828)
             .setContentTitle(contentTitle)
             .setContentText(contentText)
             .setStyle(new NotificationCompat.BigTextStyle()
@@ -102,6 +110,10 @@ public class EventReminderReceiver extends BroadcastReceiver {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setContentIntent(contentPendingIntent)
             .setAutoCancel(true);
+
+        if (largeIcon != null) {
+            builder.setLargeIcon(largeIcon);
+        }
 
         notificationManager.notify(notifId, builder.build());
     }
