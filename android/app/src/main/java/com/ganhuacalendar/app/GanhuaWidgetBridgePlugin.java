@@ -54,6 +54,8 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             int meetingCount = call.getInt("meetingCount", 0);
             String survivedDatesJson = call.getString("survivedDatesJson", "[]");
             String eventsJson = call.getString("eventsJson", "[]");
+            String lastTornToDate = call.getString("lastTornToDate", "");
+            boolean isTodayUnlocked = Boolean.TRUE.equals(call.getBoolean("isTodayUnlocked", false));
 
             SharedPreferences prefs = getContext().getSharedPreferences(
                     GanhuaWidgetProvider.PREFS_NAME,
@@ -73,6 +75,8 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             if (!offworkStr.isEmpty()) editor.putString("offwork_str", offworkStr);
             if (!streakStr.isEmpty()) editor.putString("streak_str", streakStr);
             if (!characterKey.isEmpty()) editor.putString("character_key", characterKey);
+            if (!lastTornToDate.isEmpty()) editor.putString("last_torn_to_date", lastTornToDate);
+            editor.putBoolean("is_today_unlocked", isTodayUnlocked);
             editor.putInt("meeting_count", meetingCount);
             if (!survivedDatesJson.isEmpty()) editor.putString("survived_dates_json", survivedDatesJson);
             if (eventsJson != null && !eventsJson.isEmpty()) editor.putString("events_json", eventsJson);
@@ -99,10 +103,11 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
 
             editor.apply();
 
-            // Refresh all 3 widget types placed on Android Home Screen
+            // Refresh all 4 widget types placed on Android Home Screen
             GanhuaWidgetProvider.updateAllWidgets(getContext());
             MonthlySplitWidgetProvider.updateAllWidgets(getContext());
             MonthlyLargeWidgetProvider.updateAllWidgets(getContext());
+            DeskCardWidgetProvider.updateAllWidgets(getContext());
 
             JSObject res = new JSObject();
             res.put("success", true);
@@ -110,6 +115,23 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
         } catch (Exception e) {
             call.reject("Failed to update widget: " + e.getMessage(), e);
         }
+    }
+
+    @PluginMethod
+    public void getPendingTornSync(PluginCall call) {
+        SharedPreferences prefs = getContext().getSharedPreferences(
+                GanhuaWidgetProvider.PREFS_NAME,
+                Context.MODE_PRIVATE
+        );
+        boolean hasPending = prefs.getBoolean("has_pending_torn_sync", false);
+        String lastTorn = prefs.getString("last_torn_to_date", "");
+        if (hasPending) {
+            prefs.edit().putBoolean("has_pending_torn_sync", false).apply();
+        }
+        JSObject ret = new JSObject();
+        ret.put("hasPending", hasPending);
+        ret.put("lastTornToDate", lastTorn);
+        call.resolve(ret);
     }
 
     @PluginMethod

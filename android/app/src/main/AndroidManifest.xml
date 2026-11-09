@@ -94,6 +94,23 @@
                 android:resource="@xml/widget_monthly_large_info" />
         </receiver>
 
+        <!-- Native Android Desk Calendar Tear-Off Card Widget Provider (4x5 Resizable) -->
+        <receiver
+            android:name=".DeskCardWidgetProvider"
+            android:label="@string/widget_label_desk_card"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.ganhuacalendar.app.ACTION_DESK_PREV_DAY" />
+                <action android:name="com.ganhuacalendar.app.ACTION_DESK_TEAR_NEXT" />
+                <action android:name="com.ganhuacalendar.app.ACTION_DESK_STAMP" />
+                <action android:name="com.ganhuacalendar.app.ACTION_DESK_LOCKED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_desk_card_info" />
+        </receiver>
+
         <!-- Native Android Survival Stamp Widget Provider (1x1 One-Tap Stamp) -->
         <receiver
             android:name=".SurvivalStampWidgetProvider"

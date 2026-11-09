@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_desk_card_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="2dp"
+    android:background="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/iv_desk_card_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/widget_label_desk_card" />
+
+    <!-- Interactive Touch Overlay strictly aligned with 800x1000 canvas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1000"
+        android:background="@android:color/transparent">
+
+        <!-- Top Binder Bar (Height 70 / 1000) - Tap to launch app -->
+        <FrameLayout
+            android:id="@+id/desk_top_binder_touch"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="70"
+            android:clickable="true"
+            android:background="@android:color/transparent" />
+
+        <!-- Perforated Tear Strip (Height 78 / 1000) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="78"
+            android:orientation="horizontal"
+            android:weightSum="800">
+
+            <!-- Prev Day Button [ < 前一日 ] (Width 220 / 800) -->
+            <FrameLayout
+                android:id="@+id/btn_desk_prev_day"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="220"
+                android:clickable="true"
+                android:background="@android:color/transparent" />
+
+            <!-- Center spacer / strip label (Width 220 / 800) -->
+            <FrameLayout
+                android:id="@+id/desk_strip_center_touch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="220"
+                android:clickable="true"
+                android:background="@android:color/transparent" />
+
+            <!-- Tear Next Button [ ✂️ 點擊撕頁解鎖 ↘ ] or [ 🔒 明日封印中 ] (Width 360 / 800) -->
+            <FrameLayout
+                android:id="@+id/btn_desk_tear_action"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="360"
+                android:clickable="true"
+                android:background="@android:color/transparent" />
+        </LinearLayout>
+
+        <!-- Date Header (Height 125 / 1000) - Tap to open calendar -->
+        <FrameLayout
+            android:id="@+id/desk_date_header_touch"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="125"
+            android:clickable="true"
+            android:background="@android:color/transparent" />
+
+        <!-- Center Illustration & Stamp Area (Height 372 / 1000) -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="372"
+            android:background="@android:color/transparent">
+
+            <!-- Base touch: tap illustration to open app -->
+            <FrameLayout
+                android:id="@+id/desk_illustration_touch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:background="@android:color/transparent" />
+
+            <!-- Circular Stamp Touch Area in bottom-right corner -->
+            <FrameLayout
+                android:id="@+id/btn_desk_stamp"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="6dp"
+                android:layout_marginBottom="4dp"
+                android:clickable="true"
+                android:background="@android:color/transparent" />
+        </RelativeLayout>
+
+        <!-- Daily Quote & Subtext (Height 185 / 1000) -->
+        <FrameLayout
+            android:id="@+id/desk_quote_touch"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="185"
+            android:clickable="true"
+            android:background="@android:color/transparent" />
+
+        <!-- 社畜農民曆 & Synced Agenda Strip (Height 170 / 1000) -->
+        <FrameLayout
+            android:id="@+id/btn_desk_agenda"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="170"
+            android:clickable="true"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+</FrameLayout>

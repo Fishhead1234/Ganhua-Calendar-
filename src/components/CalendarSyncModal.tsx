@@ -577,7 +577,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
           <span className="text-base shrink-0">📱</span>
           <div className="text-[11px] font-sans text-[#4A463F] leading-relaxed">
             <div className="font-bold text-[#2D2D2D] mb-0.5">桌面小工具 (Widgets) 新增方式：</div>
-            在手機主畫面長按空白處 → 點選「小工具/微件」→ 選擇「幹話日曆」即可新增 1×1 打卡章、4×2 與 4×4 農曆月曆。
+            在手機主畫面長按空白處 → 點選「小工具/微件」→ 選擇「幹話日曆」即可新增 4×5 擬真撕頁桌曆、1×1 打卡章、4×2 與 4×4 農曆月曆。
           </div>
         </div>
 

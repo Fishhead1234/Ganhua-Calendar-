@@ -696,6 +696,21 @@ export const App: React.FC = () => {
       }).catch(() => {});
     }
 
+    // Read pending torn status from 4x5 Desk Card Widget
+    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingTornSync) {
+      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingTornSync().then((res: any) => {
+        if (res?.lastTornToDate) {
+          try {
+            localStorage.setItem('last_torn_to_date', res.lastTornToDate);
+            const todayKey = toLocalDateKey(new Date());
+            if (res.lastTornToDate === todayKey) {
+              setIsTodayUnlocked(true);
+            }
+          } catch {}
+        }
+      }).catch(() => {});
+    }
+
     // Check URL parameters (?select_date=YYYY-MM-DD)
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);

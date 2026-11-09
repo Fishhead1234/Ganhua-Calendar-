@@ -1,6 +1,7 @@
 import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { parseQuoteDateDisplay } from '../components/DeskCalendarCard';
 import { getLunarDetails } from '../utils/lunarUtils';
+import { toLocalDateKey } from '../utils/dateUtils';
 import { CalendarMeeting } from './calendarService';
 
 async function extractSpriteAvatarBase64(
@@ -130,6 +131,10 @@ export async function syncNativeWidgetData(
   // Dynamically crop the exact scene illustration for today's quote
   const avatarBase64 = await extractSpriteAvatarBase64(quote.spriteSheet, quote.spritePosition);
 
+  const lastTornToDate = typeof window !== 'undefined' ? (localStorage.getItem('last_torn_to_date') || '') : '';
+  const todayKeyStr = toLocalDateKey(new Date());
+  const isTodayUnlocked = lastTornToDate === todayKeyStr;
+
   const payload = {
     monthStr: `${dateInfo.monthEn} • ${dateInfo.weekdayEn}`,
     dayStr: String(dateInfo.dayNumber),
@@ -148,6 +153,8 @@ export async function syncNativeWidgetData(
     survivedDatesJson: JSON.stringify(survivedDates || []),
     eventsJson: JSON.stringify(allMeetings && allMeetings.length > 0 ? allMeetings : (activeMeetings || [])),
     avatarBase64: avatarBase64 || '',
+    lastTornToDate,
+    isTodayUnlocked,
   };
 
   // 1. Sync to native Android widget via Capacitor Plugin Bridge
@@ -168,4 +175,23 @@ export async function syncNativeWidgetData(
   }
 
   return false;
+}
+
+export async function checkPendingTornSync(): Promise<string | null> {
+  const isNative =
+    typeof window !== 'undefined' &&
+    (window as any).Capacitor &&
+    (window as any).Capacitor.isNativePlatform();
+
+  if (isNative && (window as any).Capacitor.Plugins?.GanhuaWidgetBridge) {
+    try {
+      const res = await (window as any).Capacitor.Plugins.GanhuaWidgetBridge.getPendingTornSync();
+      if (res?.hasPending && res.lastTornToDate) {
+        return res.lastTornToDate;
+      }
+    } catch (e) {
+      console.warn('Checking pending torn sync error:', e);
+    }
+  }
+  return null;
 }
