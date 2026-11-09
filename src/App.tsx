@@ -604,7 +604,7 @@ export const App: React.FC = () => {
           ...prev,
           dateOffset: -1,
         }));
-        showToast('✂️ 親手撕下昨日日曆，正式開啟今天！');
+        showToast('✂️ 請親手撕下昨日日曆，正式開啟今天！');
         return;
       }
       setPersisted((prev) => ({
@@ -718,7 +718,7 @@ export const App: React.FC = () => {
     if (!unlocked) {
       // If Today is NOT unlocked yet, route to yesterday so the user gets to tear it off
       setPersisted((prev) => ({ ...prev, dateOffset: -1 }));
-      showToast('✂️ 親手撕下昨日日曆，正式開啟今天！');
+      showToast('✂️ 請親手撕下昨日日曆，正式開啟今天！');
     } else {
       setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
       showToast('已返回今日日曆！');

@@ -1,11 +1,13 @@
-// Synthesized Web Audio API sound effects for paper tear-off, locked bounce, and wooden ink stamp
+// Real Paper-Tearing Audio Engine & Web Audio Sound Effects
 
 let audioCtx: AudioContext | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (Ctx) {
       audioCtx = new Ctx();
     }
@@ -32,56 +34,159 @@ export function toggleSoundEnabled(): boolean {
   return next;
 }
 
-/**
- * 1. Realistic Paper-Tear Sound Synthesizer
- * 0.28s white noise through BiquadFilter (bandpass 900Hz -> 2800Hz) with exponential gain envelope
- * + Android Haptic feedback: [15, 25, 40]
- */
-export function playPaperTearSound(): void {
-  try {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([15, 25, 40]);
-    }
-    if (!isSoundEnabled()) return;
+// -------------------------------------------------------------
+// Real Audio File Preloader & Engine for Paper Tearing
+// -------------------------------------------------------------
 
+const REAL_TEAR_SOUND_PATHS = [
+  '/assets/sounds/paper_tear_crisp.wav',
+  '/assets/sounds/paper_tear_perforated.wav',
+  '/assets/sounds/paper_tear_thick.wav',
+];
+
+let preloadedAudioClips: HTMLAudioElement[] = [];
+let currentAudioClipIndex = 0;
+
+export function preloadPaperTearSounds(): void {
+  if (typeof window === 'undefined') return;
+  if (preloadedAudioClips.length > 0) return;
+
+  preloadedAudioClips = REAL_TEAR_SOUND_PATHS.map((path) => {
+    const audio = new Audio(path);
+    audio.preload = 'auto';
+    return audio;
+  });
+}
+
+// Initialize preloader immediately on browser execution
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    preloadPaperTearSounds();
+  } else {
+    window.addEventListener('DOMContentLoaded', preloadPaperTearSounds, { once: true });
+  }
+}
+
+/**
+ * Fallback Web Audio Synthesizer:
+ * Generates discrete accelerating micro-impulse bursts (25 impulses accelerating over 0.38s)
+ * routed through a 500Hz paper-body resonance filter + 1200Hz -> 3600Hz sweeping bandpass filter.
+ */
+function playSynthesizedPaperTear(): void {
+  try {
     const ctx = getAudioContext();
     if (!ctx) return;
 
-    const duration = 0.28;
-    const bufferSize = Math.floor(ctx.sampleRate * duration);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const duration = 0.38;
+    const sampleRate = ctx.sampleRate;
+    const bufferSize = Math.floor(sampleRate * duration);
+    const buffer = ctx.createBuffer(1, bufferSize, sampleRate);
     const data = buffer.getChannelData(0);
 
-    // Textured paper tear fiber noise with micro-crinkle modulation
-    for (let i = 0; i < bufferSize; i++) {
-      const progress = i / bufferSize;
-      const grain = Math.sin(i * 0.22) * 0.4 + 0.6;
-      // Crisp initial attack and exponential tear decay
-      const envelope = progress < 0.08 ? progress / 0.08 : Math.pow(1 - (progress - 0.08) / 0.92, 1.55);
-      data[i] = (Math.random() * 2 - 1) * envelope * grain;
+    const totalImpulses = 25;
+    // 25 discrete accelerating impulses (starts slower, accelerates as paper rips across)
+    const impulseIndices: number[] = [];
+    for (let k = 0; k < totalImpulses; k++) {
+      const progress = Math.pow(k / (totalImpulses - 1), 1.6);
+      const sampleIdx = Math.min(bufferSize - 1, Math.floor(progress * (bufferSize - 1)));
+      impulseIndices.push(sampleIdx);
     }
 
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
+    // Add fiber-snap micro-impulses
+    for (let k = 0; k < impulseIndices.length; k++) {
+      const center = impulseIndices[k];
+      const burstLength = Math.floor(sampleRate * 0.0035);
+      const impulseAmp = 0.6 + 0.4 * (k / totalImpulses);
+      for (let j = 0; j < burstLength; j++) {
+        const idx = center + j;
+        if (idx < bufferSize) {
+          const env = Math.exp(-j / (sampleRate * 0.0009));
+          const noise = Math.random() * 2 - 1;
+          data[idx] += noise * env * impulseAmp;
+        }
+      }
+    }
 
-    // Bandpass filter sweeping up like tearing paper fibers (900Hz -> 2800Hz)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(900, ctx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(2800, ctx.currentTime + duration);
-    filter.Q.setValueAtTime(2.2, ctx.currentTime);
+    // Clamp within [-1, 1]
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.max(-1, Math.min(1, data[i]));
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    // Filter 1: 500Hz paper-body filter
+    const bodyFilter = ctx.createBiquadFilter();
+    bodyFilter.type = 'peaking';
+    bodyFilter.frequency.setValueAtTime(500, ctx.currentTime);
+    bodyFilter.Q.setValueAtTime(1.8, ctx.currentTime);
+    bodyFilter.gain.setValueAtTime(6.0, ctx.currentTime);
+
+    // Filter 2: Sweeping bandpass filter (1200Hz -> 3600Hz)
+    const bandpassFilter = ctx.createBiquadFilter();
+    bandpassFilter.type = 'bandpass';
+    bandpassFilter.frequency.setValueAtTime(1200, ctx.currentTime);
+    bandpassFilter.frequency.exponentialRampToValueAtTime(3600, ctx.currentTime + duration);
+    bandpassFilter.Q.setValueAtTime(2.2, ctx.currentTime);
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.38, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.005, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(0.75, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
 
-    noise.connect(filter);
-    filter.connect(gain);
+    source.connect(bodyFilter);
+    bodyFilter.connect(bandpassFilter);
+    bandpassFilter.connect(gain);
     gain.connect(ctx.destination);
 
-    noise.start();
+    source.start();
   } catch {
-    // Ignore audio context restrictions if not yet interacted
+    // Ignore audio context restrictions
+  }
+}
+
+/**
+ * 1. Real Paper-Tearing Audio Engine
+ * Plays real audio recording from /assets/sounds/ (rotating through crisp, perforated, and thick)
+ * with 3-step perforated tear haptic pattern [12, 18, 15, 20, 45].
+ * Falls back to 25-impulse accelerating Web Audio synthesizer if audio.play() fails.
+ */
+export function playPaperTearSound(): void {
+  try {
+    // Perforated 3-step tear haptic pattern
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try {
+        navigator.vibrate([12, 18, 15, 20, 45]);
+      } catch {}
+    }
+
+    if (!isSoundEnabled()) return;
+
+    if (preloadedAudioClips.length === 0) {
+      preloadPaperTearSounds();
+    }
+
+    if (preloadedAudioClips.length > 0) {
+      const audio = preloadedAudioClips[currentAudioClipIndex % preloadedAudioClips.length];
+      currentAudioClipIndex = (currentAudioClipIndex + 1) % preloadedAudioClips.length;
+
+      if (audio) {
+        audio.currentTime = 0;
+        audio.volume = 0.9;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Fall back to Web Audio discrete impulse synthesizer
+            playSynthesizedPaperTear();
+          });
+        }
+        return;
+      }
+    }
+
+    // Fallback if no audio elements available
+    playSynthesizedPaperTear();
+  } catch {
+    playSynthesizedPaperTear();
   }
 }
 
