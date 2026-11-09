@@ -1,40 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { toLocalDateKey } from '../utils/dateUtils';
 import {
   X,
   Calendar as CalendarIcon,
   Sparkles,
   Smartphone,
   Globe,
-  Plus,
   Trash2,
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
-  Zap,
   Copy,
   Check,
   RefreshCw,
-  ExternalLink,
   Bell,
 } from 'lucide-react';
 import {
   CalendarMeeting,
   CalendarRoastResult,
-  SCENARIO_PRESETS,
   GOOGLE_APPS_SCRIPT_SAMPLE,
   analyzeCalendarEvents,
   fetchNativeDeviceCalendarEvents,
-  fetchLiveJsonCalendarEvents,
   fetchLiveCalendarFeed,
-  saveCustomEvent,
-  deleteCustomEvent,
   DeviceCalendarSource,
   fetchDeviceCalendars,
   getEnabledCalendarIds,
   saveEnabledCalendarIds,
-  sendTestNotificationViaBridge,
-  openExactAlarmSettingsViaBridge,
   syncAllCalendarRemindersViaBridge,
 } from '../services/calendarService';
 import { APP_VERSION } from '../constants/version';
@@ -52,6 +42,7 @@ interface CalendarSyncModalProps {
   isSyncing?: boolean;
   onForceResync?: () => Promise<void> | void;
   onRemoveSync?: () => void;
+  onUnlockDevMode?: () => void;
 }
 
 export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
@@ -67,16 +58,15 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   isSyncing,
   onForceResync,
   onRemoveSync,
+  onUnlockDevMode,
 }) => {
   const isNative =
     typeof window !== 'undefined' &&
     (window as any).Capacitor &&
     (window as any).Capacitor.isNativePlatform();
 
-  // Default to native tab if running on APK, otherwise presets or live JSON
-  const [activeTab, setActiveTab] = useState<'presets' | 'native' | 'live_json' | 'custom'>(() => {
-    return isNative ? 'native' : 'presets';
-  });
+  // Tab 1: Native Phone Calendar Sync, Tab 2: Universal iCal/URL feed
+  const [activeTab, setActiveTab] = useState<'native' | 'live_json'>('native');
 
   const [liveJsonUrl, setLiveJsonUrl] = useState(() => {
     return (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : '') || '';
@@ -86,6 +76,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [versionTapCount, setVersionTapCount] = useState(0);
 
   // Multi-Calendar Checklist State
   const [deviceCalendars, setDeviceCalendars] = useState<DeviceCalendarSource[]>([]);
@@ -197,11 +188,18 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     onClose();
   };
 
-  // Custom Meeting Form State
-  const [newTitle, setNewTitle] = useState('');
-  const [newHour, setNewHour] = useState(14);
-  const [newMinute, setNewMinute] = useState(0);
-  const [newDuration, setNewDuration] = useState(60);
+  const handleVersionClick = () => {
+    const next = versionTapCount + 1;
+    if (next >= 7) {
+      setVersionTapCount(0);
+      onUnlockDevMode?.();
+      setSuccessMsg('🛠️ 已解鎖開發者模式！底部角色切換器已開啟。');
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } else {
+      setVersionTapCount(next);
+      setTimeout(() => setVersionTapCount(0), 3000);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -218,7 +216,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
       syncAllCalendarRemindersViaBridge(meetings);
-      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場會議行程，並已為所有行程排定提醒通知。`);
+      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場行程，並已排定提醒通知。`);
     } catch (err: any) {
       setErrorMsg(err.message || '讀取手機行事曆失敗，請確認已授權日曆讀取權限。');
     } finally {
@@ -252,17 +250,6 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     }
   };
 
-  // --- Method 3: 1-Click Test Scenario Presets ---
-  const handleApplyPreset = (presetId: string) => {
-    const preset = SCENARIO_PRESETS.find((p) => p.id === presetId);
-    if (!preset) return;
-    setErrorMsg(null);
-    onUpdateMeetings(preset.events, preset.id);
-    onToggleConnected(true);
-    setSuccessMsg(`⚡ 已切換為【${preset.label}】情境！`);
-    setTimeout(() => setSuccessMsg(null), 2500);
-  };
-
   // Copy sample GAS script to clipboard
   const handleCopyGasSample = () => {
     navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_SAMPLE);
@@ -270,72 +257,11 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  // Immediate Notification Test (3s)
-  const handleSendTestNotification = () => {
-    const success = sendTestNotificationViaBridge(3);
-    if (success) {
-      setSuccessMsg('🔔 測試提醒已排定！3 秒後將跳出帶有聲音與震動的社畜行程提醒，請稍候查看！');
-    } else {
-      setSuccessMsg('🔔 測試提醒已送出！若未出現，請至 Android 系統設定確認「通知」權限已開啟。');
-    }
-    setTimeout(() => setSuccessMsg(null), 5000);
-  };
-
-  // --- Custom Meeting Handlers ---
-  const handleAddCustomMeeting = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
-
-    const todayStr = toLocalDateKey(new Date());
-    const isFridayAfterFour =
-      new Date().getDay() === 5 && (newHour >= 16 || (newHour === 15 && newMinute >= 45));
-
-    const sH = Number(newHour);
-    const sM = Number(newMinute);
-    const dur = Number(newDuration);
-
-    const newMeeting: CalendarMeeting = {
-      id: `custom-${Date.now()}`,
-      title: newTitle.trim(),
-      startHour: sH,
-      startMinute: sM,
-      durationMinutes: dur,
-      isFridayAfterFour,
-      dateKey: todayStr,
-      source: 'local',
-    };
-
-    saveCustomEvent({
-      id: newMeeting.id,
-      title: newMeeting.title,
-      dateKey: todayStr,
-      startHour: sH,
-      startMinute: sM,
-      durationMinutes: dur,
-      isAllDay: false,
-      source: 'local',
-      createdAt: Date.now(),
-    });
-
-    onUpdateMeetings([...activeMeetings, newMeeting], null);
-    onToggleConnected(true);
-    setNewTitle('');
-    setSuccessMsg('會議已新增至今日清單！');
-    setTimeout(() => setSuccessMsg(null), 2000);
-  };
-
-  const handleDeleteMeeting = (id: string) => {
-    deleteCustomEvent(id);
-    onUpdateMeetings(
-      activeMeetings.filter((m) => m.id !== id),
-      null
-    );
-  };
-
   const handleClearAll = () => {
     onUpdateMeetings([], null);
     onToggleConnected(false);
-    setSuccessMsg('已清空所有會議與連動狀態，恢復常規日曆！');
+    setSuccessMsg('已清空所有行程與連動狀態，恢復常規日曆！');
+    setTimeout(() => setSuccessMsg(null), 2000);
   };
 
   return (
@@ -350,14 +276,14 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-serif font-black text-lg text-[#2D2D2D]">
-                  行事曆智能吐槽連動
+                  行事曆連動
                 </h3>
                 <span className="text-[10px] font-sans font-black px-2 py-0.5 rounded-full bg-[#D4B483] text-[#2D2D2D] border border-[#2D2D2D]/30">
                   PRO 專屬
                 </span>
               </div>
               <p className="text-xs font-sans text-[#6E6A63]">
-                原生手機日曆零登入同步・網頁即時 JSON 串接・5 大情境模擬
+                同步手機行事曆，讓日常行程自動轉換為專屬幹話
               </p>
             </div>
           </div>
@@ -388,61 +314,35 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
           </div>
         </div>
 
-        {/* 4 Mode Navigation Tabs */}
-        <div className="grid grid-cols-4 border-b border-[#2D2D2D]/20 bg-[#FAF7F0] text-[11px] font-sans font-bold text-center">
-          <button
-            type="button"
-            onClick={() => setActiveTab('presets')}
-            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 ${
-              activeTab === 'presets'
-                ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
-                : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
-            }`}
-          >
-            <span>⚡ 模擬情境</span>
-            <span className="text-[9px] opacity-75">(一鍵測試)</span>
-          </button>
-
+        {/* 2 Clean Mode Navigation Tabs */}
+        <div className="grid grid-cols-2 border-b border-[#2D2D2D]/20 bg-[#FAF7F0] text-xs font-sans font-bold text-center">
           <button
             type="button"
             onClick={() => setActiveTab('native')}
-            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 relative ${
+            className={`py-3 transition border-b-2 flex items-center justify-center gap-1.5 relative ${
               activeTab === 'native'
                 ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
                 : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
             }`}
           >
-            <span>📱 手機同步</span>
-            <span className="text-[9px] opacity-75">(APK 推薦)</span>
+            <span>📱 手機行事曆同步</span>
+            <span className="text-[10px] opacity-80">(原生直連)</span>
             {isNative && (
-              <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
             )}
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('live_json')}
-            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 ${
+            className={`py-3 transition border-b-2 flex items-center justify-center gap-1.5 ${
               activeTab === 'live_json'
                 ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
                 : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
             }`}
           >
-            <span>🌐 網址連動</span>
-            <span className="text-[9px] opacity-75">(SchoolsBuddy/iCal)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('custom')}
-            className={`py-2.5 transition border-b-2 flex flex-col items-center justify-center gap-0.5 ${
-              activeTab === 'custom'
-                ? 'border-[#C83E31] text-[#C83E31] bg-[#F9F6F0]'
-                : 'border-transparent text-[#6E6A63] hover:text-[#2D2D2D]'
-            }`}
-          >
-            <span>✏️ 自訂行程</span>
-            <span className="text-[9px] opacity-75">({activeMeetings.length})</span>
+            <span>🌐 網址訂閱 (iCal)</span>
+            <span className="text-[10px] opacity-80">(外部/學校)</span>
           </button>
         </div>
 
@@ -463,63 +363,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 1: 5 Quick Test Presets (Mode C) */}
-          {activeTab === 'presets' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-sans font-bold text-[#2D2D2D] flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-[#C83E31]" />
-                  <span>⚡ 快速預覽情境 (測試用)</span>
-                </span>
-                <span className="text-[10px] font-sans text-[#6E6A63]">點擊立即觸發毒舌吐槽與專屬插畫</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {SCENARIO_PRESETS.map((preset) => {
-                  const isCurrent = activePresetId === preset.id;
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => handleApplyPreset(preset.id)}
-                      className={`p-3 rounded-2xl text-left border-2 transition cursor-pointer flex flex-col justify-between ${
-                        isCurrent
-                          ? 'bg-[#FAF7F0] border-[#C83E31] shadow-sm'
-                          : 'bg-white border-[#2D2D2D]/20 hover:border-[#2D2D2D]'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="font-serif font-black text-xs sm:text-sm text-[#2D2D2D]">
-                            {preset.label}
-                          </span>
-                          {isCurrent && (
-                            <span className="text-[10px] font-sans font-black px-1.5 py-0.5 rounded-md bg-[#C83E31] text-white">
-                              使用中
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs font-sans text-[#6E6A63] mt-1 line-clamp-2">
-                          {preset.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-2.5 pt-2 border-t border-[#2D2D2D]/10 flex items-center justify-between text-[10px] font-sans">
-                        <span className="text-[#C83E31] font-bold">
-                          {preset.events.length} 場會議
-                        </span>
-                        <span className="text-[#6E6A63]">
-                          觸發：{preset.badge}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: Native Android/iOS Phone Calendar Sync (Method 1) */}
+          {/* TAB 1: Native Android/iOS Phone Calendar Sync */}
           {activeTab === 'native' && (
             <div className="space-y-4">
               <div className="bg-white p-5 rounded-2xl border border-[#2D2D2D]/20 space-y-4 text-center">
@@ -556,7 +400,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                   <span>{isLoading ? '讀取行事曆中...' : '一鍵同步手機行事曆'}</span>
                 </button>
 
-                {/* Multi-Calendar Checklist & Auto-Activation */}
+                {/* Multi-Calendar Checklist */}
                 {deviceCalendars.length > 0 && (() => {
                   const enabledInList = deviceCalendars.filter((c) => enabledCalendarIds.includes(String(c.id)));
                   return (
@@ -643,17 +487,11 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                     </div>
                   );
                 })()}
-
-                {!isNative && (
-                  <p className="text-[11px] font-sans text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200">
-                    ⚠️ 偵測到您目前在電腦瀏覽器環境中。若要在電腦測試，建議切換至「🌐 即時 JSON」或「⚡ 模擬情境」分頁！
-                  </p>
-                )}
               </div>
             </div>
           )}
 
-          {/* TAB 3: Live Universal Calendar Feed (SchoolsBuddy / BSKL / iCal / webcal / GAS) */}
+          {/* TAB 2: Live Universal Calendar Feed (SchoolsBuddy / BSKL / iCal / webcal / GAS) */}
           {activeTab === 'live_json' && (
             <div className="space-y-4">
               <div className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3">
@@ -691,7 +529,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                   </div>
                 </div>
 
-                {/* Clear Explanations for SchoolsBuddy and iCal */}
+                {/* Explanations for SchoolsBuddy and iCal */}
                 <div className="pt-2 border-t border-[#2D2D2D]/15 space-y-2 text-xs font-sans text-[#6E6A63]">
                   <div className="font-bold text-[#2D2D2D]">🏫 支援的日曆來源說明：</div>
                   <ul className="space-y-1.5 text-[11px] leading-relaxed">
@@ -732,161 +570,30 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
               </div>
             </div>
           )}
-
-          {/* TAB 4: Custom Today's Meetings */}
-          {activeTab === 'custom' && (
-            <div className="space-y-4">
-              <form
-                onSubmit={handleAddCustomMeeting}
-                className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3"
-              >
-                <div className="font-sans font-bold text-xs text-[#2D2D2D] flex items-center gap-1.5">
-                  <Plus className="w-3.5 h-3.5 text-[#C83E31]" />
-                  <span>自訂新增一場今日會議</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <input
-                    type="text"
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="會議名稱 (例: 專案進度對齊)"
-                    className="sm:col-span-2 px-3 py-1.5 text-xs bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden"
-                  />
-                  <div className="flex gap-1">
-                    <input
-                      type="number"
-                      min={0}
-                      max={23}
-                      value={newHour}
-                      onChange={(e) => setNewHour(Number(e.target.value))}
-                      className="w-14 px-2 py-1.5 text-xs bg-white border border-[#2D2D2D]/30 rounded-xl text-center"
-                      title="開始小時 (0-23)"
-                    />
-                    <span className="self-center text-xs font-bold">:</span>
-                    <input
-                      type="number"
-                      min={0}
-                      max={59}
-                      step={5}
-                      value={newMinute}
-                      onChange={(e) => setNewMinute(Number(e.target.value))}
-                      className="w-14 px-2 py-1.5 text-xs bg-white border border-[#2D2D2D]/30 rounded-xl text-center"
-                      title="開始分鐘 (0-59)"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-sans text-[#6E6A63]">
-                    <span>時長：</span>
-                    <select
-                      value={newDuration}
-                      onChange={(e) => setNewDuration(Number(e.target.value))}
-                      className="px-2 py-1 bg-white border border-[#2D2D2D]/30 rounded-lg text-xs"
-                    >
-                      <option value={30}>30 分鐘</option>
-                      <option value={45}>45 分鐘</option>
-                      <option value={60}>1 小時</option>
-                      <option value={90}>1.5 小時</option>
-                      <option value={120}>2 小時</option>
-                    </select>
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-3 py-1.5 bg-[#2D2D2D] text-[#FAF7F0] rounded-xl text-xs font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer"
-                  >
-                    加入清單
-                  </button>
-                </div>
-              </form>
-
-              {/* Active Meetings List */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-sans font-bold text-[#6E6A63] px-1">
-                  <span>今日已登錄會議 ({activeMeetings.length})</span>
-                  {activeMeetings.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={handleClearAll}
-                      className="text-red-600 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>清空重置</span>
-                    </button>
-                  )}
-                </div>
-
-                {activeMeetings.length === 0 ? (
-                  <div className="p-6 text-center text-xs font-sans text-[#6E6A63] bg-white rounded-2xl border border-dashed border-[#2D2D2D]/20">
-                    目前今日尚無會議紀錄，靈魂處於最平和的摸魚狀態 ✨
-                  </div>
-                ) : (
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                    {activeMeetings.map((m) => (
-                      <div
-                        key={m.id}
-                        className="p-2.5 bg-white rounded-xl border border-[#2D2D2D]/20 flex items-center justify-between gap-2 text-xs"
-                      >
-                        <div className="min-w-0 flex items-center gap-2">
-                          <span className="font-mono font-bold text-[#2D2D2D] shrink-0">
-                            {String(m.startHour).padStart(2, '0')}:
-                            {String(m.startMinute).padStart(2, '0')}
-                          </span>
-                          <span className="font-medium text-[#2D2D2D] truncate">
-                            {m.title}
-                          </span>
-                          {m.isFridayAfterFour && (
-                            <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-sm shrink-0">
-                              週五致命會
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-[#6E6A63] font-sans text-[11px]">
-                            {m.durationMinutes}m
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteMeeting(m.id)}
-                            className="p-1 text-[#6E6A63] hover:text-red-600 transition cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Notification Reminder & Test Card */}
-        <div className="mx-4 sm:mx-6 mb-3 p-3 rounded-2xl border border-[#2D2D2D]/15 bg-white/90 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="p-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
-              <Bell className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <h4 className="font-sans font-bold text-xs text-[#2D2D2D] truncate">
-                行程即時提醒（如同 Google 日曆）
-              </h4>
-              <p className="font-sans text-[11px] text-[#6E6A63] leading-tight">
-                行程開始前 10 分鐘自動跳出高優先級通知與社畜吐槽建議
-              </p>
-            </div>
+        {/* 1. Android Widget Setup Guidance Info Box */}
+        <div className="mx-4 sm:mx-6 mb-2 p-3 rounded-2xl border border-[#2D2D2D]/15 bg-stone-50/90 flex items-start gap-2.5 text-left shadow-2xs">
+          <span className="text-base shrink-0">📱</span>
+          <div className="text-[11px] font-sans text-[#4A463F] leading-relaxed">
+            <div className="font-bold text-[#2D2D2D] mb-0.5">桌面小工具 (Widgets) 新增方式：</div>
+            在手機主畫面長按空白處 → 點選「小工具/微件」→ 選擇「幹話日曆」即可新增 1×1 打卡章、4×2 與 4×4 農曆月曆。
           </div>
+        </div>
 
-          <button
-            type="button"
-            onClick={handleSendTestNotification}
-            className="px-3 py-1.5 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#2D2D2D] hover:text-[#FAF7F0] text-[#2D2D2D] text-xs font-sans font-bold transition cursor-pointer active:scale-95 flex items-center gap-1.5 shrink-0 shadow-2xs"
-            title="測試通知功能（3秒後發送）"
-          >
-            <Bell className="w-3.5 h-3.5 text-amber-600" />
-            <span>測試提醒 (3秒)</span>
-          </button>
+        {/* 2. Notification Reminder Banner (Production Clean - without test buttons) */}
+        <div className="mx-4 sm:mx-6 mb-3 p-3 rounded-2xl border border-[#2D2D2D]/15 bg-white/90 flex items-center gap-2.5 shadow-2xs">
+          <div className="p-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+            <Bell className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <h4 className="font-sans font-bold text-xs text-[#2D2D2D] truncate">
+              行程即時提醒（如同 Google 日曆）
+            </h4>
+            <p className="font-sans text-[11px] text-[#6E6A63] leading-tight">
+              行程開始前 10 分鐘自動跳出高優先級通知與社畜吐槽建議
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
@@ -899,9 +606,14 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
               >
                 {isConnected ? '已啟用 (吐槽中)' : '未連動 (常規日曆)'}
               </span>
-              <span className="text-[10px] font-mono text-[#6E6A63]/70 font-semibold bg-[#2D2D2D]/5 px-1.5 py-0.5 rounded border border-[#2D2D2D]/10">
+              <button
+                type="button"
+                onClick={handleVersionClick}
+                className="text-[10px] font-mono text-[#6E6A63]/70 font-semibold bg-[#2D2D2D]/5 hover:bg-[#2D2D2D]/10 px-1.5 py-0.5 rounded border border-[#2D2D2D]/10 cursor-pointer transition"
+                title="連續點擊 7 次以開啟/關閉內部管理員工具列"
+              >
                 v{APP_VERSION}
-              </span>
+              </button>
             </div>
 
             {/* Remove Sync Button */}

@@ -16,7 +16,6 @@ import { IgStoryModal } from './components/IgStoryModal';
 import { PaywallModal } from './components/PaywallModal';
 import { CalendarSyncBar } from './components/CalendarSyncBar';
 import { CalendarSyncModal } from './components/CalendarSyncModal';
-import { WidgetPreviewDrawer } from './components/WidgetPreviewDrawer';
 import { AdminConsoleModal } from './components/AdminConsoleModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { BirthdayModal } from './components/BirthdayModal';
@@ -179,6 +178,9 @@ export const App: React.FC = () => {
   const [isIgModalOpen, setIsIgModalOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isCalendarSyncModalOpen, setIsCalendarSyncModalOpen] = useState(false);
+  const [isDevModeUnlocked, setIsDevModeUnlocked] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && localStorage.getItem('ganhua_dev_mode_unlocked') === 'true';
+  });
   const [isAdminConsoleOpen, setIsAdminConsoleOpen] = useState(false);
   const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [isBirthdayModalOpen, setIsBirthdayModalOpen] = useState(false);
@@ -1013,16 +1015,6 @@ export const App: React.FC = () => {
             </span>
           </button>
         </div>
-
-        {/* D. Collapsible Widget Preview Drawer */}
-        <WidgetPreviewDrawer
-          quote={currentQuote}
-          artStyle={persisted.artStyle}
-          streakCount={persisted.streakCount}
-          offWorkHour={persisted.offWorkHour}
-          survivedDates={persisted.survivedDates}
-          activeMeetings={effectiveMeetings}
-        />
       </main>
 
       {/* IG Story Modal */}
@@ -1084,6 +1076,13 @@ export const App: React.FC = () => {
           setIsCalendarSyncModalOpen(false);
           setIsPaywallOpen(true);
         }}
+        onUnlockDevMode={() => {
+          setIsDevModeUnlocked(true);
+          try {
+            localStorage.setItem('ganhua_dev_mode_unlocked', 'true');
+          } catch {}
+          showToast('🛠️ 已啟用開發者模式！底部工具列已顯示');
+        }}
       />
 
       {/* Monthly Desk Calendar Modal */}
@@ -1117,21 +1116,30 @@ export const App: React.FC = () => {
         onDelete={handleDeleteCustomEvent}
       />
 
-      {/* Floating Version Quick-Switcher */}
-      <FloatingVersionBar
-        currentTier={tier}
-        isAdminAuthed={isAdminAuthed}
-        onChangeTier={(newTier) => {
-          const success = setTier(newTier);
-          if (success) {
-            showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
-          } else {
-            setIsAdminPasswordModalOpen(true);
-          }
-        }}
-        onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
-        onRequestPasswordAuth={() => setIsAdminPasswordModalOpen(true)}
-      />
+      {/* Floating Version Quick-Switcher (Only visible when dev mode unlocked via 7-tap) */}
+      {isDevModeUnlocked && (
+        <FloatingVersionBar
+          currentTier={tier}
+          isAdminAuthed={isAdminAuthed}
+          onChangeTier={(newTier) => {
+            const success = setTier(newTier);
+            if (success) {
+              showToast(`已切換為【${newTier === 'admin' ? '👑 管理員模式' : newTier === 'pro' ? 'PRO 專業版' : '免費體驗版'}】視角！`);
+            } else {
+              setIsAdminPasswordModalOpen(true);
+            }
+          }}
+          onOpenAdminConsole={() => setIsAdminConsoleOpen(true)}
+          onRequestPasswordAuth={() => setIsAdminPasswordModalOpen(true)}
+          onLockDevMode={() => {
+            setIsDevModeUnlocked(false);
+            try {
+              localStorage.removeItem('ganhua_dev_mode_unlocked');
+            } catch {}
+            showToast('🔒 開發者模式已關閉');
+          }}
+        />
+      )}
 
       {/* Admin Console & Time Machine Modal */}
       <AdminConsoleModal

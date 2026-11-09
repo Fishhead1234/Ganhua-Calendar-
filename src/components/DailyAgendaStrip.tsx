@@ -272,7 +272,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
               className="text-[11px] font-sans font-bold text-[#6E6A63] hover:text-[#2D2D2D] flex items-center gap-1 cursor-pointer transition ml-0.5"
             >
               <Calendar className="w-3.5 h-3.5 text-[#C83E31]" />
-              <span className="hidden sm:inline">連動</span>
+              <span className="text-[10px] sm:text-[11px]">連動</span>
             </button>
 
             {isOpen ? (

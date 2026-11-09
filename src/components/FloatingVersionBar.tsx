@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Crown, User, Settings2, ChevronUp, ChevronDown, Lock } from 'lucide-react';
+import { Shield, Crown, User, Settings2, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { AppTier } from '../services/purchaseService';
 
 interface FloatingVersionBarProps {
@@ -8,6 +8,7 @@ interface FloatingVersionBarProps {
   onChangeTier: (tier: AppTier) => void;
   onOpenAdminConsole: () => void;
   onRequestPasswordAuth: () => void;
+  onLockDevMode?: () => void;
 }
 
 export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
@@ -16,24 +17,9 @@ export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
   onChangeTier,
   onOpenAdminConsole,
   onRequestPasswordAuth,
+  onLockDevMode,
 }) => {
   const [collapsed, setCollapsed] = useState(false);
-
-  // If not authenticated as Admin, only show a subtle discrete keyhole entrance
-  if (!isAdminAuthed) {
-    return (
-      <div className="fixed bottom-3 left-3 z-40 select-none">
-        <button
-          type="button"
-          onClick={onRequestPasswordAuth}
-          className="p-2 rounded-full bg-[#2D2D2D]/40 hover:bg-[#2D2D2D] text-[#D4B483] border border-[#2D2D2D]/20 hover:border-[#D4B483]/50 transition cursor-pointer opacity-25 hover:opacity-100 shadow-sm"
-          title="內部管理員通道"
-        >
-          <Lock className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed bottom-3 left-3 sm:left-4 z-40 select-none">
@@ -90,7 +76,13 @@ export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
 
           <button
             type="button"
-            onClick={() => onChangeTier('admin')}
+            onClick={() => {
+              if (isAdminAuthed) {
+                onChangeTier('admin');
+              } else {
+                onRequestPasswordAuth();
+              }
+            }}
             className={`px-2.5 py-1 rounded-xl text-xs font-sans font-bold transition cursor-pointer flex items-center gap-1 ${
               currentTier === 'admin'
                 ? 'bg-amber-500 text-[#2D2D2D] font-black shadow-sm'
@@ -104,14 +96,16 @@ export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
 
           <div className="h-4 w-[1px] bg-white/20 mx-0.5" />
 
-          <button
-            type="button"
-            onClick={onOpenAdminConsole}
-            className="p-1.5 rounded-xl hover:bg-white/10 text-[#D4B483] transition cursor-pointer"
-            title="開啟管理員控制台 (時光機、毒舌情境注入、打卡模擬)"
-          >
-            <Settings2 className="w-4 h-4" />
-          </button>
+          {isAdminAuthed && (
+            <button
+              type="button"
+              onClick={onOpenAdminConsole}
+              className="p-1.5 rounded-xl hover:bg-white/10 text-[#D4B483] transition cursor-pointer"
+              title="開啟管理員控制台 (時光機、毒舌情境注入、打卡模擬)"
+            >
+              <Settings2 className="w-4 h-4" />
+            </button>
+          )}
 
           <button
             type="button"
@@ -121,6 +115,17 @@ export const FloatingVersionBar: React.FC<FloatingVersionBarProps> = ({
           >
             <ChevronDown className="w-3.5 h-3.5" />
           </button>
+
+          {onLockDevMode && (
+            <button
+              type="button"
+              onClick={onLockDevMode}
+              className="p-1 rounded-xl hover:bg-red-500/20 text-red-400 transition cursor-pointer"
+              title="關閉開發者視角列"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       )}
     </div>

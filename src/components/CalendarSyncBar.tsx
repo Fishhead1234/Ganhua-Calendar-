@@ -118,7 +118,7 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
                 <Calendar className="w-3 h-3" />
               </div>
               <span className="font-serif font-black text-xs text-[#2D2D2D] truncate">
-                連動行事曆（解鎖今日專屬吐槽）
+                行事曆連動
               </span>
               {!isPro && (
                 <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-900 border border-amber-600/30 text-[9px] font-sans font-black tracking-wider shrink-0 flex items-center gap-0.5">
@@ -129,7 +129,7 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
             </div>
 
             <div className="flex items-center gap-1 text-[11px] font-sans font-bold text-[#6E6A63] hover:text-[#2D2D2D] shrink-0">
-              <span className="hidden sm:inline">設定連動</span>
+              <span>📅 連動</span>
               <Settings2 className="w-3.5 h-3.5" />
             </div>
           </div>
