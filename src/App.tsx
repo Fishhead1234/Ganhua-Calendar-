@@ -6,6 +6,7 @@ import {
   Sparkles,
   Calendar as CalendarIcon,
   RotateCcw,
+  Scissors,
 } from 'lucide-react';
 import quotesData from './data/quotes.json';
 import { CalendarQuote, CharacterType } from './types/calendar';
@@ -69,15 +70,44 @@ function getTodayYmd(): string {
   return getTodayLocalDateKey();
 }
 
+/**
+ * Tear-to-Unlock Today Ritual:
+ * If Today (todayKey) has not been torn yet (last_torn_to_date !== todayKey),
+ * compute initial offset to start on last_torn_to_date (or yesterday = -1 if missing or >3 days).
+ */
+function computeInitialDateOffset(todayYmd: string): number {
+  try {
+    const storedLastTorn = localStorage.getItem('last_torn_to_date');
+    if (storedLastTorn === todayYmd) {
+      return 0; // Today has already been torn/unlocked
+    }
+    if (storedLastTorn && /^\d{4}-\d{2}-\d{2}$/.test(storedLastTorn)) {
+      const [ty, tm, td] = todayYmd.split('-').map(Number);
+      const [ly, lm, ld] = storedLastTorn.split('-').map(Number);
+      const todayMid = new Date(ty, tm - 1, td).getTime();
+      const lastMid = new Date(ly, lm - 1, ld).getTime();
+      const diffDays = Math.round((todayMid - lastMid) / 86400000);
+      if (diffDays >= 1 && diffDays <= 3) {
+        return -diffDays; // 1, 2, or 3 days ago so user only needs 1-3 satisfying tears to reach Today
+      }
+    }
+  } catch {
+    // ignore
+  }
+  // Default to yesterday (-1) so user gets to tear off yesterday's sheet to reveal Today!
+  return -1;
+}
+
 function loadPersistedState(): PersistedState {
   const todayYmd = getTodayYmd();
+  const initialOffset = computeInitialDateOffset(todayYmd);
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       return {
         selectedTheme: parsed.selectedTheme || 'all',
-        dateOffset: 0, // ALWAYS start on TODAY (0 offset) upon fresh app launch!
+        dateOffset: initialOffset,
         favoritedIds: Array.isArray(parsed.favoritedIds) ? parsed.favoritedIds : ['q365-01-01'],
         survivedDates: Array.isArray(parsed.survivedDates) ? parsed.survivedDates : [],
         streakCount: typeof parsed.streakCount === 'number' ? parsed.streakCount : 3,
@@ -116,7 +146,7 @@ function loadPersistedState(): PersistedState {
   }
   return {
     selectedTheme: 'all',
-    dateOffset: 0,
+    dateOffset: initialOffset,
     favoritedIds: ['q365-01-01'],
     survivedDates: [],
     streakCount: 3,
@@ -222,6 +252,25 @@ export const App: React.FC = () => {
   const roastResult: CalendarRoastResult = useMemo(() => {
     return analyzeCalendarEvents(effectiveMeetings, activePresetId || undefined);
   }, [effectiveMeetings, activePresetId]);
+
+  const todayKey = useMemo(() => getTodayYmd(), []);
+
+  const [isTodayUnlocked, setIsTodayUnlocked] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('last_torn_to_date') === getTodayYmd();
+    } catch {
+      return false;
+    }
+  });
+
+  // Real today's meetings for top Schedule Alert bar (Requirement 3: always active in real-time)
+  const todayMeetings = useMemo(() => {
+    return getMergedEvents(activeMeetings, todayKey);
+  }, [activeMeetings, customEvents, todayKey]);
+
+  const todayRoastResult: CalendarRoastResult = useMemo(() => {
+    return analyzeCalendarEvents(todayMeetings, activePresetId || undefined);
+  }, [todayMeetings, activePresetId]);
 
   const isEmbedMode = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -445,10 +494,39 @@ export const App: React.FC = () => {
 
   const handleNextDay = () => {
     if (canGoNext) {
+      const nextOffset = persisted.dateOffset + 1;
       playPaperTearSound();
+
+      // The Moment the User Tears Forward and Reaches today (nextOffset === 0)
+      if (nextOffset === 0 && !isTodayUnlocked) {
+        try {
+          localStorage.setItem('last_torn_to_date', todayKey);
+        } catch {}
+        setIsTodayUnlocked(true);
+
+        // Haptic vibration feedback
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try {
+            navigator.vibrate([40, 60, 40]);
+          } catch {}
+        }
+
+        // Confetti celebration
+        try {
+          confetti({
+            particleCount: 70,
+            spread: 75,
+            origin: { y: 0.6 },
+            colors: ['#C83E31', '#D4B483', '#2D2D2D', '#FAF7F0'],
+          });
+        } catch {}
+
+        showToast('🎉 新的一天正式解鎖！今日幹話已揭曉');
+      }
+
       setPersisted((prev) => ({
         ...prev,
-        dateOffset: prev.dateOffset + 1,
+        dateOffset: nextOffset,
       }));
     } else {
       handleBlockedTomorrow();
@@ -516,14 +594,33 @@ export const App: React.FC = () => {
     const todayMidnight = new Date(t.getFullYear(), t.getMonth(), t.getDate());
     const targetMidnight = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
     const diffDays = Math.round((targetMidnight.getTime() - todayMidnight.getTime()) / 86400000);
+    const currentTodayKey = getTodayYmd();
+    const unlocked = localStorage.getItem('last_torn_to_date') === currentTodayKey;
+
+    if (diffDays === 0) {
+      if (!unlocked) {
+        // Today is not unlocked yet: route to yesterday so the user gets to tear it off!
+        setPersisted((prev) => ({
+          ...prev,
+          dateOffset: -1,
+        }));
+        showToast('✂️ 親手撕下昨日日曆，正式開啟今天！');
+        return;
+      }
+      setPersisted((prev) => ({
+        ...prev,
+        dateOffset: 0,
+      }));
+      showToast('已返回今日日曆！');
+      return;
+    }
+
     setPersisted((prev) => ({
       ...prev,
       dateOffset: diffDays,
     }));
     if (diffDays > 0) {
       showToast('🔮 已檢視未來預排行程，幹話將於當日 00:00 解鎖！');
-    } else if (diffDays === 0) {
-      showToast('已返回今日日曆！');
     } else {
       showToast(`已翻閱至歷史存檔 (${targetDate.getMonth() + 1}/${targetDate.getDate()})`);
     }
@@ -616,8 +713,16 @@ export const App: React.FC = () => {
   }, []);
 
   const handleBackToToday = () => {
-    setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
-    showToast('已返回今日日曆！');
+    const currentTodayKey = getTodayYmd();
+    const unlocked = localStorage.getItem('last_torn_to_date') === currentTodayKey;
+    if (!unlocked) {
+      // If Today is NOT unlocked yet, route to yesterday so the user gets to tear it off
+      setPersisted((prev) => ({ ...prev, dateOffset: -1 }));
+      showToast('✂️ 親手撕下昨日日曆，正式開啟今天！');
+    } else {
+      setPersisted((prev) => ({ ...prev, dateOffset: 0 }));
+      showToast('已返回今日日曆！');
+    }
   };
 
   // Stamp Survived
@@ -686,6 +791,7 @@ export const App: React.FC = () => {
           onBlockedTomorrow={handleBlockedTomorrow}
           onOpenMonthlyCalendar={() => setIsMonthlyCalendarOpen(true)}
           onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
+          isTodayUnlocked={isTodayUnlocked}
         />
       </div>
     );
@@ -739,11 +845,11 @@ export const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-5xl w-full mx-auto px-4 pt-2 space-y-3">
-        {/* A. Calendar Sync Module (Roast Engine) */}
+        {/* A. Calendar Sync Module (Roast Engine - Requirement 3: always active in real-time) */}
         <CalendarSyncBar
           isPro={isPro || isAdmin}
           isConnected={persisted.calendarConnected}
-          roastResult={persisted.calendarConnected ? roastResult : null}
+          roastResult={persisted.calendarConnected ? todayRoastResult : null}
           isSyncing={isCalendarSyncing}
           onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
           onOpenPaywall={() => setIsPaywallOpen(true)}
@@ -760,18 +866,37 @@ export const App: React.FC = () => {
             {persisted.dateOffset !== 0 && (
               <div className="max-w-[390px] mx-auto flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#2D2D2D] text-[#F9F6F0] border border-[#D4B483] shadow-lg animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">{isFutureDate ? '🔮' : '📜'}</span>
+                  <span className="text-sm">
+                    {isFutureDate
+                      ? '🔮'
+                      : !isTodayUnlocked && persisted.dateOffset === -1
+                      ? '✨'
+                      : '📜'}
+                  </span>
                   <span className="text-xs font-sans font-bold">
-                    {isFutureDate ? '未來預約日程' : '歷史存檔'}：{currentDateObj.getMonth() + 1}月{currentDateObj.getDate()}日
+                    {isFutureDate
+                      ? `未來預約日程：${currentDateObj.getMonth() + 1}月${currentDateObj.getDate()}日`
+                      : !isTodayUnlocked && persisted.dateOffset === -1
+                      ? '昨日日曆・等待撕頁解鎖今日'
+                      : `歷史存檔：${currentDateObj.getMonth() + 1}月${currentDateObj.getDate()}日`}
                   </span>
                 </div>
                 <button
                   type="button"
-                  onClick={handleBackToToday}
+                  onClick={!isTodayUnlocked && persisted.dateOffset === -1 ? handleNextDay : handleBackToToday}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#D4B483] hover:bg-[#c2a270] text-[#2D2D2D] text-xs font-sans font-black transition active:scale-95 cursor-pointer shadow-xs"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>返回今日</span>
+                  {!isTodayUnlocked && persisted.dateOffset === -1 ? (
+                    <>
+                      <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]" />
+                      <span>撕下解鎖今日</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>返回今日</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -795,6 +920,7 @@ export const App: React.FC = () => {
               onCycleSpecialQuote={() => setSpecialQuoteCycleIndex((prev) => prev + 1)}
               onBackToToday={handleBackToToday}
               onShowToast={showToast}
+              isTodayUnlocked={isTodayUnlocked}
               onToggleRoastMode={() => {
                 const currentMode = currentQuote?.currentMode || (currentQuote?.hasRoastOverride ? 'roast' : 'original');
                 const nextMode = currentMode === 'roast' ? 'original' : 'roast';
@@ -975,6 +1101,7 @@ export const App: React.FC = () => {
         onOpenAddEvent={(dateStr) => handleOpenAddEvent(dateStr)}
         onEditEvent={handleEditMeeting}
         onShowToast={showToast}
+        isTodayUnlocked={isTodayUnlocked}
       />
 
       {/* Add / Edit Appointment Modal */}

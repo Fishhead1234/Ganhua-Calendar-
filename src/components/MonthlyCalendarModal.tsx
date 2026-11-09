@@ -48,6 +48,7 @@ interface MonthlyCalendarModalProps {
   onOpenAddEvent?: (dateStr: string) => void;
   onEditEvent?: (event: CalendarMeeting) => void;
   onShowToast?: (msg: string) => void;
+  isTodayUnlocked?: boolean;
 }
 
 export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
@@ -64,6 +65,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   onOpenAddEvent,
   onEditEvent,
   onShowToast,
+  isTodayUnlocked = true,
 }) => {
   // Validate and sanitize dates
   const safeCurrentDate = useMemo(() => {
@@ -937,7 +939,9 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                 {isPickedFuture
                   ? `檢視 ${pickedDate.getMonth() + 1}/${pickedDate.getDate()} 行程與封印卡`
                   : isPickedToday
-                  ? '前往今日日曆'
+                  ? !isTodayUnlocked
+                    ? '✂️ 親手撕下昨日・解鎖今日'
+                    : '前往今日日曆'
                   : `翻閱至 ${pickedDate.getMonth() + 1}/${pickedDate.getDate()} 存檔`}
               </span>
             </button>

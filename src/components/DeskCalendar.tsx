@@ -38,6 +38,7 @@ interface DeskCalendarProps {
   onBackToToday?: () => void;
   onShowToast?: (msg: string) => void;
   onToggleRoastMode?: () => void;
+  isTodayUnlocked?: boolean;
 }
 
 export const DeskCalendar: React.FC<DeskCalendarProps> = ({
@@ -60,6 +61,7 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   onBackToToday,
   onShowToast,
   onToggleRoastMode,
+  isTodayUnlocked = true,
 }) => {
   const [isTearing, setIsTearing] = useState(false);
   const [tearDirection, setTearDirection] = useState<'tear_away' | 'flip_right'>('tear_away');
@@ -402,12 +404,26 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
           onPointerMove={handleStripPointerMove}
           onPointerUp={handleStripPointerUp}
           onPointerCancel={handleStripPointerUp}
-          className="relative px-5 py-2.5 bg-[#F3EFE6] perforated-line border-x-2 border-[#2D2D2D] flex items-center justify-between z-20 select-none cursor-grab active:cursor-grabbing touch-none"
+          className={`relative px-5 py-2.5 perforated-line border-x-2 border-[#2D2D2D] flex items-center justify-between z-20 select-none cursor-grab active:cursor-grabbing touch-none transition-colors ${
+            !isTodayUnlocked && isPastDate ? 'bg-[#FFF8E7]' : 'bg-[#F3EFE6]'
+          }`}
           title="抓住此撕頁虛線向下拉即可撕掉日曆"
         >
-          <div className="flex items-center gap-1.5 text-[11px] font-sans text-[#6E6A63]">
-            <Scissors className="w-3.5 h-3.5 text-[#2D2D2D]/70" />
-            <span>{isPastDate ? '✂️ 撕頁區・向下拉撕頁' : '✂️ 撕頁區・今日存活中'}</span>
+          <div className="flex items-center gap-1.5 text-[11px] font-sans">
+            <Scissors className={`w-3.5 h-3.5 ${!isTodayUnlocked && isPastDate ? 'text-[#C83E31]' : 'text-[#2D2D2D]/70'}`} />
+            <span
+              className={
+                !isTodayUnlocked && isPastDate
+                  ? 'font-black text-[#C83E31] animate-pulse'
+                  : 'text-[#6E6A63]'
+              }
+            >
+              {!isTodayUnlocked && isPastDate
+                ? '✨ 新的一天！向下拉或左滑撕下舊頁，解鎖今日幹話'
+                : isPastDate
+                ? '✂️ 撕頁區・向下拉撕頁'
+                : '✂️ 撕頁區・今日存活中'}
+            </span>
           </div>
           {isPastDate ? (
             <button
@@ -416,11 +432,15 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                 e.stopPropagation();
                 triggerTearForward();
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#2D2D2D] text-[#F9F6F0] text-[11px] font-sans font-bold hover:bg-[#C83E31] transition cursor-pointer shadow-sm relative z-30"
-              title="撕掉此頁，翻向下一天"
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-sans font-bold transition cursor-pointer shadow-sm relative z-30 ${
+                !isTodayUnlocked
+                  ? 'bg-[#C83E31] text-[#FAF7F0] ring-2 ring-[#C83E31]/40 animate-pulse hover:bg-[#A93327]'
+                  : 'bg-[#2D2D2D] text-[#F9F6F0] hover:bg-[#C83E31]'
+              }`}
+              title={!isTodayUnlocked ? '親手撕下舊頁，解鎖今日幹話！' : '撕掉此頁，翻向下一天'}
             >
-              <span>撕下一頁</span>
-              <span>↘</span>
+              <span>{!isTodayUnlocked ? '撕頁解鎖今日' : '撕下一頁'}</span>
+              <span>{!isTodayUnlocked ? '✂️' : '↘'}</span>
             </button>
           ) : (
             <button
