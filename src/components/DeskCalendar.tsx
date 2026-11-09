@@ -69,27 +69,6 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [copyToast, setCopyToast] = useState<string | null>(null);
-
-  const handleCopyWish = async (text: string) => {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-    } catch {
-      // ignore
-    }
-    setCopyToast('已複製！快去貼上交差');
-    if (onShowToast) onShowToast('已複製！快去貼上交差');
-    setTimeout(() => setCopyToast(null), 2500);
-  };
 
   const isDraggingBody = useRef(false);
   const isDraggingStrip = useRef(false);
@@ -556,13 +535,11 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                       onCycleSpecialQuote();
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F0] border border-[#C83E31] text-[#C83E31] hover:bg-[#C83E31] hover:text-white text-[10px] font-sans font-bold shadow-sm transition cursor-pointer active:scale-95"
-                    title={quote.eventType === 'other_person_birthday' ? '點擊換一句社交慶生幹話' : '點擊換一句防禦幹話'}
+                    title="點擊換一句防禦幹話"
                   >
                     <RefreshCw className="w-3 h-3" />
                     <span>
-                      {quote.eventType === 'other_person_birthday'
-                        ? `🔄 換一句社交慶生幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`
-                        : `換一句防禦幹話 (${(quote.specialEventIndex || 0) + 1}/${quote.specialEventCandidatesCount})`}
+                      換一句防禦幹話 ({(quote.specialEventIndex || 0) + 1}/{quote.specialEventCandidatesCount})
                     </span>
                   </button>
                 )}
@@ -729,54 +706,6 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                   </p>
                 </div>
 
-                {/* 1-Tap Birthday Wish Copy Bar (for other person's birthday) */}
-                {quote.eventType === 'other_person_birthday' && (
-                  <div className="rounded-2xl bg-[#FFF8EB] border-2 border-[#D4B483] p-3 text-xs space-y-2 animate-in fade-in shadow-sm">
-                    <div className="flex items-center justify-between font-serif font-black text-[#785A3C] text-[11px]">
-                      <div className="flex items-center gap-1.5">
-                        <Copy className="w-3.5 h-3.5 text-[#C83E31]" />
-                        <span>💬 懶得想祝賀詞？一鍵複製傳給壽星：</span>
-                      </div>
-                      {copyToast && (
-                        <span className="text-[10px] font-sans font-bold text-[#C83E31] animate-in fade-in">
-                          ✓ {copyToast}
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('生日快樂！！🎉🎂 祝天天開心、事事順心！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[11px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>🤖 群組省力版</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('生日快樂🎂！祝你今年會議少一點、薪水多一點、老闆離你遠一點！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[11px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>💼 社畜同事版</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('祝你生日快樂🎉！雖然又老了一歲，但別難過，因為你明年會更老！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[11px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>🔥 損友幹話版</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* 社畜農民曆 (with Real Lunar Lucky Slack Time) */}
                 <div className="relative rounded-2xl bg-[#FBF8F2] border-2 border-[#C83E31]/40 p-3 pt-3.5 text-xs font-sans space-y-1.5 shadow-sm">

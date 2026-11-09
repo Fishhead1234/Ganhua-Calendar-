@@ -21,6 +21,7 @@ import {
   Bell,
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
+import { BirthdayWishGenerator } from './BirthdayWishGenerator';
 import { toLocalDateKey } from '../utils/dateUtils';
 import {
   CalendarMeeting,
@@ -79,26 +80,6 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   const [viewYear, setViewYear] = useState<number>(() => safeCurrentDate.getFullYear());
   const [viewMonth, setViewMonth] = useState<number>(() => safeCurrentDate.getMonth()); // 0-11
   const [pickedDate, setPickedDate] = useState<Date>(() => safeCurrentDate);
-  const [copyToast, setCopyToast] = useState<string | null>(null);
-
-  const handleCopyWish = async (text: string) => {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-    } catch {
-      // ignore
-    }
-    setCopyToast('已複製！快去貼上交差');
-    setTimeout(() => setCopyToast(null), 2500);
-  };
 
   // Sync state when opening with updated currentDate
   useEffect(() => {
@@ -241,8 +222,21 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     if (events.length === 0) return null;
     const allExpanded = events.length > 0 && expandedEventIds.size === events.length;
 
+    const birthdayEvent = events.find((evt) => {
+      const t = `${evt.title || ''} ${evt.calendarName || ''}`.toLowerCase();
+      return ['birthday', 'bday', '生日', '慶生'].some((k) => t.includes(k));
+    });
+
     return (
       <div className="rounded-xl bg-[#F3EFE6] p-2.5 space-y-1.5 border border-[#2D2D2D]/10">
+        {/* 壽星幹話祝賀詞產生器 (一鍵複製) */}
+        {birthdayEvent && (
+          <BirthdayWishGenerator
+            eventName={birthdayEvent.title}
+            className="mb-2"
+          />
+        )}
+
         <div className="flex items-center justify-between text-xs font-sans font-bold text-[#2D2D2D]">
           <span className="flex items-center gap-1.5">
             <CalendarDays className="w-3.5 h-3.5 text-[#6E6A63]" />
@@ -851,54 +845,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                   </div>
                 </div>
 
-                {/* 1-Tap Birthday Wish Copy Bar (for other person's birthday) */}
-                {pickedQuote?.eventType === 'other_person_birthday' && (
-                  <div className="rounded-xl bg-[#FFF8EB] border border-[#D4B483] p-2.5 text-xs space-y-1.5 animate-in fade-in">
-                    <div className="flex items-center justify-between font-serif font-black text-[#785A3C] text-[11px]">
-                      <div className="flex items-center gap-1">
-                        <Copy className="w-3.5 h-3.5 text-[#C83E31]" />
-                        <span>💬 懶得想祝賀詞？一鍵複製傳給壽星：</span>
-                      </div>
-                      {copyToast && (
-                        <span className="text-[10px] font-sans font-bold text-[#C83E31] animate-in fade-in">
-                          ✓ {copyToast}
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('生日快樂！！🎉🎂 祝天天開心、事事順心！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[10px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>🤖 群組省力版</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('生日快樂🎂！祝你今年會議少一點、薪水多一點、老闆離你遠一點！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[10px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>💼 社畜同事版</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyWish('祝你生日快樂🎉！雖然又老了一歲，但別難過，因為你明年會更老！');
-                        }}
-                        className="flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-white border border-[#D4B483] hover:bg-[#F9F6F0] text-[#2D2D2D] font-sans font-bold text-[10px] shadow-xs active:scale-95 transition cursor-pointer"
-                      >
-                        <span>🔥 損友幹話版</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
+
 
                 <div className="flex items-center justify-between text-xs font-sans">
                   <span className="text-[#6E6A63]">

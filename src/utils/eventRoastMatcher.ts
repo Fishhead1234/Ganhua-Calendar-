@@ -90,8 +90,11 @@ export function matchSpecialEventRoast({
     );
     const keywordMatches: SpecialEventQuote[] = [];
 
-    // Find all items matching any event keyword
+    // Find all items matching any event keyword (excluding other_person_birthday to preserve normal 365 quotes on main card)
     for (const item of specialEventsList) {
+      if (item.eventType === 'other_person_birthday') {
+        continue; // Never override main card for someone else's birthday
+      }
       const isMatched = item.triggerKeywords.some((kw) => {
         const lowerKw = kw.toLowerCase();
         return titles.some((t) => t.includes(lowerKw));

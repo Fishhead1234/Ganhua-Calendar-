@@ -15,6 +15,7 @@ import {
   Check,
 } from 'lucide-react';
 import { CalendarMeeting } from '../services/calendarService';
+import { BirthdayWishGenerator } from './BirthdayWishGenerator';
 
 interface DailyAgendaStripProps {
   events: CalendarMeeting[];
@@ -114,6 +115,11 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
   const [isOpen, setIsOpen] = useState(true);
   const [expandedEventIds, setExpandedEventIds] = useState<Set<string>>(new Set());
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
+
+  const birthdayEvent = events.find((evt) => {
+    const t = `${evt.title || ''} ${evt.calendarName || ''}`.toLowerCase();
+    return ['birthday', 'bday', '生日', '慶生'].some((k) => t.includes(k));
+  });
 
   const formatTime = (h: number, m: number, isAllDay?: boolean) => {
     if (isAllDay) return '全天';
@@ -217,6 +223,11 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
             <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#2D2D2D]/10 text-[#6E6A63]">
               {events.length} 場
             </span>
+            {birthdayEvent && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-black bg-[#C83E31] text-[#FAF7F0] flex items-center gap-1 shadow-2xs">
+                <span>🎂 壽星</span>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -275,6 +286,15 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
         {/* Collapsible Content */}
         {isOpen && (
           <div className="px-3 pb-3 pt-1 border-t border-[#2D2D2D]/15 space-y-2">
+            {/* 壽星幹話祝賀詞產生器 (一鍵複製) */}
+            {birthdayEvent && (
+              <BirthdayWishGenerator
+                eventName={birthdayEvent.title}
+                onShowToast={onShowToast}
+                className="mt-1"
+              />
+            )}
+
             {events.length === 0 ? (
               <div className="py-2.5 text-center text-xs font-sans text-[#6E6A63] space-y-1">
                 <p className="font-bold text-[#2D2D2D]">今日行事曆一片淨土 🏖️</p>

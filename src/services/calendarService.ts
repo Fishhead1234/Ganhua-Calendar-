@@ -1023,6 +1023,26 @@ export function resolveDayContent(
     const isOtherPersonBday = roast.eventType === 'other_person_birthday';
     const isSchoolEvent = roast.eventType === 'school_parent';
 
+    // STRICT RULE: Never override main card for other person's birthday!
+    // When someone else's birthday is on the calendar, keep normal daily quote and character illustration from quotes365.json
+    if (isOtherPersonBday) {
+      return {
+        ...base,
+        hasRoastOverride: false,
+        roastBadge: '',
+        eventLabel: undefined,
+        roastAvailable: false,
+        canToggleRoast: false,
+        currentMode: 'original',
+        meetingsCount: roast.meetingsCount,
+        timedMeetingsCount: timedEvents.length,
+        totalMeetingHours: roast.totalMeetingHours,
+        extractedName: roast.extractedName,
+        specialEventCandidatesCount: 1,
+        specialEventIndex: 0,
+      };
+    }
+
     // Anti-Fatigue Rule:
     // Limit school roasts to Monday (1) and Thursday (4) (and weekend events if present).
     // On Tue, Wed, Fri, default to NOT overriding the main card (fallback to quotes365.json).
