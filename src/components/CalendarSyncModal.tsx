@@ -37,6 +37,7 @@ import {
   openExactAlarmSettingsViaBridge,
   syncAllCalendarRemindersViaBridge,
 } from '../services/calendarService';
+import { APP_VERSION } from '../constants/version';
 
 interface CalendarSyncModalProps {
   isOpen: boolean;
@@ -891,12 +892,15 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
         {/* Footer */}
         <div className="bg-[#FAF7F0] border-t border-[#2D2D2D]/20 p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="text-xs font-sans text-[#6E6A63]">
-              連動狀態：
+            <div className="text-xs font-sans text-[#6E6A63] flex items-center gap-1.5">
+              <span>連動狀態：</span>
               <span
-                className={`font-bold ml-1 ${isConnected ? 'text-emerald-700' : 'text-[#6E6A63]'}`}
+                className={`font-bold ${isConnected ? 'text-emerald-700' : 'text-[#6E6A63]'}`}
               >
                 {isConnected ? '已啟用 (吐槽中)' : '未連動 (常規日曆)'}
+              </span>
+              <span className="text-[10px] font-mono text-[#6E6A63]/70 font-semibold bg-[#2D2D2D]/5 px-1.5 py-0.5 rounded border border-[#2D2D2D]/10">
+                v{APP_VERSION}
               </span>
             </div>
 

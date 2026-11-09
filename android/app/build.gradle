@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
+import groovy.json.JsonSlurper
 
 def computeVersionCode() {
     def runNum = System.getenv("GITHUB_RUN_NUMBER")
     if (runNum != null && runNum.isInteger()) {
-        return 100 + Integer.parseInt(runNum)
+        return 1000 + Integer.parseInt(runNum)
     }
     try {
         def stdout = new ByteArrayOutputStream()
@@ -11,18 +12,26 @@ def computeVersionCode() {
             commandLine 'git', 'rev-list', '--count', 'HEAD'
             standardOutput = stdout
         }
-        return 100 + Integer.parseInt(stdout.toString().trim())
+        return 1000 + Integer.parseInt(stdout.toString().trim())
     } catch (Exception ignored) {
-        return 101
+        return 1100
     }
 }
 
 def computeVersionName() {
     def runNum = System.getenv("GITHUB_RUN_NUMBER")
-    if (runNum != null && runNum.isInteger()) {
-        return "1.0." + runNum
-    }
-    return "1.0.1"
+    try {
+        def packageFile = new File(project.rootDir, '../package.json')
+        if (packageFile.exists()) {
+            def packageJson = new JsonSlurper().parseText(packageFile.text)
+            def baseVer = packageJson.version ?: "1.1.0"
+            if (runNum != null && runNum.isInteger()) {
+                return baseVer + "." + runNum
+            }
+            return baseVer
+        }
+    } catch (Exception ignored) {}
+    return "1.1.0"
 }
 
 android {

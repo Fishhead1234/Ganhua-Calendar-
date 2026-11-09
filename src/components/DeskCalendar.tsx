@@ -17,6 +17,7 @@ import { CharacterIllustration } from './CharacterIllustration';
 import { parseQuoteDateDisplay } from './DeskCalendarCard';
 import { getLunarDetails } from '../utils/lunarUtils';
 import { playPaperTearSound, playLockedBounceSound } from '../utils/soundEffects';
+import { APP_VERSION } from '../constants/version';
 
 interface DeskCalendarProps {
   quote: CalendarQuote;
@@ -836,8 +837,9 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                 </button>
               </div>
 
-              <span className="font-serif font-bold text-sm tracking-[0.2em] text-[#6E6A63]/80">
-                幹話日曆
+              <span className="font-serif font-bold text-xs tracking-wider text-[#6E6A63]/80 flex items-center gap-1.5 select-none" title={`幹話日曆 版本 v${APP_VERSION}`}>
+                <span>幹話日曆</span>
+                <span className="font-mono text-[10px] text-[#6E6A63]/70 font-semibold bg-[#2D2D2D]/5 px-1.5 py-0.5 rounded border border-[#2D2D2D]/10">v{APP_VERSION}</span>
               </span>
             </div>
           </div>

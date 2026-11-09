@@ -24,6 +24,7 @@ import {
   CalendarMeeting,
   MOCK_CALENDAR_PRESETS,
 } from '../services/calendarRoastService';
+import { APP_VERSION } from '../constants/version';
 
 interface AdminConsoleModalProps {
   isOpen: boolean;
@@ -111,6 +112,9 @@ export const AdminConsoleModal: React.FC<AdminConsoleModalProps> = ({
                 </h2>
                 <span className="text-[10px] font-sans font-bold px-2 py-0.5 rounded-full bg-[#D4B483] text-[#2D2D2D] border border-[#2D2D2D]">
                   ADMIN
+                </span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#2D2D2D]/5 text-[#6E6A63] border border-[#2D2D2D]/20">
+                  v{APP_VERSION}
                 </span>
               </div>
               <p className="text-xs font-sans text-[#6E6A63]">
