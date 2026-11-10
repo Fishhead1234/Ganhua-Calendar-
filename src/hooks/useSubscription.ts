@@ -9,6 +9,7 @@ export function useSubscription() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    purchaseService.initialize();
     const unsubscribe = purchaseService.subscribe((proVal, tierVal, adminVal, authedVal) => {
       setIsPro(proVal);
       setTierState(tierVal);

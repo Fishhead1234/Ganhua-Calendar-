@@ -1,4 +1,7 @@
 // RevenueCat / In-App Purchase Service for Web, Capacitor & Native Mobile
+import { Purchases, LOG_LEVEL, PurchasesPackage } from '@revenuecat/purchases-capacitor';
+import { Capacitor } from '@capacitor/core';
+import { REVENUECAT_GOOGLE_API_KEY, ENTITLEMENT_ID_PRO, PRODUCT_IDS } from '../constants/revenuecat';
 
 export type SubscriptionPlan = 'annual' | 'lifetime';
 export type AppTier = 'free' | 'pro' | 'admin';
@@ -49,6 +52,8 @@ class PurchaseService {
   private tier: AppTier = 'free';
   private isAdminAuthed: boolean = false;
   private listeners: Set<SubscriptionListener> = new Set();
+  private isConfigured: boolean = false;
+  private availablePackages: PurchasesPackage[] = [];
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -72,6 +77,81 @@ class PurchaseService {
         this.tier = 'free';
         this.isAdminAuthed = false;
       }
+    }
+  }
+
+  /**
+   * Initialize RevenueCat SDK on native mobile platforms
+   */
+  public async initialize(): Promise<void> {
+    if (this.isConfigured) return;
+    if (typeof window === 'undefined') return;
+
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+        await Purchases.configure({ apiKey: REVENUECAT_GOOGLE_API_KEY });
+        this.isConfigured = true;
+
+        // Check active subscriptions on startup
+        try {
+          const { customerInfo } = await Purchases.getCustomerInfo();
+          const hasActivePro = Boolean(customerInfo?.entitlements?.active?.[ENTITLEMENT_ID_PRO]);
+          if (hasActivePro && this.tier !== 'admin') {
+            this.tier = 'pro';
+            try {
+              localStorage.setItem(LOCAL_STORAGE_PRO_KEY, 'true');
+              localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'pro');
+            } catch {
+              // ignore
+            }
+            this.notify();
+          }
+        } catch (e) {
+          console.warn('[RevenueCat] Check customer info on init warning:', e);
+        }
+
+        // Fetch offerings to get dynamic local currency prices from Google Play
+        await this.loadOfferings();
+      } catch (err) {
+        console.warn('[RevenueCat] Purchases.configure warning:', err);
+      }
+    }
+  }
+
+  /**
+   * Load offerings from RevenueCat & update local price display
+   */
+  public async loadOfferings(): Promise<PurchasesPackage[]> {
+    if (!Capacitor.isNativePlatform()) return [];
+    try {
+      const offerings = await Purchases.getOfferings();
+      if (offerings.current?.availablePackages && offerings.current.availablePackages.length > 0) {
+        this.availablePackages = offerings.current.availablePackages;
+
+        // Sync real store prices into SUBSCRIPTION_PLANS
+        for (const pkg of this.availablePackages) {
+          const id = pkg.identifier.toLowerCase();
+          const pkgType = (pkg.packageType || '').toLowerCase();
+          const prodId = (pkg.product?.identifier || '').toLowerCase();
+
+          if (id.includes('annual') || pkgType === 'annual' || prodId.includes('annual')) {
+            const annualPlan = SUBSCRIPTION_PLANS.find((p) => p.id === 'annual');
+            if (annualPlan && pkg.product?.priceString) {
+              annualPlan.priceFormatted = `${pkg.product.priceString} / 年`;
+            }
+          } else if (id.includes('lifetime') || pkgType === 'lifetime' || prodId.includes('lifetime')) {
+            const lifetimePlan = SUBSCRIPTION_PLANS.find((p) => p.id === 'lifetime');
+            if (lifetimePlan && pkg.product?.priceString) {
+              lifetimePlan.priceFormatted = `${pkg.product.priceString} 終身買斷`;
+            }
+          }
+        }
+      }
+      return this.availablePackages;
+    } catch (e) {
+      console.warn('[RevenueCat] Load offerings error:', e);
+      return [];
     }
   }
 
@@ -171,34 +251,65 @@ class PurchaseService {
   }
 
   /**
-   * Simulate or execute purchase
+   * Execute Google Play native purchase via RevenueCat, or web mock fallback
    */
   public async purchasePlan(planId: SubscriptionPlan): Promise<{ success: boolean; message: string }> {
-    // Check if running on Capacitor native with RevenueCat
-    const isNative =
-      typeof window !== 'undefined' &&
-      (window as any).Capacitor &&
-      (window as any).Capacitor.isNativePlatform();
-
-    if (isNative && (window as any).Purchases) {
+    if (Capacitor.isNativePlatform()) {
       try {
-        // Native RevenueCat purchase flow hook
-        const purchases = (window as any).Purchases;
-        const offerings = await purchases.getOfferings();
-        const pkg = offerings.current?.availablePackages?.find(
-          (p: any) => p.identifier.includes(planId) || p.packageType.toLowerCase().includes(planId)
-        );
-        if (pkg) {
-          const res = await purchases.purchasePackage({ aPackage: pkg });
-          if (res.customerInfo?.entitlements?.active?.pro) {
+        await this.initialize();
+        if (this.availablePackages.length === 0) {
+          await this.loadOfferings();
+        }
+
+        // Locate corresponding RevenueCat package
+        const pkg =
+          this.availablePackages.find((p) => {
+            const id = p.identifier.toLowerCase();
+            const pkgType = (p.packageType || '').toLowerCase();
+            const prodId = (p.product?.identifier || '').toLowerCase();
+            if (planId === 'annual') {
+              return (
+                id.includes('annual') ||
+                pkgType === 'annual' ||
+                prodId === PRODUCT_IDS.ANNUAL ||
+                prodId.includes('annual')
+              );
+            } else {
+              return (
+                id.includes('lifetime') ||
+                pkgType === 'lifetime' ||
+                prodId === PRODUCT_IDS.LIFETIME ||
+                prodId.includes('lifetime')
+              );
+            }
+          }) || this.availablePackages[0];
+
+        if (!pkg) {
+          return {
+            success: false,
+            message: '目前無法取得 Google Play 商品方案，請確認連線或稍後再試。',
+          };
+        }
+
+        const res = await Purchases.purchasePackage({ aPackage: pkg });
+        const hasPro = Boolean(res.customerInfo?.entitlements?.active?.[ENTITLEMENT_ID_PRO]);
+
+        if (hasPro) {
+          if (this.tier !== 'admin') {
             this.setTier('pro');
-            return { success: true, message: '🎉 購買成功！已解鎖社畜終極逃生包！' };
           }
+          return { success: true, message: '🎉 購買成功！已解鎖社畜終極逃生包！' };
+        } else {
+          return { success: false, message: '已完成交易，但未開通授權權益。' };
         }
       } catch (e: any) {
-        if (e.userCancelled) {
+        if (e.userCancelled || e.code === 1) {
           return { success: false, message: '已取消購買' };
         }
+        return {
+          success: false,
+          message: `購買未完成：${e.message || '請確認 Google Play 帳號設定與網路'}`,
+        };
       }
     }
 
@@ -214,25 +325,21 @@ class PurchaseService {
   }
 
   /**
-   * Restore purchases (Google Play / App Store / Local verification)
+   * Restore purchases (Google Play / RevenueCat verification)
    */
   public async restorePurchases(): Promise<{ success: boolean; message: string }> {
-    const isNative =
-      typeof window !== 'undefined' &&
-      (window as any).Capacitor &&
-      (window as any).Capacitor.isNativePlatform();
-
-    if (isNative && (window as any).Purchases) {
+    if (Capacitor.isNativePlatform()) {
       try {
-        const { customerInfo } = await (window as any).Purchases.restorePurchases();
-        const hasPro = Boolean(customerInfo?.entitlements?.active?.pro);
+        await this.initialize();
+        const { customerInfo } = await Purchases.restorePurchases();
+        const hasPro = Boolean(customerInfo?.entitlements?.active?.[ENTITLEMENT_ID_PRO]);
         if (hasPro) {
           if (this.tier !== 'admin') this.setTier('pro');
           return { success: true, message: '✓ 已成功恢復您的 Pro 專業版權益！' };
         }
         return { success: false, message: '查無過往購買紀錄。' };
-      } catch {
-        return { success: false, message: '恢復失敗，請確認網路連線或登入帳號。' };
+      } catch (e: any) {
+        return { success: false, message: `恢復失敗：${e.message || '請確認網路連線'}` };
       }
     }
 
@@ -247,5 +354,3 @@ class PurchaseService {
 }
 
 export const purchaseService = new PurchaseService();
-
-
