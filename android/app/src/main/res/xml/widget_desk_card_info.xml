@@ -2,16 +2,15 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_desk_card_description"
     android:initialLayout="@layout/widget_desk_card"
-    android:minWidth="250dp"
-    android:minHeight="380dp"
-    android:minResizeWidth="200dp"
-    android:minResizeHeight="300dp"
+    android:minWidth="260dp"
+    android:minHeight="420dp"
+    android:minResizeWidth="220dp"
+    android:minResizeHeight="350dp"
     android:maxResizeWidth="600dp"
-    android:maxResizeHeight="800dp"
+    android:maxResizeHeight="900dp"
     android:targetCellWidth="4"
     android:targetCellHeight="5"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen">
 </appwidget-provider>
-

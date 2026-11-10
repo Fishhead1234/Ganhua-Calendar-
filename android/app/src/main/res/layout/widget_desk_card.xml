@@ -3,7 +3,7 @@
     android:id="@+id/widget_desk_card_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="2dp"
+    android:padding="0dp"
     android:background="@android:color/transparent">
 
     <ImageView
@@ -13,32 +13,32 @@
         android:scaleType="fitCenter"
         android:contentDescription="@string/widget_label_desk_card" />
 
-    <!-- Interactive Touch Overlay aligned with 800x1200 canvas -->
+    <!-- Interactive Touch Overlay aligned with 800x1360 canvas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:weightSum="1200"
+        android:weightSum="1360"
         android:background="@android:color/transparent">
 
-        <!-- Top Brass Rings & Charcoal Binder Bar (Height 190 / 1200) - Tap to launch app -->
+        <!-- Top Brass Rings & Charcoal Binder Bar (Height 220 / 1360) - Tap to launch app -->
         <FrameLayout
             android:id="@+id/desk_top_binder_touch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="190"
+            android:layout_weight="220"
             android:clickable="true"
             android:background="@android:color/transparent" />
 
-        <!-- Jagged Edge & Perforated Tear Strip (Height 105 / 1200) with Wide 36% Clickable Pills -->
+        <!-- Jagged Edge & Perforated Tear Strip (Height 85 / 1360) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="105"
+            android:layout_weight="85"
             android:orientation="horizontal"
             android:weightSum="800">
 
-            <!-- Prev Day Button [ ◀ 前一日 ] (Width 288 / 800 = 36%) -->
+            <!-- Prev Day Button [ < 前一日 ] (Width 288 / 800 = 36%) -->
             <FrameLayout
                 android:id="@+id/btn_desk_prev_day"
                 android:layout_width="0dp"
@@ -47,7 +47,7 @@
                 android:clickable="true"
                 android:background="@android:color/transparent" />
 
-            <!-- Center label ✂️ 點擊撕頁 (Width 224 / 800 = 28%) -->
+            <!-- Center label ✂ 點擊撕下日曆 (Width 224 / 800 = 28%) -->
             <FrameLayout
                 android:id="@+id/desk_strip_center_touch"
                 android:layout_width="0dp"
@@ -56,7 +56,7 @@
                 android:clickable="true"
                 android:background="@android:color/transparent" />
 
-            <!-- Tear Next Button [ 撕下一頁 ▶ ] / [ 🔒 明日封印 ] (Width 288 / 800 = 36%) -->
+            <!-- Tear Next Button [ 撕下一頁 ↘ ] / [ 🔒 明日封印 ] (Width 288 / 800 = 36%) -->
             <FrameLayout
                 android:id="@+id/btn_desk_tear_action"
                 android:layout_width="0dp"
@@ -66,20 +66,20 @@
                 android:background="@android:color/transparent" />
         </LinearLayout>
 
-        <!-- 3-Column Taiwanese Hero Date Header (Height 150 / 1200) - Tap to open calendar -->
+        <!-- 3-Column Taiwanese Hero Date Header (Height 175 / 1360) - Tap to open calendar -->
         <FrameLayout
             android:id="@+id/desk_date_header_touch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="150"
+            android:layout_weight="175"
             android:clickable="true"
             android:background="@android:color/transparent" />
 
-        <!-- Frameless Center Character Illustration & Overlapping Stamp (Height 290 / 1200) -->
+        <!-- Seamless Character Illustration & Overlapping Stamp (Height 325 / 1360) -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="290"
+            android:layout_weight="325"
             android:background="@android:color/transparent">
 
             <!-- Base touch: tap illustration to open app -->
@@ -90,34 +90,34 @@
                 android:clickable="true"
                 android:background="@android:color/transparent" />
 
-            <!-- Circular / Oval Stamp Touch Area overlapping bottom-right -->
+            <!-- Circular / Rectangular Stamp Touch Area overlapping right -->
             <FrameLayout
                 android:id="@+id/btn_desk_stamp"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="160dp"
+                android:layout_height="90dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:layout_marginBottom="4dp"
                 android:clickable="true"
                 android:background="@android:color/transparent" />
         </RelativeLayout>
 
-        <!-- Daily Quote & Subtext (Height 175 / 1200) -->
+        <!-- Daily Quote & Subtext (Height 170 / 1360) -->
         <FrameLayout
             android:id="@+id/desk_quote_touch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="175"
+            android:layout_weight="170"
             android:clickable="true"
             android:background="@android:color/transparent" />
 
-        <!-- 社畜農民曆 & Stacked Pages with Bottom-Right Page Curl (Height 290 / 1200) -->
+        <!-- 社畜農民曆 & Stacked Pages with Bottom-Right Page Curl (Height 385 / 1360) -->
         <FrameLayout
             android:id="@+id/btn_desk_agenda"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="290"
+            android:layout_weight="385"
             android:clickable="true"
             android:background="@android:color/transparent" />
     </LinearLayout>
