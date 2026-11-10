@@ -6,3 +6,4 @@ export const PRODUCT_IDS = {
   ANNUAL: 'ganhua_pro_annual',
   LIFETIME: 'ganhua_pro_lifetime',
 } as const;
+
