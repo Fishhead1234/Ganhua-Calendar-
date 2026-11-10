@@ -366,8 +366,9 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         boolean isToday = cardDate.equals(todayKey);
         boolean isPast = cardDate.compareTo(todayKey) < 0;
 
-        float cardLeft = 70f;
-        float cardRight = 730f;
+        // Full-bleed geometry filling 98% of widget width and height
+        float cardLeft = 14f;
+        float cardRight = 786f;
         float cardWidth = cardRight - cardLeft;
 
         if (isPeeling && isPast) {
@@ -390,15 +391,15 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
 
             Paint shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             shadowPaint.setColor(Color.parseColor("#44000000"));
-            RectF peelShadowRect = new RectF(cardLeft, 220f, cardRight, 960f);
+            RectF peelShadowRect = new RectF(cardLeft, 190f, cardRight, 960f);
             canvas.drawRoundRect(peelShadowRect, 24f, 24f, shadowPaint);
 
             drawTallDeskCalendarCard(canvas, context, prefs, cardDate, todayKey, true, cardLeft, cardRight, width, height);
             canvas.restore();
 
             // Re-draw the fixed top black binder clamp and brass rings on top
-            drawTopCharcoalHeader(canvas, cardLeft, cardRight, 95f, 225f);
-            drawBrassRings(canvas, cardLeft, cardWidth, 45f, 145f);
+            drawTopCharcoalHeader(canvas, cardLeft, cardRight, 45f, 175f);
+            drawBrassRings(canvas, cardLeft, cardWidth, 10f, 105f);
         } else {
             // Regular crisp desk calendar view
             drawTallDeskCalendarCard(canvas, context, prefs, cardDate, todayKey, false, cardLeft, cardRight, width, height);
@@ -438,11 +439,11 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         String monthZh = (month >= 1 && month <= 12) ? CHINESE_MONTH_NAMES[month - 1] : month + "月";
 
         float cardWidth = cardRight - cardLeft;
-        float headerTop = 95f;
-        float headerBottom = 225f;
-        float pageBottom = 920f;
+        float headerTop = 45f;
+        float headerBottom = 175f;
+        float pageBottom = 935f;
 
-        // 1. Draw 4 Bottom 3D Stacked Paper Layers (from y = 920 to 985)
+        // 1. Draw 4 Bottom 3D Stacked Paper Layers (from y = 935 to 1095)
         if (!isDetachedPeel) {
             drawBottomStackedLayers(canvas, cardLeft, cardRight, pageBottom);
         }
@@ -463,104 +464,133 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         // 3. Top Charcoal Header Block (#2D2D2D) & 3D Brass Rings
         if (!isDetachedPeel) {
             drawTopCharcoalHeader(canvas, cardLeft, cardRight, headerTop, headerBottom);
-            drawBrassRings(canvas, cardLeft, cardWidth, 45f, 145f);
+            drawBrassRings(canvas, cardLeft, cardWidth, 10f, 105f);
         }
 
         // 4. Jagged Torn Paper Edge across full width
         drawJaggedTornEdge(canvas, cardLeft, cardRight, headerBottom);
 
-        // 5. Tear Action Bar (y = 238 to 295)
-        float actionY = 270f;
-        Paint navTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        navTextPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        navTextPaint.setTextSize(20);
-        navTextPaint.setColor(Color.parseColor("#2D2D2D"));
+        // 5. Tear Action Bar (y = 180 to 280) with 36% Wide Touch Pill Buttons
+        float actionCenterY = 236f;
+        float pillW = cardWidth * 0.36f; // 36% of card width for easy tapping
 
-        // Left button: [ < 前一日 ]
-        canvas.drawText("[ < 前一日 ]", cardLeft + 20f, actionY, navTextPaint);
+        // Left button: [ ◀ 前一日 ] Solid/Bordered Pill
+        RectF leftPillRect = new RectF(cardLeft + 10f, 192f, cardLeft + 10f + pillW, 268f);
+        Paint leftPillBg = new Paint(Paint.ANTI_ALIAS_FLAG);
+        leftPillBg.setColor(Color.parseColor("#FAF6F0"));
+        canvas.drawRoundRect(leftPillRect, 18f, 18f, leftPillBg);
+        Paint leftPillBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+        leftPillBorder.setStyle(Paint.Style.STROKE);
+        leftPillBorder.setStrokeWidth(3.0f);
+        leftPillBorder.setColor(Color.parseColor("#2D2D2D"));
+        canvas.drawRoundRect(leftPillRect, 18f, 18f, leftPillBorder);
 
-        // Center label: ✂ 點擊撕下日曆
+        Paint leftPillText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        leftPillText.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        leftPillText.setTextSize(25);
+        leftPillText.setColor(Color.parseColor("#2D2D2D"));
+        leftPillText.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("◀ 前一日", leftPillRect.centerX(), actionCenterY + 9f, leftPillText);
+
+        // Center label: ✂ 點擊撕頁
         Paint centerLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         centerLabelPaint.setTypeface(Typeface.DEFAULT_BOLD);
         centerLabelPaint.setTextSize(20);
-        centerLabelPaint.setColor(Color.parseColor("#2D2D2D"));
+        centerLabelPaint.setColor(Color.parseColor("#8C2D25"));
         centerLabelPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("✂ 點擊撕下日曆", width / 2f, actionY, centerLabelPaint);
+        canvas.drawText("✂ 點擊撕頁", width / 2f, actionCenterY + 7f, centerLabelPaint);
 
-        // Right button: [ 撕下一頁 ↘ ] or [ 🔒 明日封印 ]
-        Paint rightActionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        rightActionPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        rightActionPaint.setTextSize(20);
-        rightActionPaint.setTextAlign(Paint.Align.RIGHT);
+        // Right button: [ 撕下一頁 ▶ ] or [ 🔒 明日封印 ] Solid/Bordered Pill
+        RectF rightPillRect = new RectF(cardRight - 10f - pillW, 192f, cardRight - 10f, 268f);
+        Paint rightPillBg = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Paint rightPillBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rightPillBorder.setStyle(Paint.Style.STROKE);
+        Paint rightPillText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rightPillText.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        rightPillText.setTextAlign(Paint.Align.CENTER);
 
         if (isPast) {
-            rightActionPaint.setColor(Color.parseColor("#2D2D2D"));
-            canvas.drawText("[ 撕下一頁 ↘ ]", cardRight - 20f, actionY, rightActionPaint);
+            rightPillBg.setColor(Color.parseColor("#C83E31")); // Vermilion Red Pill
+            canvas.drawRoundRect(rightPillRect, 18f, 18f, rightPillBg);
+            rightPillBorder.setStrokeWidth(3.0f);
+            rightPillBorder.setColor(Color.parseColor("#2D2D2D"));
+            canvas.drawRoundRect(rightPillRect, 18f, 18f, rightPillBorder);
+
+            rightPillText.setTextSize(25);
+            rightPillText.setColor(Color.parseColor("#FAF6F0"));
+            canvas.drawText("撕下一頁 ▶", rightPillRect.centerX(), actionCenterY + 9f, rightPillText);
         } else {
-            rightActionPaint.setColor(Color.parseColor("#6E6A63"));
-            canvas.drawText("[ 🔒 明日封印 ]", cardRight - 20f, actionY, rightActionPaint);
+            rightPillBg.setColor(Color.parseColor("#EAE4D7"));
+            canvas.drawRoundRect(rightPillRect, 18f, 18f, rightPillBg);
+            rightPillBorder.setStrokeWidth(2.5f);
+            rightPillBorder.setColor(Color.parseColor("#6E6A63"));
+            canvas.drawRoundRect(rightPillRect, 18f, 18f, rightPillBorder);
+
+            rightPillText.setTextSize(22);
+            rightPillText.setColor(Color.parseColor("#5C5851"));
+            canvas.drawText("🔒 明日封印", rightPillRect.centerX(), actionCenterY + 8f, rightPillText);
         }
 
         // Action Bar Bottom Dashed Line
         Paint dashedLine = new Paint(Paint.ANTI_ALIAS_FLAG);
         dashedLine.setStyle(Paint.Style.STROKE);
-        dashedLine.setStrokeWidth(2.0f);
+        dashedLine.setStrokeWidth(2.2f);
         dashedLine.setColor(Color.parseColor("#402D2D2D"));
         dashedLine.setPathEffect(new DashPathEffect(new float[]{8, 6}, 0));
-        canvas.drawLine(cardLeft + 15f, 295f, cardRight - 15f, 295f, dashedLine);
+        canvas.drawLine(cardLeft + 15f, 280f, cardRight - 15f, 280f, dashedLine);
 
-        // 6. Classic 3-Column Taiwanese Hero Date Layout (y = 295 to 430)
+        // 6. Classic 3-Column Taiwanese Hero Date Layout (y = 290 to 425)
         // Left Column: 2026年 + 十一月
         Paint yearPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         yearPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        yearPaint.setTextSize(26);
+        yearPaint.setTextSize(28);
         yearPaint.setColor(Color.parseColor("#2D2D2D"));
         yearPaint.setTextAlign(Paint.Align.CENTER);
-        float leftColX = cardLeft + 115f;
-        canvas.drawText(year + "年", leftColX, 350f, yearPaint);
+        float leftColX = cardLeft + 125f;
+        canvas.drawText(year + "年", leftColX, 342f, yearPaint);
 
         Paint monthPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         monthPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        monthPaint.setTextSize(38);
+        monthPaint.setTextSize(40);
         monthPaint.setColor(Color.parseColor("#2D2D2D"));
         monthPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(monthZh, leftColX, 400f, monthPaint);
+        canvas.drawText(monthZh, leftColX, 396f, monthPaint);
 
         // Center Column: Hero Vermilion Red 2-Digit Day Number (e.g. 09)
         Paint heroDayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         heroDayPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
-        heroDayPaint.setTextSize(115);
+        heroDayPaint.setTextSize(125);
         heroDayPaint.setColor(Color.parseColor("#C83E31")); // Vermilion Red
         heroDayPaint.setTextAlign(Paint.Align.CENTER);
         String dayStr = String.format(Locale.US, "%02d", day);
-        canvas.drawText(dayStr, width / 2f, 405f, heroDayPaint);
+        canvas.drawText(dayStr, width / 2f, 400f, heroDayPaint);
 
         // Right Column: 星期一・ + 農曆十月初一
-        float rightColX = cardRight - 115f;
+        float rightColX = cardRight - 125f;
         Paint weekdayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         weekdayPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        weekdayPaint.setTextSize(26);
+        weekdayPaint.setTextSize(28);
         weekdayPaint.setColor(Color.parseColor("#2D2D2D"));
         weekdayPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(weekdayZh + "・", rightColX, 350f, weekdayPaint);
+        canvas.drawText(weekdayZh + "・", rightColX, 342f, weekdayPaint);
 
         String lunarDesc = getLunarDescription(year, month - 1, day);
         Paint lunarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         lunarPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        lunarPaint.setTextSize(24);
+        lunarPaint.setTextSize(26);
         lunarPaint.setColor(Color.parseColor("#2D2D2D"));
         lunarPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("農曆" + lunarDesc, rightColX, 400f, lunarPaint);
+        canvas.drawText("農曆" + lunarDesc, rightColX, 396f, lunarPaint);
 
         // Solid Bold Ink Divider under Date Header
         Paint solidDivider = new Paint(Paint.ANTI_ALIAS_FLAG);
         solidDivider.setColor(Color.parseColor("#2D2D2D"));
-        solidDivider.setStrokeWidth(3.2f);
-        canvas.drawLine(cardLeft + 20f, 430f, cardRight - 20f, 430f, solidDivider);
+        solidDivider.setStrokeWidth(3.5f);
+        canvas.drawLine(cardLeft + 15f, 425f, cardRight - 15f, 425f, solidDivider);
 
-        // 7. Frameless Center Character Illustration (Clean on #FAF7F0 paper, NO inner grey box)
-        float illCenterY = 545f;
-        float spriteSize = 225f;
+        // 7. Frameless Center Character Illustration
+        float illCenterY = 555f;
+        float spriteSize = 250f;
         Bitmap spriteBitmap = getSpriteCellBitmap(context, quote.spriteSheet, quote.spritePosition, quote.character);
         if (spriteBitmap != null) {
             RectF dstRect = new RectF(
@@ -573,53 +603,53 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         }
 
         // Overlapping Tilted Red Ink Seal "今日已生還"
-        drawTiltedSurvivalSeal(canvas, cardRight - 120f, illCenterY + 45f, isSurvived, isPast);
+        drawTiltedSurvivalSeal(canvas, cardRight - 125f, illCenterY + 45f, isSurvived, isPast);
 
-        // 8. Core Gàn-huà Quote & Subtext (y = 665 to 770)
+        // 8. Core Gàn-huà Quote & Subtext (y = 675 to 780)
         TextPaint quotePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         quotePaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        quotePaint.setTextSize(28);
+        quotePaint.setTextSize(30);
         quotePaint.setColor(Color.parseColor("#2D2D2D"));
 
         String displayQuote = "「" + quote.quote + "」";
         StaticLayout quoteLayout = new StaticLayout(
                 displayQuote,
                 quotePaint,
-                (int) (cardWidth - 70f),
+                (int) (cardWidth - 60f),
                 Layout.Alignment.ALIGN_CENTER,
-                1.24f,
+                1.22f,
                 0.0f,
                 false
         );
 
         canvas.save();
-        canvas.translate(cardLeft + 35f, 665f);
+        canvas.translate(cardLeft + 30f, 675f);
         quoteLayout.draw(canvas);
         canvas.restore();
 
         Paint subtextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         subtextPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        subtextPaint.setTextSize(17);
+        subtextPaint.setTextSize(18);
         subtextPaint.setColor(Color.parseColor("#6E6A63"));
         subtextPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(quote.subtext, width / 2f, 755f, subtextPaint);
+        canvas.drawText(quote.subtext, width / 2f, 775f, subtextPaint);
 
-        // 9. 社畜農民曆 Box (y = 778 to 885)
-        float almTop = 778f;
-        float almBottom = 885f;
-        RectF almRect = new RectF(cardLeft + 25f, almTop, cardRight - 25f, almBottom);
+        // 9. 社畜農民曆 Box (y = 800 to 915)
+        float almTop = 800f;
+        float almBottom = 915f;
+        RectF almRect = new RectF(cardLeft + 20f, almTop, cardRight - 20f, almBottom);
         Paint almBg = new Paint(Paint.ANTI_ALIAS_FLAG);
         almBg.setColor(Color.parseColor("#FAF7F0"));
         canvas.drawRoundRect(almRect, 18f, 18f, almBg);
 
         Paint almBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
         almBorder.setStyle(Paint.Style.STROKE);
-        almBorder.setStrokeWidth(2.2f);
+        almBorder.setStrokeWidth(2.4f);
         almBorder.setColor(Color.parseColor("#C83E31"));
         canvas.drawRoundRect(almRect, 18f, 18f, almBorder);
 
         // Pill Badge: "社畜農民曆"
-        RectF badgeRect = new RectF(cardLeft + 42f, almTop - 12f, cardLeft + 165f, almTop + 14f);
+        RectF badgeRect = new RectF(cardLeft + 38f, almTop - 12f, cardLeft + 165f, almTop + 14f);
         Paint badgeBg = new Paint(Paint.ANTI_ALIAS_FLAG);
         badgeBg.setColor(Color.parseColor("#C83E31"));
         canvas.drawRoundRect(badgeRect, 13f, 13f, badgeBg);
@@ -630,33 +660,33 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         badgeText.setTextAlign(Paint.Align.CENTER);
         canvas.drawText("社畜農民曆", badgeRect.centerX(), badgeRect.centerY() + 5f, badgeText);
 
-        // Line 1: 宜：準時關機人際關係
+        // Line 1: 宜：
         Paint yiLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
         yiLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        yiLabel.setTextSize(18);
+        yiLabel.setTextSize(19);
         yiLabel.setColor(Color.parseColor("#C83E31"));
-        canvas.drawText("宜：", cardLeft + 48f, 828f, yiLabel);
+        canvas.drawText("宜：", cardLeft + 42f, 850f, yiLabel);
 
         Paint yiContent = new Paint(Paint.ANTI_ALIAS_FLAG);
         yiContent.setTypeface(Typeface.DEFAULT_BOLD);
-        yiContent.setTextSize(18);
+        yiContent.setTextSize(19);
         yiContent.setColor(Color.parseColor("#2D2D2D"));
-        String yiStr = quote.yi.length() > 22 ? quote.yi.substring(0, 21) + "…" : quote.yi;
-        canvas.drawText(yiStr, cardLeft + 88f, 828f, yiContent);
+        String yiStr = quote.yi.length() > 24 ? quote.yi.substring(0, 23) + "…" : quote.yi;
+        canvas.drawText(yiStr, cardLeft + 84f, 850f, yiContent);
 
-        // Line 2: 忌：認真打開銀行帳戶看存款餘額
+        // Line 2: 忌：
         Paint jiLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
         jiLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        jiLabel.setTextSize(18);
+        jiLabel.setTextSize(19);
         jiLabel.setColor(Color.parseColor("#C83E31"));
-        canvas.drawText("忌：", cardLeft + 48f, 862f, jiLabel);
+        canvas.drawText("忌：", cardLeft + 42f, 888f, jiLabel);
 
         Paint jiContent = new Paint(Paint.ANTI_ALIAS_FLAG);
         jiContent.setTypeface(Typeface.DEFAULT_BOLD);
-        jiContent.setTextSize(18);
+        jiContent.setTextSize(19);
         jiContent.setColor(Color.parseColor("#2D2D2D"));
-        String jiStr = quote.ji.length() > 22 ? quote.ji.substring(0, 21) + "…" : quote.ji;
-        canvas.drawText(jiStr, cardLeft + 88f, 862f, jiContent);
+        String jiStr = quote.ji.length() > 24 ? quote.ji.substring(0, 23) + "…" : quote.ji;
+        canvas.drawText(jiStr, cardLeft + 84f, 888f, jiContent);
 
         // 10. Curled Page Corner on Bottom-Right (Active Sheet Fold)
         if (!isDetachedPeel) {

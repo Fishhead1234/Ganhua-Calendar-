@@ -457,32 +457,38 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             canvas.drawRect(0, footerY, width, height, footerBgPaint);
             canvas.drawLine(0, footerY, width, footerY, dividerPaint);
 
-            // Character Illustration Thumbnail
-            Bitmap avatarBitmap = null;
-            File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
-            if (avatarFile.exists() && avatarFile.length() > 0) {
-                try {
-                    avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
-                } catch (Exception ignored) {}
-            }
-            if (avatarBitmap == null) {
-                int fallbackRes = R.drawable.widget_char_cat;
-                if ("capybara".equals(characterKey)) fallbackRes = R.drawable.widget_char_capybara;
-                else if ("ghost".equals(characterKey)) fallbackRes = R.drawable.widget_char_ghost;
-                avatarBitmap = BitmapFactory.decodeResource(context.getResources(), fallbackRes);
-            }
+            int avatarSize = 175;
+            RectF avRect = new RectF(28, footerY + 28, 28 + avatarSize, footerY + 28 + avatarSize);
 
-            if (avatarBitmap != null) {
-                int avatarSize = 175;
-                Bitmap roundedAvatar = getRoundedBitmap(avatarBitmap, avatarSize, 22);
+            if (isSelectedFuture) {
+                // Future Date: Do NOT draw character sprite! Draw yellow/red Talisman Seal graphic instead
+                drawTalismanSealBox(canvas, avRect);
+            } else {
+                // Character Illustration Thumbnail for Today and Past Dates
+                Bitmap avatarBitmap = null;
+                File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
+                if (avatarFile.exists() && avatarFile.length() > 0) {
+                    try {
+                        avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                    } catch (Exception ignored) {}
+                }
+                if (avatarBitmap == null) {
+                    int fallbackRes = R.drawable.widget_char_cat;
+                    if ("capybara".equals(characterKey)) fallbackRes = R.drawable.widget_char_capybara;
+                    else if ("ghost".equals(characterKey)) fallbackRes = R.drawable.widget_char_ghost;
+                    avatarBitmap = BitmapFactory.decodeResource(context.getResources(), fallbackRes);
+                }
 
-                Paint avatarCardBg = new Paint(Paint.ANTI_ALIAS_FLAG);
-                avatarCardBg.setColor(Color.WHITE);
-                RectF avRect = new RectF(28, footerY + 28, 28 + avatarSize, footerY + 28 + avatarSize);
-                canvas.drawRoundRect(avRect, 22, 22, avatarCardBg);
+                if (avatarBitmap != null) {
+                    Bitmap roundedAvatar = getRoundedBitmap(avatarBitmap, avatarSize, 22);
 
-                canvas.drawBitmap(roundedAvatar, 28, footerY + 28, null);
-                canvas.drawRoundRect(avRect, 22, 22, dividerPaint);
+                    Paint avatarCardBg = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    avatarCardBg.setColor(Color.WHITE);
+                    canvas.drawRoundRect(avRect, 22, 22, avatarCardBg);
+
+                    canvas.drawBitmap(roundedAvatar, 28, footerY + 28, null);
+                    canvas.drawRoundRect(avRect, 22, 22, dividerPaint);
+                }
             }
 
             // Quote & Info on Right of Footer
@@ -794,6 +800,60 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             }
         } catch (Exception ignored) {}
         return false;
+    }
+
+    private static void drawTalismanSealBox(Canvas canvas, RectF rect) {
+        // Yellow talisman parchment background
+        Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bgPaint.setColor(Color.parseColor("#FEF3C7")); // Amber 100
+        canvas.drawRoundRect(rect, 22, 22, bgPaint);
+
+        // Amber border
+        Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.parseColor("#D97706")); // Amber 600
+        borderPaint.setStrokeWidth(3f);
+        canvas.drawRoundRect(rect, 22, 22, borderPaint);
+
+        // Inner cinnabar border
+        RectF innerRect = new RectF(rect.left + 8, rect.top + 8, rect.right - 8, rect.bottom - 8);
+        Paint innerBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+        innerBorder.setStyle(Paint.Style.STROKE);
+        innerBorder.setColor(Color.parseColor("#C83E31")); // Chinese cinnabar red
+        innerBorder.setStrokeWidth(2f);
+        canvas.drawRoundRect(innerRect, 14, 14, innerBorder);
+
+        float cx = rect.centerX();
+
+        // 1. "敕 令"
+        Paint chiLingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        chiLingPaint.setColor(Color.parseColor("#C83E31"));
+        chiLingPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        chiLingPaint.setTextSize(26);
+        chiLingPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("敕 令", cx, rect.top + 42, chiLingPaint);
+
+        // 2. Crystal ball / Talisman icon
+        Paint emojiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        emojiPaint.setTextSize(36);
+        emojiPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("🔮", cx, rect.top + 86, emojiPaint);
+
+        // 3. "幹話封印"
+        Paint sealWordPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        sealWordPaint.setColor(Color.parseColor("#C83E31"));
+        sealWordPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        sealWordPaint.setTextSize(22);
+        sealWordPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("幹話封印", cx, rect.top + 124, sealWordPaint);
+
+        // 4. "明日解鎖" badge
+        Paint subWordPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        subWordPaint.setColor(Color.parseColor("#92400E")); // Amber 800
+        subWordPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        subWordPaint.setTextSize(14);
+        subWordPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("明日解鎖 🔒", cx, rect.top + 152, subWordPaint);
     }
 
     private static Bitmap getRoundedBitmap(Bitmap bitmap, int size, float cornerRadius) {

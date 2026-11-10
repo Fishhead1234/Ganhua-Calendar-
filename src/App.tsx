@@ -345,6 +345,22 @@ export const App: React.FC = () => {
     userCardMode: currentCardViewMode,
   });
 
+  // Today's quote strictly locked for Native Widgets to prevent future/past date spoilers
+  const { currentQuote: todayQuoteToSync } = useTodayQuote({
+    dateOffset: isTodayUnlocked ? 0 : -1,
+    isPro,
+    isAdmin,
+    allowFutureDates: false,
+    calendarConnected: persisted.calendarConnected,
+    roastResult: persisted.calendarConnected ? todayRoastResult : null,
+    selectedThemeFilter: persisted.selectedTheme,
+    birthday: persisted.birthday || null,
+    calendarEvents: todayMeetings,
+    specialQuoteCycleIndex,
+    activePresetId: activePresetId || undefined,
+    userCardMode: currentCardViewMode,
+  });
+
   const syncAllCalendarSources = async (): Promise<CalendarMeeting[]> => {
     setIsCalendarSyncing(true);
     try {
@@ -460,22 +476,32 @@ export const App: React.FC = () => {
     }
   }, [isBirthday, isToday]);
 
-  // Sync to native Android widget & schedule calendar alarms whenever quote or appointments update
+  // Sync to native Android widget & schedule calendar alarms strictly using today's quote (preventing future spoilers)
   useEffect(() => {
-    if (currentQuote) {
+    const quoteToSync = todayQuoteToSync || (persisted.dateOffset === 0 ? currentQuote : null);
+    if (quoteToSync) {
       syncNativeWidgetData(
-        currentQuote,
+        quoteToSync,
         persisted.streakCount,
         persisted.offWorkHour,
         persisted.survivedDates,
-        effectiveMeetings,
+        todayMeetings,
         allAppointments
       );
     }
     if (allAppointments && allAppointments.length > 0) {
       syncAllCalendarRemindersViaBridge(allAppointments);
     }
-  }, [currentQuote, persisted.streakCount, persisted.offWorkHour, persisted.survivedDates, effectiveMeetings, allAppointments]);
+  }, [
+    todayQuoteToSync,
+    currentQuote,
+    persisted.dateOffset,
+    persisted.streakCount,
+    persisted.offWorkHour,
+    persisted.survivedDates,
+    todayMeetings,
+    allAppointments,
+  ]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {
@@ -952,9 +978,12 @@ export const App: React.FC = () => {
             {/* Daily Agenda & Sarcastic Timeline Strip */}
             <DailyAgendaStrip
               events={effectiveMeetings}
+              allEvents={allAppointments}
+              currentDateKey={currentQuote?.date || todayKey}
+              todayDateKey={todayKey}
               isFuture={isFutureDate}
               onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
-              onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
+              onOpenAddEvent={(targetDateKey) => handleOpenAddEvent(targetDateKey || currentQuote?.date)}
               onEditEvent={handleEditMeeting}
               onShowToast={showToast}
             />
