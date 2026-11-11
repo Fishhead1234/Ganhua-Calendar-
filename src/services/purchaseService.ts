@@ -135,7 +135,7 @@ class PurchaseService {
           const pkgType = (pkg.packageType || '').toLowerCase();
           const prodId = (pkg.product?.identifier || '').toLowerCase();
 
-          if (id.includes('annual') || pkgType === 'annual' || prodId.includes('annual')) {
+          if (id.includes('annual') || pkgType === 'annual' || prodId.includes('annual') || prodId.includes('yearly') || prodId.includes('monthly')) {
             const annualPlan = SUBSCRIPTION_PLANS.find((p) => p.id === 'annual');
             if (annualPlan && pkg.product?.priceString) {
               annualPlan.priceFormatted = `${pkg.product.priceString} / 年`;
@@ -272,7 +272,10 @@ class PurchaseService {
                 id.includes('annual') ||
                 pkgType === 'annual' ||
                 prodId === PRODUCT_IDS.ANNUAL ||
-                prodId.includes('annual')
+                prodId === PRODUCT_IDS.ANNUAL_LEGACY ||
+                prodId.includes('annual') ||
+                prodId.includes('yearly') ||
+                prodId.includes('monthly')
               );
             } else {
               return (
