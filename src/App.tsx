@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Stamp,
@@ -47,6 +47,7 @@ import {
   deleteNativeDeviceCalendarEvent,
   pushEventToGoogleAppsScript,
   syncAllCalendarRemindersViaBridge,
+  cancelAllCalendarRemindersViaBridge,
   sendTestNotificationViaBridge,
 } from './services/calendarService';
 
@@ -450,11 +451,7 @@ export const App: React.FC = () => {
     } catch {
       // ignore
     }
-    try {
-      if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.syncAllEventReminders) {
-        (window as any).AndroidCalendarBridge.syncAllEventReminders('[]');
-      }
-    } catch {}
+    cancelAllCalendarRemindersViaBridge();
     setPersisted((prev) => ({ ...prev, calendarConnected: false }));
     showToast('✕ 已完全解除行事曆連動，恢復每日常規 365 幹話！');
   };
@@ -489,7 +486,7 @@ export const App: React.FC = () => {
     }
   }, [isBirthday, isToday]);
 
-  // Sync to native Android widget & schedule calendar alarms strictly using today's quote (preventing future spoilers)
+  // Sync to native Android widget strictly using today's quote (preventing future spoilers)
   useEffect(() => {
     const quoteToSync = todayQuoteToSync || (persisted.dateOffset === 0 ? currentQuote : null);
     if (quoteToSync) {
@@ -502,9 +499,6 @@ export const App: React.FC = () => {
         allAppointments
       );
     }
-    if (allAppointments && allAppointments.length > 0) {
-      syncAllCalendarRemindersViaBridge(allAppointments);
-    }
   }, [
     todayQuoteToSync,
     currentQuote,
@@ -515,6 +509,31 @@ export const App: React.FC = () => {
     todayMeetings,
     allAppointments,
   ]);
+
+  // Schedule native event alarms only when appointments fingerprint changes and calendar is connected
+  const lastSyncedRemindersHashRef = useRef<string>('');
+  useEffect(() => {
+    if (!persisted.calendarConnected) {
+      lastSyncedRemindersHashRef.current = '';
+      cancelAllCalendarRemindersViaBridge();
+      return;
+    }
+
+    if (!allAppointments || allAppointments.length === 0) {
+      lastSyncedRemindersHashRef.current = '';
+      cancelAllCalendarRemindersViaBridge();
+      return;
+    }
+
+    const fingerprint = allAppointments
+      .map((a) => `${a.id}:${a.dateKey}:${a.startHour}:${a.startMinute}`)
+      .join('|');
+
+    if (fingerprint !== lastSyncedRemindersHashRef.current) {
+      lastSyncedRemindersHashRef.current = fingerprint;
+      syncAllCalendarRemindersViaBridge(allAppointments);
+    }
+  }, [persisted.calendarConnected, allAppointments]);
 
   // Handlers for Backward Navigation
   const handlePrevDay = () => {

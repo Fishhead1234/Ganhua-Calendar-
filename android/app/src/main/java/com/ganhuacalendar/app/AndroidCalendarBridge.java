@@ -2,6 +2,7 @@ package com.ganhuacalendar.app;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -379,14 +380,16 @@ public class AndroidCalendarBridge {
                 }
 
                 long triggerMs = eventStartMs - offsetMs;
-                if (triggerMs <= now) {
-                    if (eventStartMs > now) {
-                        // Event hasn't started yet, fire alert immediately in 2 seconds
-                        triggerMs = now + 2000L;
-                    } else {
-                        // Already in the past
-                        continue;
-                    }
+                // Never schedule alarms for the past or immediate 5 seconds
+                if (triggerMs <= now + 5000L) {
+                    continue;
+                }
+
+                android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
+                String timeStr = String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute);
+                String notifKey = dateKey + "_" + title + "_" + timeStr + "_" + i;
+                if (prefs.getBoolean("fired_" + notifKey, false)) {
+                    continue;
                 }
 
                 Intent intent = new Intent(context, EventReminderReceiver.class);
@@ -395,11 +398,11 @@ public class AndroidCalendarBridge {
                 intent.putExtra("reminderIndex", i);
                 intent.putExtra("title", title);
                 intent.putExtra("dateKey", dateKey);
-                intent.putExtra("timeStr", String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute));
+                intent.putExtra("timeStr", timeStr);
                 intent.putExtra("reminderText", unitText);
                 intent.putExtra("roast", roast);
 
-                int requestCode = (id + "_" + i).hashCode();
+                int requestCode = Math.abs(notifKey.hashCode());
                 int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
@@ -542,12 +545,30 @@ public class AndroidCalendarBridge {
     }
 
     /**
+     * Cancel and remove all posted reminder notifications from notification tray
+     */
+    @JavascriptInterface
+    public boolean cancelAllEventNotifications() {
+        try {
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null) {
+                nm.cancelAll();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Sync and schedule reminders for ALL upcoming calendar events (both phone synced & custom)
      */
     @JavascriptInterface
     public String syncAllEventReminders(String eventsJsonArray) {
-        if (eventsJsonArray == null || eventsJsonArray.trim().isEmpty()) {
-            return "{\"scheduled\": 0, \"message\": \"Empty events array\"}";
+        if (eventsJsonArray == null || eventsJsonArray.trim().isEmpty() || eventsJsonArray.trim().equals("[]")) {
+            cancelAllEventNotifications();
+            return "{\"scheduled\": 0, \"message\": \"Cleared all reminders\"}";
         }
 
         try {
@@ -557,10 +578,11 @@ public class AndroidCalendarBridge {
 
             long now = System.currentTimeMillis();
             int totalScheduled = 0;
+            android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
 
             for (int e = 0; e < events.length(); e++) {
                 JSONObject obj = events.getJSONObject(e);
-                String id = obj.optString("id", String.valueOf(System.currentTimeMillis() + e));
+                String id = obj.optString("id", "evt_" + e);
                 String title = obj.optString("title", "社畜行程");
                 String dateKey = obj.optString("dateKey");
                 int startHour = obj.optInt("startHour", 9);
@@ -630,13 +652,16 @@ public class AndroidCalendarBridge {
                     }
 
                     long triggerMs = eventStartMs - offsetMs;
-                    if (triggerMs <= now) {
-                        // If trigger time passed but event starts soon (in next 10 mins), trigger in 3s!
-                        if (eventStartMs > now) {
-                            triggerMs = now + 3000L;
-                        } else {
-                            continue;
-                        }
+                    // Never schedule alarms for the past or immediate 5 seconds
+                    if (triggerMs <= now + 5000L) {
+                        continue;
+                    }
+
+                    String timeStr = String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute);
+                    String notifKey = dateKey + "_" + title + "_" + timeStr + "_" + i;
+                    if (prefs.getBoolean("fired_" + notifKey, false)) {
+                        // Already notified to user
+                        continue;
                     }
 
                     Intent intent = new Intent(context, EventReminderReceiver.class);
@@ -645,11 +670,12 @@ public class AndroidCalendarBridge {
                     intent.putExtra("reminderIndex", i);
                     intent.putExtra("title", title);
                     intent.putExtra("dateKey", dateKey);
-                    intent.putExtra("timeStr", String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute));
+                    intent.putExtra("timeStr", timeStr);
                     intent.putExtra("reminderText", unitText);
                     intent.putExtra("roast", roast);
 
-                    int requestCode = (id + "_" + i).hashCode();
+                    // Stable deterministic request code based on notifKey
+                    int requestCode = Math.abs(notifKey.hashCode());
                     int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         pendingFlag |= PendingIntent.FLAG_IMMUTABLE;

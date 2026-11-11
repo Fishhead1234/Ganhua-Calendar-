@@ -1649,7 +1649,7 @@ export function parseICSToMeetings(
               (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
             meetings.push({
-              id: `ics-${currentEvent.uid || meetings.length + 1}-${Date.now()}`,
+              id: `ics-${currentEvent.uid || `${dateKey}_${title.replace(/\s+/g, '_')}_${startHour}_${startMinute}`}`,
               title,
               startHour,
               startMinute,
@@ -1745,7 +1745,7 @@ export function parseJsonMeetings(data: any[], targetDate: Date = new Date()): C
       (startHour >= 16 || (startHour === 15 && startMinute >= 45));
 
     meetings.push({
-      id: `live-json-${idx + 1}-${Date.now()}`,
+      id: `live-json-${item.id || `${eventDateKey}_${(item.title || item.summary || 'meeting').replace(/\s+/g, '_')}_${startHour}_${startMinute}`}`,
       title: item.title || item.summary || '未命名會議',
       startHour,
       startMinute,
@@ -2010,6 +2010,22 @@ export function cancelEventNotificationsViaBridge(eventId: string): void {
     }
   } catch (err) {
     console.warn('Failed to cancel event notifications via bridge:', err);
+  }
+}
+
+/**
+ * Cancel and clear ALL scheduled calendar alarms & remove existing notifications
+ */
+export function cancelAllCalendarRemindersViaBridge(): void {
+  try {
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.cancelAllEventNotifications) {
+      (window as any).AndroidCalendarBridge.cancelAllEventNotifications();
+    }
+    if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.syncAllEventReminders) {
+      (window as any).AndroidCalendarBridge.syncAllEventReminders('[]');
+    }
+  } catch (err) {
+    console.warn('Failed to cancel all reminders via bridge:', err);
   }
 }
 

@@ -43,6 +43,16 @@ public class EventReminderReceiver extends BroadcastReceiver {
             roast = "深呼吸，肉體出席點頭就好，靈魂請準時請假。";
         }
 
+        // Deduplication: prevent duplicate firing for the exact same event reminder
+        String notifKey = (dateKey != null ? dateKey : "") + "_" + title + "_" + (timeStr != null ? timeStr : "") + "_" + reminderIndex;
+        android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
+        if (prefs.getBoolean("fired_" + notifKey, false)) {
+            // Already fired and displayed to user! Skip duplicate.
+            return;
+        }
+        // Mark as fired immediately
+        prefs.edit().putBoolean("fired_" + notifKey, true).apply();
+
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager == null) return;
 
@@ -84,7 +94,8 @@ public class EventReminderReceiver extends BroadcastReceiver {
             pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
         }
 
-        int notifId = (eventId != null ? (eventId + "_" + reminderIndex).hashCode() : (int) System.currentTimeMillis());
+        // Deterministic notification ID so it replaces instead of duplicating
+        int notifId = Math.abs(notifKey.hashCode());
         PendingIntent contentPendingIntent = PendingIntent.getActivity(context, notifId, tapIntent, pendingFlag);
 
         String contentTitle = "🔔【" + reminderText + "】" + title;
