@@ -3,11 +3,13 @@ import bundledBirthdayQuotes from '../data/birthday_quotes.json';
 import bundledScenesManifest from '../data/scenes_manifest.json';
 import bundledSpecialEventsQuotes from '../data/special_events_quotes.json';
 import { RawStaticQuote365 } from '../types/calendar';
+import { purchaseService } from './purchaseService';
 
 export interface RemoteVersionManifest {
   version: number;
   updatedAt: string;
   baseAssetUrl: string;
+  trialDays?: number;
   files?: {
     quotes365?: string;
     birthdayQuotes?: string;
@@ -180,6 +182,16 @@ class ContentSyncService {
       const manifest: RemoteVersionManifest = await res.json();
       const remoteVer = manifest.version || 1;
       const cachedVer = this.getCachedVersion();
+
+      // Sync remote trial days configuration
+      if (typeof manifest.trialDays === 'number' && manifest.trialDays > 0) {
+        try {
+          localStorage.setItem('remote_trial_days', String(manifest.trialDays));
+          purchaseService.refreshTrial();
+        } catch {
+          // ignore
+        }
+      }
 
       if (manifest.baseAssetUrl && manifest.baseAssetUrl !== 'https://YOUR-WEB-APP-DOMAIN.com') {
         this.setBaseAssetUrl(manifest.baseAssetUrl);

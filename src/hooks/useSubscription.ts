@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
-import { purchaseService, SubscriptionPlan, AppTier } from '../services/purchaseService';
+import { purchaseService, SubscriptionPlan, AppTier, TrialInfo } from '../services/purchaseService';
 
 export function useSubscription() {
   const [tier, setTierState] = useState<AppTier>(() => purchaseService.getTier());
   const [isPro, setIsPro] = useState<boolean>(() => purchaseService.isPro());
   const [isAdmin, setIsAdmin] = useState<boolean>(() => purchaseService.isAdmin());
   const [isAdminAuthed, setIsAdminAuthed] = useState<boolean>(() => purchaseService.isAdminAuthenticated());
+  const [trialInfo, setTrialInfo] = useState<TrialInfo>(() => purchaseService.getTrialInfo());
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     purchaseService.initialize();
-    const unsubscribe = purchaseService.subscribe((proVal, tierVal, adminVal, authedVal) => {
+    const unsubscribe = purchaseService.subscribe((proVal, tierVal, adminVal, authedVal, trialVal) => {
       setIsPro(proVal);
       setTierState(tierVal);
       setIsAdmin(adminVal);
       setIsAdminAuthed(authedVal);
+      setTrialInfo(trialVal);
     });
     return unsubscribe;
   }, []);
@@ -49,6 +51,15 @@ export function useSubscription() {
     }
   };
 
+  const restoreWithTransferId = async (code: string) => {
+    setIsLoading(true);
+    try {
+      return await purchaseService.restoreWithTransferId(code);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const toggleMockPro = () => {
     if (!isAdminAuthed) {
       return;
@@ -67,12 +78,18 @@ export function useSubscription() {
     isPro,
     isAdmin,
     isAdminAuthed,
+    trialInfo,
+    isFreeTrialActive: trialInfo.isFreeTrialActive,
+    trialDaysRemaining: trialInfo.trialDaysRemaining,
+    trialDaysTotal: trialInfo.trialDaysTotal,
+    isPaidPro: purchaseService.isPaidPro(),
     isLoading,
     loginAdmin,
     logoutAdmin,
     setTier,
     purchase,
     restore,
+    restoreWithTransferId,
     toggleMockPro,
   };
 }

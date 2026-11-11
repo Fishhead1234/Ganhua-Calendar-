@@ -164,12 +164,18 @@ export const App: React.FC = () => {
     isPro,
     isAdmin,
     isAdminAuthed,
+    trialInfo,
+    isFreeTrialActive,
+    trialDaysRemaining,
+    trialDaysTotal,
+    isPaidPro,
     isLoading: isSubLoading,
     loginAdmin,
     logoutAdmin,
     setTier,
     purchase,
     restore,
+    restoreWithTransferId,
     toggleMockPro,
   } = useSubscription();
 
@@ -869,6 +875,10 @@ export const App: React.FC = () => {
         showFavoritesOnly={showFavoritesOnly}
         onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
         isPro={isPro}
+        isFreeTrialActive={isFreeTrialActive}
+        trialDaysRemaining={trialDaysRemaining}
+        trialDaysTotal={trialDaysTotal}
+        isPaidPro={isPaidPro}
         currentTier={tier}
         isAdminAuthed={isAdminAuthed}
         birthday={persisted.birthday || null}
@@ -1085,6 +1095,11 @@ export const App: React.FC = () => {
         onRestore={restore}
         isLoading={isSubLoading}
         isPro={isPro}
+        isFreeTrialActive={isFreeTrialActive}
+        trialDaysRemaining={trialDaysRemaining}
+        trialDaysTotal={trialDaysTotal}
+        isPaidPro={isPaidPro}
+        onRestoreWithCode={restoreWithTransferId}
         onToggleMockPro={toggleMockPro}
       />
 

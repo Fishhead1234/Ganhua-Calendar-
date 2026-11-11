@@ -31,6 +31,10 @@ interface TopBarProps {
   showFavoritesOnly: boolean;
   onToggleFavoritesOnly: () => void;
   isPro: boolean;
+  isFreeTrialActive?: boolean;
+  trialDaysRemaining?: number;
+  trialDaysTotal?: number;
+  isPaidPro?: boolean;
   currentTier?: AppTier;
   isAdminAuthed?: boolean;
   birthday?: { month: number; day: number } | null;
@@ -54,6 +58,10 @@ export const TopBar: React.FC<TopBarProps> = ({
   showFavoritesOnly,
   onToggleFavoritesOnly,
   isPro,
+  isFreeTrialActive = false,
+  trialDaysRemaining = 0,
+  trialDaysTotal = 15,
+  isPaidPro = false,
   currentTier = 'free',
   isAdminAuthed = false,
   birthday = null,
@@ -181,15 +189,31 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <button
                   type="button"
                   onClick={onOpenPaywall}
-                  className={`text-[10px] font-sans font-black px-2 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 ${
-                    isPro
+                  className={`text-[10px] font-sans font-black px-2.5 py-0.5 rounded-full border transition cursor-pointer flex items-center gap-1 shadow-xs ${
+                    isPaidPro || currentTier === 'admin'
                       ? 'bg-[#D4B483] text-[#2D2D2D] border-[#2D2D2D]'
+                      : isFreeTrialActive
+                      ? 'bg-amber-100 text-amber-900 border-amber-400 hover:bg-amber-200'
                       : 'bg-[#C83E31]/10 text-[#C83E31] border-[#C83E31]/30 hover:bg-[#C83E31]/20'
                   }`}
-                  title="點擊查看 Pro 會員特權與終身方案"
+                  title={
+                    isFreeTrialActive && !isPaidPro && currentTier !== 'admin'
+                      ? `🎁 新手 ${trialDaysTotal} 天 Pro 免費體驗中（剩餘 ${trialDaysRemaining} 天），點擊可查看方案或提前升級`
+                      : '點擊查看 Pro 會員特權與終身方案'
+                  }
                 >
-                  <Crown className="w-3 h-3 fill-current" />
-                  <span>{isPro ? 'PRO 專業版' : '升級 PRO'}</span>
+                  {isFreeTrialActive && !isPaidPro && currentTier !== 'admin' ? (
+                    <span className="flex items-center gap-1">
+                      <span className="text-xs">🎁</span>
+                      <span className="hidden md:inline">新手 {trialDaysTotal} 天 Pro 免費體驗中（剩餘 {trialDaysRemaining} 天）</span>
+                      <span className="md:hidden">Pro 體驗中 (剩 {trialDaysRemaining} 天)</span>
+                    </span>
+                  ) : (
+                    <>
+                      <Crown className="w-3 h-3 fill-current" />
+                      <span>{isPaidPro || currentTier === 'admin' ? 'PRO 專業版' : '升級 PRO'}</span>
+                    </>
+                  )}
                 </button>
               </div>
               <p className="text-[11px] font-sans text-[#6E6A63] hidden sm:block">

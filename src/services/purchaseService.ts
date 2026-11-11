@@ -38,6 +38,17 @@ export const SUBSCRIPTION_PLANS: PlanDetails[] = [
 const LOCAL_STORAGE_PRO_KEY = 'ganhua_pro_subscription_v1';
 const LOCAL_STORAGE_TIER_KEY = 'ganhua_app_tier_v2';
 const LOCAL_STORAGE_ADMIN_AUTH_KEY = 'ganhua_admin_authenticated_v2';
+const LOCAL_STORAGE_FIRST_INSTALL_KEY = 'first_install_ts';
+const LOCAL_STORAGE_REMOTE_TRIAL_DAYS_KEY = 'remote_trial_days';
+
+export const REVIEWER_VIP_CODE = 'PLAY-VIP-2026';
+
+export interface TrialInfo {
+  isFreeTrialActive: boolean;
+  trialDaysTotal: number;
+  trialDaysRemaining: number;
+  daysElapsed: number;
+}
 
 const MASTER_PASSWORDS = ['ganhua2026', '8888'];
 
@@ -45,7 +56,8 @@ type SubscriptionListener = (
   isPro: boolean,
   tier: AppTier,
   isAdmin: boolean,
-  isAdminAuthed: boolean
+  isAdminAuthed: boolean,
+  trialInfo: TrialInfo
 ) => void;
 
 class PurchaseService {
@@ -58,6 +70,11 @@ class PurchaseService {
   constructor() {
     if (typeof window !== 'undefined') {
       try {
+        // Record first install timestamp for 15-day free welcome trial
+        if (!localStorage.getItem(LOCAL_STORAGE_FIRST_INSTALL_KEY)) {
+          localStorage.setItem(LOCAL_STORAGE_FIRST_INSTALL_KEY, Date.now().toString());
+        }
+
         const authed = localStorage.getItem(LOCAL_STORAGE_ADMIN_AUTH_KEY) === 'true';
         this.isAdminAuthed = authed;
 
@@ -159,8 +176,57 @@ class PurchaseService {
     return this.tier;
   }
 
+  /**
+   * Calculate 15-day welcome trial information
+   */
+  public getTrialInfo(): TrialInfo {
+    if (typeof window === 'undefined') {
+      return { isFreeTrialActive: false, trialDaysTotal: 15, trialDaysRemaining: 0, daysElapsed: 0 };
+    }
+    try {
+      let firstInstallTs = localStorage.getItem(LOCAL_STORAGE_FIRST_INSTALL_KEY);
+      if (!firstInstallTs) {
+        firstInstallTs = Date.now().toString();
+        localStorage.setItem(LOCAL_STORAGE_FIRST_INSTALL_KEY, firstInstallTs);
+      }
+      const remoteDays = localStorage.getItem(LOCAL_STORAGE_REMOTE_TRIAL_DAYS_KEY);
+      const trialDaysTotal = remoteDays ? Math.max(1, parseInt(remoteDays, 10) || 15) : 15;
+      const daysElapsed = Math.floor((Date.now() - Number(firstInstallTs)) / (1000 * 60 * 60 * 24));
+      const trialDaysRemaining = Math.max(0, trialDaysTotal - daysElapsed);
+      const isFreeTrialActive = trialDaysRemaining > 0;
+      return { isFreeTrialActive, trialDaysTotal, trialDaysRemaining, daysElapsed };
+    } catch {
+      return { isFreeTrialActive: false, trialDaysTotal: 15, trialDaysRemaining: 0, daysElapsed: 0 };
+    }
+  }
+
+  /**
+   * Returns true if user has active Pro access (either paid subscription or active 15-day welcome trial)
+   */
   public isPro(): boolean {
-    return this.tier === 'pro' || this.tier === 'admin';
+    if (this.tier === 'admin') return true;
+    if (this.isPaidPro()) return true;
+    return this.getTrialInfo().isFreeTrialActive;
+  }
+
+  /**
+   * Returns true only if user has legitimately purchased Pro (not just trial)
+   */
+  public isPaidPro(): boolean {
+    if (this.tier === 'admin') return true;
+    if (this.tier === 'pro') return true;
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem(LOCAL_STORAGE_PRO_KEY) === 'true';
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  public refreshTrial(): void {
+    this.notify();
   }
 
   public isAdmin(): boolean {
@@ -208,7 +274,7 @@ class PurchaseService {
 
   public subscribe(callback: SubscriptionListener): () => void {
     this.listeners.add(callback);
-    callback(this.isPro(), this.tier, this.isAdmin(), this.isAdminAuthed);
+    callback(this.isPro(), this.tier, this.isAdmin(), this.isAdminAuthed, this.getTrialInfo());
     return () => this.listeners.delete(callback);
   }
 
@@ -216,7 +282,8 @@ class PurchaseService {
     const pro = this.isPro();
     const admin = this.isAdmin();
     const authed = this.isAdminAuthed;
-    this.listeners.forEach((cb) => cb(pro, this.tier, admin, authed));
+    const trial = this.getTrialInfo();
+    this.listeners.forEach((cb) => cb(pro, this.tier, admin, authed, trial));
   }
 
   /**
@@ -353,6 +420,26 @@ class PurchaseService {
       return { success: true, message: '✓ 已成功恢復您的 Pro 權益！' };
     }
     return { success: false, message: '目前無已儲存的購買紀錄，可使用控制台切換體驗。' };
+  }
+
+  /**
+   * Restore purchases or redeem universal reviewer / VIP transfer code
+   */
+  public async restoreWithTransferId(code: string): Promise<{ success: boolean; message: string }> {
+    const cleaned = (code || '').trim().toUpperCase();
+    if (cleaned === REVIEWER_VIP_CODE) {
+      this.tier = 'pro';
+      try {
+        localStorage.setItem(LOCAL_STORAGE_PRO_KEY, 'true');
+        localStorage.setItem(LOCAL_STORAGE_TIER_KEY, 'pro');
+      } catch {
+        // ignore
+      }
+      this.notify();
+      return { success: true, message: '🎉 審查專用 VIP 代碼已生效，成功永久解鎖 Pro 專業版！' };
+    }
+
+    return await this.restorePurchases();
   }
 }
 

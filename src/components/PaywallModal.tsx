@@ -10,6 +10,11 @@ interface PaywallModalProps {
   isLoading: boolean;
   isPro: boolean;
   onToggleMockPro: () => void;
+  isFreeTrialActive?: boolean;
+  trialDaysRemaining?: number;
+  trialDaysTotal?: number;
+  isPaidPro?: boolean;
+  onRestoreWithCode?: (code: string) => Promise<{ success: boolean; message: string }>;
 }
 
 export const PaywallModal: React.FC<PaywallModalProps> = ({
@@ -20,9 +25,16 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   isLoading,
   isPro,
   onToggleMockPro,
+  isFreeTrialActive = false,
+  trialDaysRemaining = 0,
+  trialDaysTotal = 15,
+  isPaidPro = false,
+  onRestoreWithCode,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>('annual');
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [vipCode, setVipCode] = useState('');
 
   if (!isOpen) return null;
 
@@ -45,6 +57,22 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
         onClose();
         setFeedbackMsg(null);
       }, 1400);
+    }
+  };
+
+  const handleRedeemVip = async () => {
+    if (!vipCode.trim()) return;
+    if (onRestoreWithCode) {
+      const res = await onRestoreWithCode(vipCode.trim());
+      setFeedbackMsg(res.message);
+      if (res.success) {
+        setTimeout(() => {
+          onClose();
+          setFeedbackMsg(null);
+        }, 1400);
+      }
+    } else {
+      setFeedbackMsg('未支援兌換碼輸入');
     }
   };
 
@@ -83,6 +111,24 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
               讓行事曆每一場鳥會，都變成會心一笑的幹話。
             </p>
           </div>
+
+          {/* Free Welcome Trial Banner */}
+          {isFreeTrialActive && !isPaidPro && (
+            <div className="rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 p-3.5 text-amber-900 flex items-start gap-3 animate-in fade-in">
+              <span className="text-2xl shrink-0 mt-0.5">🎁</span>
+              <div className="text-xs space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-amber-950">新手 {trialDaysTotal} 天免綁卡體驗中</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-950 font-mono font-bold text-[11px]">
+                    剩餘 {trialDaysRemaining} 天
+                  </span>
+                </div>
+                <p className="text-amber-800 leading-relaxed text-[11px]">
+                  體驗期間已為您全數開放 Pro 特權！若喜歡幹話日曆，歡迎提前贊助解鎖終身或年度方案支持我們。
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Feature Checklist */}
           <div className="rounded-2xl bg-[#F3EFE6] border border-[#2D2D2D]/20 p-4 space-y-2.5">
@@ -202,6 +248,44 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
             >
               {isPro ? '🧪 測試：已啟用 PRO' : '🧪 測試：切換 PRO 狀態'}
             </button>
+          </div>
+
+          {/* Universal Reviewer / VIP Code Redeem */}
+          <div className="pt-2 text-center">
+            {!showCodeInput ? (
+              <button
+                type="button"
+                onClick={() => setShowCodeInput(true)}
+                className="text-[11px] font-sans text-[#6E6A63] hover:text-[#2D2D2D] hover:underline cursor-pointer"
+              >
+                審查員 / VIP 專屬兌換碼 (Redeem VIP Code)
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 max-w-xs mx-auto">
+                <input
+                  type="text"
+                  value={vipCode}
+                  onChange={(e) => setVipCode(e.target.value)}
+                  placeholder="輸入 PLAY-VIP-2026"
+                  className="flex-1 px-3 py-1.5 rounded-xl border border-[#2D2D2D]/30 bg-white text-xs font-mono uppercase"
+                />
+                <button
+                  type="button"
+                  disabled={isLoading || !vipCode.trim()}
+                  onClick={handleRedeemVip}
+                  className="px-3 py-1.5 rounded-xl bg-[#2D2D2D] text-white text-xs font-bold cursor-pointer hover:bg-[#3D3D3D] disabled:opacity-50"
+                >
+                  兌換
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCodeInput(false)}
+                  className="text-xs text-[#6E6A63] hover:text-[#2D2D2D]"
+                >
+                  取消
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
