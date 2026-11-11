@@ -85,7 +85,7 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
                   onClick={handleResync}
                   disabled={isSyncing}
                   className="px-2 py-0.5 rounded-md bg-emerald-700/80 hover:bg-emerald-600 text-[#FAF7F0] text-[10px] font-bold flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
-                  title="一鍵強制重新同步行事曆（抓取最新會議/學校行程）"
+                  title="一鍵強制重新同步行事曆（抓取最新會議與行程）"
                 >
                   <RefreshCw className={`w-3 h-3 text-[#FAF7F0] ${isSyncing ? 'animate-spin' : ''}`} />
                   <span className="hidden sm:inline">{isSyncing ? '同步中' : '重新同步'}</span>

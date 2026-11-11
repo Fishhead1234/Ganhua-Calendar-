@@ -398,7 +398,7 @@ export const App: React.FC = () => {
         }
       }
 
-      // 2. Fetch saved live calendar feed URL (SchoolsBuddy / iCal / webcal / GAS)
+      // 2. Fetch saved live calendar feed URL (iCal / webcal / GAS)
       const savedLiveUrl = localStorage.getItem('live_calendar_url');
       if (savedLiveUrl && savedLiveUrl.trim()) {
         try {
@@ -432,7 +432,7 @@ export const App: React.FC = () => {
       if (results.length > 0) {
         showToast(`✅ 行事曆重新同步完成！共載入 ${results.length} 場行程。`);
       } else {
-        showToast('⚠️ 未偵測到行程，請確認已授權日曆或已設定 SchoolsBuddy 網址。');
+        showToast('⚠️ 未偵測到行程，請確認已授權手機日曆或已設定訂閱網址。');
       }
     } catch (err: any) {
       showToast(`❌ 同步失敗: ${err?.message || '請稍候再試'}`);
@@ -445,11 +445,18 @@ export const App: React.FC = () => {
     try {
       localStorage.removeItem('ganhua_calendar_meetings');
       localStorage.removeItem('ganhua_active_preset_id');
+      localStorage.removeItem('live_calendar_url');
+      localStorage.removeItem('ganhua_enabled_calendar_ids');
     } catch {
       // ignore
     }
+    try {
+      if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.syncAllEventReminders) {
+        (window as any).AndroidCalendarBridge.syncAllEventReminders('[]');
+      }
+    } catch {}
     setPersisted((prev) => ({ ...prev, calendarConnected: false }));
-    showToast('✕ 已解除行事曆連動，恢復每日常規 365 幹話！');
+    showToast('✕ 已完全解除行事曆連動，恢復每日常規 365 幹話！');
   };
 
   // Check for OTA Remote Content Updates in background on app start

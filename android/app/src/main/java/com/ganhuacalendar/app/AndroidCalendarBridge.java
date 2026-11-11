@@ -48,7 +48,7 @@ public class AndroidCalendarBridge {
 
     /**
      * 1. Query all calendars on phone with NO filters and NO deduplication by name.
-     * Returns all sub-calendars, including Parent Calendar (BSKL), SchoolsBuddy, Family, etc.
+     * Returns all sub-calendars, including Google Calendar, Outlook, Family, Work, etc.
      */
     @JavascriptInterface
     public String getCalendarsJson() {
@@ -116,7 +116,7 @@ public class AndroidCalendarBridge {
 
     /**
      * 2. Query CalendarContract.Instances across [startMs, endMs].
-     * Expands recurring events (RRULE) and subscribed calendars (BSKL, SchoolsBuddy, Parent Calendar, Family).
+     * Expands recurring events (RRULE) and subscribed calendars (Google, Outlook, Family, Work).
      * For all-day events (ALL_DAY == 1), extracts YYYY-MM-DD using UTC timezone.
      */
     @JavascriptInterface

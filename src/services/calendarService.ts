@@ -457,12 +457,10 @@ export function analyzeCalendarEvents(
       hasLessonOrMusic = true;
     }
 
-    // School / Parent / SchoolsBuddy / BSKL
+    // School / Parent / Activities
     if (
       combo.includes('school') ||
       combo.includes('parent') ||
-      combo.includes('schoolsbuddy') ||
-      combo.includes('bskl') ||
       combo.includes('家長') ||
       combo.includes('學校') ||
       combo.includes('班級') ||
@@ -1175,23 +1173,16 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
       const list = JSON.parse(jsonStr || '[]');
       if (Array.isArray(list) && list.length > 0) {
         calendars = list.map((c: any) => {
-          let name = c.name || c.title || '未命名日曆';
+          let name = c.name || c.title || '個人行事曆';
           const accountName = c.accountName || '';
-          const lowerStr = (name + ' ' + accountName).toLowerCase();
-          if (lowerStr.includes('schoolsbuddy')) {
-            name = '🏫 SchoolsBuddy (學校日曆)';
-          } else if (lowerStr.includes('bskl')) {
-            name = '🏫 BSKL (英國國際學校)';
-          } else if (lowerStr.includes('parent')) {
-            name = '🏫 Parent Calendar (學校家長聯絡簿)';
-          } else if (name.startsWith('http://') || name.startsWith('https://')) {
+          if (name.startsWith('http://') || name.startsWith('https://')) {
             name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
           }
           return {
             id: String(c.id),
             name,
             accountName,
-            color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
+            color: c.color || '#2D2D2D',
             isPrimary: Boolean(c.isPrimary),
           };
         });
@@ -1207,23 +1198,16 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
       const res = await win.Capacitor.Plugins.CapacitorCalendar.listCalendars();
       const list = res.result || res.calendars || [];
       calendars = list.map((c: any) => {
-        let name = c.name || c.title || '未命名日曆';
+        let name = c.name || c.title || '個人行事曆';
         const accountName = c.accountName || c.source || '';
-        const lowerStr = (name + ' ' + accountName).toLowerCase();
-        if (lowerStr.includes('schoolsbuddy')) {
-          name = '🏫 SchoolsBuddy (學校日曆)';
-        } else if (lowerStr.includes('bskl')) {
-          name = '🏫 BSKL (英國國際學校)';
-        } else if (lowerStr.includes('parent')) {
-          name = '🏫 Parent Calendar (學校家長聯絡簿)';
-        } else if (name.startsWith('http://') || name.startsWith('https://')) {
+        if (name.startsWith('http://') || name.startsWith('https://')) {
           name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
         }
         return {
           id: String(c.id),
           name,
           accountName,
-          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
+          color: c.color || '#2D2D2D',
           isPrimary: Boolean(c.isPrimary),
         };
       });
@@ -1238,23 +1222,16 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
       const res = await win.Capacitor.Plugins.GanhuaWidgetBridge.listCalendars();
       const list = res.calendars || [];
       calendars = list.map((c: any) => {
-        let name = c.name || c.title || '未命名日曆';
+        let name = c.name || c.title || '個人行事曆';
         const accountName = c.accountName || '';
-        const lowerStr = (name + ' ' + accountName).toLowerCase();
-        if (lowerStr.includes('schoolsbuddy')) {
-          name = '🏫 SchoolsBuddy (學校日曆)';
-        } else if (lowerStr.includes('bskl')) {
-          name = '🏫 BSKL (英國國際學校)';
-        } else if (lowerStr.includes('parent')) {
-          name = '🏫 Parent Calendar (學校家長聯絡簿)';
-        } else if (name.startsWith('http://') || name.startsWith('https://')) {
+        if (name.startsWith('http://') || name.startsWith('https://')) {
           name = `🌐 訂閱日曆 (${name.replace(/^https?:\/\//, '').split('/')[0]})`;
         }
         return {
           id: String(c.id),
           name,
           accountName,
-          color: c.color || (lowerStr.includes('schoolsbuddy') ? '#0F9D58' : lowerStr.includes('bskl') ? '#1E3A8A' : '#2D2D2D'),
+          color: c.color || '#2D2D2D',
           isPrimary: Boolean(c.isPrimary),
         };
       });
@@ -1266,10 +1243,10 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
   // 4. Fallback for Web browser preview / test
   if (calendars.length === 0) {
     calendars = [
-      { id: 'cal_work', name: '工作會議 (Google Calendar)', accountName: 'work@corp.com', color: '#4285F4', isPrimary: true },
-      { id: 'cal_bskl', name: 'BSKL 英國學校日曆 (Parent Calendar)', accountName: 'bskl@school.edu', color: '#1E3A8A' },
-      { id: 'cal_parent', name: '學校課表與社團 (SchoolsBuddy)', accountName: 'parents@schoolsbuddy.com', color: '#0F9D58' },
-      { id: 'cal_family', name: '家庭日曆 (Family)', accountName: 'home@family.net', color: '#EA4335' },
+      { id: 'cal_work', name: '工作會議 (Google Calendar)', accountName: 'work@company.com', color: '#4285F4', isPrimary: true },
+      { id: 'cal_personal', name: '個人生活 (Personal)', accountName: 'user@gmail.com', color: '#0F9D58' },
+      { id: 'cal_family', name: '家庭生活 (Family)', accountName: 'home@family.net', color: '#EA4335' },
+      { id: 'cal_tasks', name: '待辦事項 (Tasks)', accountName: 'tasks@outlook.com', color: '#8E24AA' },
     ];
   }
 
@@ -1346,7 +1323,7 @@ export async function fetchNativeDeviceCalendarEvents(
   // 1. Try AndroidCalendarBridge.getEventsInstancesJson first!
   // This queries CalendarContract.Instances across [startMs, endMs], expanding:
   // - Recurring weekly school events (Book Club, Cross Country, Football, U15 & U18)
-  // - Subscribed .ics calendars (BSKL Main, Parent Calendar, SchoolsBuddy)
+  // - Subscribed .ics calendars and multi-source feeds
   // - All-day UTC midnight format so dates never shift!
   if (win.AndroidCalendarBridge?.getEventsInstancesJson) {
     try {
@@ -1566,11 +1543,11 @@ export function parseIcsTimestamp(val: string): { date: Date; isAllDay: boolean 
 /**
  * Universal iCalendar / webcal Parser
  * Correctly parses multi-day events, UTC timezone conversions, and assigns local dateKey.
- * Supports SchoolsBuddy, Google Calendar ICS, Outlook, and Apple iCal feeds.
+ * Supports Google Calendar ICS, Outlook, Apple iCal feeds, and any standard .ics URL.
  */
 export function parseICSToMeetings(
   icsContent: string,
-  defaultCalendarName: string = '🏫 SchoolsBuddy'
+  defaultCalendarName: string = '🌐 外部訂閱日曆'
 ): CalendarMeeting[] {
   const meetings: CalendarMeeting[] = [];
 
@@ -1578,7 +1555,7 @@ export function parseICSToMeetings(
   const unfolded = icsContent.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
   const lines = unfolded.split(/\r?\n/);
 
-  // Extract calendar display name if present (e.g. X-WR-CALNAME:SchoolsBuddy)
+  // Extract calendar display name if present (e.g. X-WR-CALNAME:...)
   let detectedCalName = defaultCalendarName;
   for (const line of lines) {
     if (line.startsWith('X-WR-CALNAME:')) {
@@ -1615,17 +1592,13 @@ export function parseICSToMeetings(
           const endParsed = currentEvent.dtend ? parseIcsTimestamp(currentEvent.dtend) : null;
           const isAllDay = startParsed.isAllDay;
 
-          const title = (currentEvent.summary || '未命名學校行程')
+          const title = (currentEvent.summary || '未命名行程')
             .replace(/\\,/g, ',')
             .replace(/\\;/g, ';')
             .replace(/\\n/gi, ' ')
             .trim();
 
-          const calName =
-            detectedCalName.toLowerCase().includes('schoolsbuddy') ||
-            (currentEvent.description || '').toLowerCase().includes('schoolsbuddy')
-              ? '🏫 SchoolsBuddy'
-              : detectedCalName;
+          const calName = detectedCalName || '🌐 外部訂閱日曆';
 
           // If all-day event spanning multiple days (e.g. DTSTART:20261102 to DTEND:20261105)
           if (isAllDay && endParsed && endParsed.isAllDay) {
@@ -1867,17 +1840,9 @@ export async function fetchSingleCalendarUrl(
     throw new Error(`無法讀取日曆網址（${cleanUrl} - ${fetchErrorMsg}）。請確認網址正確且公開可用。`);
   }
 
-  const lowerUrl = cleanUrl.toLowerCase();
-  let defaultName = '🌐 訂閱日曆';
-  if (lowerUrl.includes('schoolsbuddy')) {
-    defaultName = '🏫 SchoolsBuddy';
-  } else if (lowerUrl.includes('bskl')) {
-    defaultName = '🏫 BSKL (英國國際學校)';
-  } else if (lowerUrl.includes('parent')) {
-    defaultName = '🏫 Parent Calendar';
-  }
+  const defaultName = '🌐 訂閱日曆';
 
-  // Format 1: iCalendar (.ics / webcal / SchoolsBuddy / BSKL)
+  // Format 1: iCalendar (.ics / webcal)
   if (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT')) {
     const meetings = parseICSToMeetings(text, defaultName);
     if (meetings.length === 0) {
@@ -1901,7 +1866,7 @@ export async function fetchSingleCalendarUrl(
 
 /**
  * Universal Live Calendar Feed Fetcher
- * Supports linking MULTIPLE iCal / webcal / GAS URLs simultaneously (e.g. BSKL + SchoolsBuddy).
+ * Supports linking MULTIPLE iCal / webcal / GAS URLs simultaneously.
  * Bypasses CORS via native AndroidCalendarBridge on mobile.
  */
 export async function fetchLiveCalendarFeed(
@@ -1913,7 +1878,7 @@ export async function fetchLiveCalendarFeed(
     (typeof window !== 'undefined' ? localStorage.getItem('live_calendar_url') : null);
 
   if (!urlInput) {
-    throw new Error('請輸入日曆網址（支援 SchoolsBuddy、BSKL、Google/Apple iCal 或 Apps Script）！');
+    throw new Error('請輸入日曆網址（支援 Google/Apple iCal、Outlook、.ics 或 Apps Script）！');
   }
 
   // Split multiple URLs separated by newline, comma, or semicolon
@@ -2049,7 +2014,7 @@ export function cancelEventNotificationsViaBridge(eventId: string): void {
 }
 
 /**
- * Sync and schedule reminders for ALL upcoming calendar events (Google / BSKL / SchoolsBuddy / Custom)
+ * Sync and schedule reminders for ALL upcoming calendar events (Google / Outlook / iCal / Custom)
  */
 export function syncAllCalendarRemindersViaBridge(meetings: CalendarMeeting[]): void {
   try {

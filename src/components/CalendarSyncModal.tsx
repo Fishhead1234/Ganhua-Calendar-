@@ -224,10 +224,10 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     }
   };
 
-  // --- Method 2: Live Universal Calendar Feed Sync (SchoolsBuddy / BSKL / iCal / webcal / GAS) ---
+  // --- Method 2: Live Universal Calendar Feed Sync (iCal / webcal / GAS) ---
   const handleLiveJsonSync = async () => {
     if (!liveJsonUrl.trim()) {
-      setErrorMsg('請先輸入日曆網址（支援 SchoolsBuddy、BSKL、Google/Apple iCal 或 Apps Script）');
+      setErrorMsg('請先輸入日曆網址（支援 Google/Apple iCal、Outlook、.ics 或 Apps Script）');
       return;
     }
 
@@ -257,11 +257,34 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleClearAll = () => {
+  const handleResetToCleanState = () => {
+    // 1. Clear saved URL input and local storage items
+    setLiveJsonUrl('');
+    try {
+      localStorage.removeItem('live_calendar_url');
+      localStorage.removeItem('ganhua_calendar_meetings');
+      localStorage.removeItem('ganhua_active_preset_id');
+      localStorage.removeItem('ganhua_enabled_calendar_ids');
+    } catch {}
+
+    // 2. Clear enabled calendar selections
+    setEnabledCalendarIds([]);
+    saveEnabledCalendarIds([]);
+
+    // 3. Clear meeting state in parent and disconnect
     onUpdateMeetings([], null);
     onToggleConnected(false);
-    setSuccessMsg('已清空所有行程與連動狀態，恢復常規日曆！');
-    setTimeout(() => setSuccessMsg(null), 2000);
+    onRemoveSync?.();
+
+    // 4. Cancel bridge reminders
+    try {
+      if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.syncAllEventReminders) {
+        (window as any).AndroidCalendarBridge.syncAllEventReminders('[]');
+      }
+    } catch {}
+
+    setSuccessMsg('✅ 已完全解除連動並清空快取，日曆已恢復純淨常規狀態！');
+    setTimeout(() => setSuccessMsg(null), 3500);
   };
 
   return (
@@ -342,7 +365,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             }`}
           >
             <span>🌐 網址訂閱 (iCal)</span>
-            <span className="text-[10px] opacity-80">(外部/學校)</span>
+            <span className="text-[10px] opacity-80">(外部/工作)</span>
           </button>
         </div>
 
@@ -426,7 +449,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                       </div>
 
                       <p className="text-[11px] font-sans text-[#6E6A63] leading-relaxed">
-                        勾選您希望日曆讀取的行事曆（已自動為您勾選包括學校、家長聯絡簿、家庭與工作日曆）：
+                        勾選您希望日曆讀取的行事曆（已為您預設勾選常用行事曆，可隨時自訂勾選或取消）：
                       </p>
 
                       <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -491,7 +514,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: Live Universal Calendar Feed (SchoolsBuddy / BSKL / iCal / webcal / GAS) */}
+          {/* TAB 2: Live Universal Calendar Feed (iCal / webcal / GAS) */}
           {activeTab === 'live_json' && (
             <div className="space-y-4">
               <div className="bg-[#FAF7F0] p-4 rounded-2xl border border-[#2D2D2D]/20 space-y-3">
@@ -510,12 +533,12 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                     rows={3}
                     value={liveJsonUrl}
                     onChange={(e) => setLiveJsonUrl(e.target.value)}
-                    placeholder={"https://asia1schoolsbuddy.azurewebsites.net/...\nhttps://bskl.org.my/calendar.ics"}
+                    placeholder={"https://calendar.google.com/calendar/ical/.../basic.ics\nwebcal://example.com/calendar.ics"}
                     className="w-full px-3 py-2 text-xs font-mono bg-white border border-[#2D2D2D]/30 rounded-xl focus:outline-hidden focus:border-[#C83E31] leading-relaxed resize-y"
                   />
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-sans text-[#6E6A63]">
-                      💡 支援同時輸入 BSKL 與 SchoolsBuddy 等多個訂閱連結
+                      💡 支援同時輸入 Google 日曆、Outlook、Apple iCal 或公開/私人 .ics 訂閱連結
                     </span>
                     <button
                       type="button"
@@ -529,21 +552,21 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                   </div>
                 </div>
 
-                {/* Explanations for SchoolsBuddy and iCal */}
+                {/* Explanations for iCal and GAS */}
                 <div className="pt-2 border-t border-[#2D2D2D]/15 space-y-2 text-xs font-sans text-[#6E6A63]">
-                  <div className="font-bold text-[#2D2D2D]">🏫 支援的日曆來源說明：</div>
+                  <div className="font-bold text-[#2D2D2D]">🌐 支援的日曆來源說明：</div>
                   <ul className="space-y-1.5 text-[11px] leading-relaxed">
                     <li className="flex items-start gap-1.5">
                       <span className="text-[#C83E31] font-bold">●</span>
-                      <span><strong>BSKL / 學校日曆：</strong>直接貼上 BSKL 學校日曆 <code>.ics</code> 或 <code>webcal://</code> 網址，系統原生連線無 CORS 限制。</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-[#C83E31] font-bold">●</span>
-                      <span><strong>SchoolsBuddy 學校系統：</strong>支援 <code>https://asia1schoolsbuddy...</code> 學生個人活動、社團與比賽日程訂閱。</span>
+                      <span><strong>iCal / webcal 訂閱：</strong>直接貼上任何 <code>.ics</code> 或 <code>webcal://</code> 網址（例如 Google 日曆公開/私人網址、Outlook、Apple 行事曆或公司日曆），系統原生連線無 CORS 限制。</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-[#C83E31] font-bold">●</span>
                       <span><strong>多網址自動合併：</strong>可一次貼上多個日曆（一行一個），系統將自動排重合併呈現。</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-[#C83E31] font-bold">●</span>
+                      <span><strong>Google Apps Script 備用範本：</strong>支援透過自建 Apps Script JSON 串接公司內部 Google Workspace 日曆。</span>
                     </li>
                   </ul>
 
@@ -616,21 +639,16 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
               </button>
             </div>
 
-            {/* Remove Sync Button */}
-            {onRemoveSync && isConnected && (
-              <button
-                type="button"
-                onClick={() => {
-                  onRemoveSync();
-                  handleClearAll();
-                }}
-                className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-[11px] font-sans font-bold flex items-center gap-1 transition cursor-pointer"
-                title="清除行事曆連動快取並恢復常規 365 幹話"
-              >
-                <Trash2 className="w-3 h-3 text-red-600" />
-                <span>解除連動</span>
-              </button>
-            )}
+            {/* Reset to Clean State / Unlink Button */}
+            <button
+              type="button"
+              onClick={handleResetToCleanState}
+              className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-[11px] font-sans font-bold flex items-center gap-1 transition cursor-pointer active:scale-95"
+              title="清除所有行事曆快取、取消勾選並完全恢復純淨常規日曆"
+            >
+              <Trash2 className="w-3 h-3 text-red-600" />
+              <span>{isConnected ? '解除連動' : '一鍵重設純淨日曆'}</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2">

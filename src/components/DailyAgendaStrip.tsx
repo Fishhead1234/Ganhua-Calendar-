@@ -80,9 +80,7 @@ export function generateMeetingRoastTag(title: string, startHour: number): strin
   }
   if (
     lower.includes('school') ||
-    lower.includes('bskl') ||
     lower.includes('parent') ||
-    lower.includes('schoolsbuddy') ||
     lower.includes('football') ||
     lower.includes('cross country') ||
     lower.includes('book club') ||

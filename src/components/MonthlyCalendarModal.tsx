@@ -106,7 +106,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
     return toLocalDateKey(pickedDate);
   }, [pickedDate]);
 
-  // Master events covering the full 90-day window (synced BSKL, SchoolsBuddy, Family + custom events)
+  // Master events covering the full 90-day window (synced calendars, Family + custom events)
   const masterEvents = useMemo(() => {
     return allEvents && allEvents.length > 0 ? allEvents : activeMeetings;
   }, [allEvents, activeMeetings]);
