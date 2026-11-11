@@ -39,6 +39,12 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     signingConfigs {
+        release {
+            storeFile file('ganhua.keystore')
+            storePassword 'ganhuacalendar'
+            keyAlias 'ganhuakey'
+            keyPassword 'ganhuacalendar'
+        }
         debug {
             storeFile file('ganhua.keystore')
             storePassword 'ganhuacalendar'
@@ -65,7 +71,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
