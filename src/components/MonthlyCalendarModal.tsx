@@ -19,6 +19,8 @@ import {
   FileText,
   Tag,
   Bell,
+  BellOff,
+  Trash2,
 } from 'lucide-react';
 import { getLunarDetails, LunarInfo } from '../utils/lunarUtils';
 import { BirthdayWishGenerator } from './BirthdayWishGenerator';
@@ -26,6 +28,7 @@ import { toLocalDateKey } from '../utils/dateUtils';
 import {
   CalendarMeeting,
   CustomCalendarEvent,
+  EventReminder,
   getMergedEvents,
   resolveDayContent,
   ResolvedDayContent,
@@ -48,9 +51,16 @@ interface MonthlyCalendarModalProps {
   onSelectDate: (targetDate: Date) => void;
   onOpenAddEvent?: (dateStr: string) => void;
   onEditEvent?: (event: CalendarMeeting) => void;
+  onDeleteEvent?: (event: CalendarMeeting) => void;
   onShowToast?: (msg: string) => void;
   isTodayUnlocked?: boolean;
 }
+
+const formatReminderLabel = (r: EventReminder): string => {
+  if (r.unit === 'exact') return `指定 ${r.exactTime || ''}`.trim();
+  if (r.unit === 'minutes' && r.value === 0) return '準時提醒';
+  return `${r.value} ${r.unit === 'hours' ? '小時' : r.unit === 'days' ? '天' : '分鐘'}前`;
+};
 
 export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   isOpen,
@@ -65,6 +75,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   onSelectDate,
   onOpenAddEvent,
   onEditEvent,
+  onDeleteEvent,
   onShowToast,
   isTodayUnlocked = true,
 }) => {
@@ -409,25 +420,29 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                       </div>
                     )}
 
-                    {/* Reminders List (if present) */}
-                    {m.reminders && m.reminders.length > 0 && (
+                    {/* Reminders List */}
+                    {m.notificationsDisabled ? (
+                      <div className="flex items-center gap-1.5 text-[10px] text-stone-500 bg-stone-100 px-2 py-1 rounded-lg border border-stone-200">
+                        <BellOff className="w-3 h-3 text-stone-400 shrink-0" />
+                        <span>已關閉此行程通知</span>
+                      </div>
+                    ) : m.reminders && m.reminders.length > 0 ? (
                       <div className="flex items-center gap-1.5 text-[10px] text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">
                         <Bell className="w-3 h-3 text-amber-700 shrink-0" />
                         <span>已設定提醒：</span>
                         <div className="flex gap-1 flex-wrap">
                           {m.reminders.map((r, idx) => (
                             <span key={r.id || idx} className="font-mono font-bold">
-                              {r.value}{' '}
-                              {r.unit === 'hours' ? '小時' : r.unit === 'days' ? '天' : '分鐘'}前
+                              {formatReminderLabel(r)}
                               {idx < (m.reminders?.length || 1) - 1 ? '、' : ''}
                             </span>
                           ))}
                         </div>
                       </div>
-                    )}
+                    ) : null}
 
                     {/* Action buttons */}
-                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-[#2D2D2D]/10">
+                    <div className="flex items-center justify-end gap-1.5 pt-1 border-t border-[#2D2D2D]/10 flex-wrap">
                       <button
                         type="button"
                         onClick={(e) => handleCopyEventDetails(m, e)}
@@ -442,12 +457,12 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                         ) : (
                           <>
                             <Copy className="w-3 h-3 text-[#6E6A63]" />
-                            <span>複製行程</span>
+                            <span>複製</span>
                           </>
                         )}
                       </button>
 
-                      {isCustom && onEditEvent && (
+                      {onEditEvent && (
                         <button
                           type="button"
                           onClick={(e) => {
@@ -455,10 +470,27 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                             onEditEvent(m);
                           }}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4B483]/30 hover:bg-[#D4B483]/50 border border-[#D4B483] text-[#5A4228] text-[10px] font-sans font-bold transition shadow-2xs active:scale-95 cursor-pointer"
-                          title="編輯此自訂行程"
+                          title="編輯行程與通知時間"
                         >
                           <Edit2 className="w-3 h-3" />
-                          <span>編輯行程</span>
+                          <span>編輯 / 改通知</span>
+                        </button>
+                      )}
+
+                      {onDeleteEvent && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`確定要刪除「${m.title}」此行程嗎？`)) {
+                              onDeleteEvent(m);
+                            }
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-[10px] font-sans font-bold transition shadow-2xs active:scale-95 cursor-pointer"
+                          title="刪除此行程"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>刪除</span>
                         </button>
                       )}
                     </div>

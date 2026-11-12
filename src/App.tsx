@@ -43,9 +43,16 @@ import {
   saveCustomEvent,
   deleteCustomEvent,
   getMergedEvents,
+  customEventToMeeting,
+  applySyncedEventCustomizations,
+  saveSyncedEventOverride,
+  markSyncedEventDeleted,
+  clearSyncedEventCustomizations,
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
   pushEventToGoogleAppsScript,
+  scheduleEventNotificationsViaBridge,
+  cancelEventNotificationsViaBridge,
   syncAllCalendarRemindersViaBridge,
   cancelAllCalendarRemindersViaBridge,
   sendTestNotificationViaBridge,
@@ -240,22 +247,11 @@ export const App: React.FC = () => {
     return getMergedEvents(activeMeetings, currentDateKey);
   }, [activeMeetings, customEvents, currentDateKey]);
 
-  // All merged meetings across all dates for month widget
+  // All merged meetings across all dates for month widget & reminder sync
   const allAppointments = useMemo(() => {
-    const customAsMeetings: CalendarMeeting[] = (customEvents || []).map((e) => ({
-      id: e.id,
-      title: e.title,
-      startHour: e.startHour,
-      startMinute: e.startMinute,
-      durationMinutes: e.durationMinutes,
-      isAllDay: e.isAllDay,
-      dateKey: e.dateKey,
-      notes: e.notes,
-      source: 'local',
-      calendarName: e.calendarName,
-      calendarColor: e.calendarColor,
-    }));
-    return [...activeMeetings, ...customAsMeetings];
+    const customAsMeetings: CalendarMeeting[] = (customEvents || []).map(customEventToMeeting);
+    const customizedSynced = applySyncedEventCustomizations(activeMeetings);
+    return [...customizedSynced, ...customAsMeetings];
   }, [activeMeetings, customEvents]);
 
   const roastResult: CalendarRoastResult = useMemo(() => {
@@ -452,6 +448,7 @@ export const App: React.FC = () => {
       // ignore
     }
     cancelAllCalendarRemindersViaBridge();
+    clearSyncedEventCustomizations();
     setPersisted((prev) => ({ ...prev, calendarConnected: false }));
     showToast('✕ 已完全解除行事曆連動，恢復每日常規 365 幹話！');
   };
@@ -510,28 +507,29 @@ export const App: React.FC = () => {
     allAppointments,
   ]);
 
-  // Schedule native event alarms only when appointments fingerprint changes and calendar is connected
+  // Schedule native event alarms only when appointments or notification settings change
   const lastSyncedRemindersHashRef = useRef<string>('');
   useEffect(() => {
-    if (!persisted.calendarConnected) {
+    const eventsToNotify = (allAppointments || []).filter(
+      (a) => a.source === 'local' || persisted.calendarConnected
+    );
+
+    if (eventsToNotify.length === 0) {
       lastSyncedRemindersHashRef.current = '';
       cancelAllCalendarRemindersViaBridge();
       return;
     }
 
-    if (!allAppointments || allAppointments.length === 0) {
-      lastSyncedRemindersHashRef.current = '';
-      cancelAllCalendarRemindersViaBridge();
-      return;
-    }
-
-    const fingerprint = allAppointments
-      .map((a) => `${a.id}:${a.dateKey}:${a.startHour}:${a.startMinute}`)
+    const fingerprint = eventsToNotify
+      .map(
+        (a) =>
+          `${a.id}:${a.dateKey}:${a.startHour}:${a.startMinute}:${Boolean(a.notificationsDisabled)}:${JSON.stringify(a.reminders || [])}`
+      )
       .join('|');
 
     if (fingerprint !== lastSyncedRemindersHashRef.current) {
       lastSyncedRemindersHashRef.current = fingerprint;
-      syncAllCalendarRemindersViaBridge(allAppointments);
+      syncAllCalendarRemindersViaBridge(eventsToNotify);
     }
   }, [persisted.calendarConnected, allAppointments]);
 
@@ -614,13 +612,72 @@ export const App: React.FC = () => {
       setAddEventInitialDate(found.dateKey);
       setIsAddEventModalOpen(true);
     } else {
-      setEditingCustomEvent(null);
-      setAddEventInitialDate(currentDateKey);
+      // Populate modal from synced / preset meeting so user can edit notification times, details, or delete
+      const editable: CustomCalendarEvent = {
+        id: meeting.id,
+        title: meeting.title,
+        dateKey: meeting.dateKey || currentDateKey,
+        startHour: meeting.startHour,
+        startMinute: meeting.startMinute,
+        durationMinutes: meeting.durationMinutes,
+        isAllDay: Boolean(meeting.isAllDay),
+        notes: meeting.notes,
+        location: meeting.location,
+        source: meeting.source || 'synced',
+        calendarName: meeting.calendarName,
+        calendarColor: meeting.calendarColor,
+        reminders: meeting.reminders,
+        notificationsDisabled: meeting.notificationsDisabled,
+      };
+      setEditingCustomEvent(editable);
+      setAddEventInitialDate(editable.dateKey);
       setIsAddEventModalOpen(true);
     }
   };
 
   const handleSaveCustomEvent = (newEvent: CustomCalendarEvent) => {
+    const isSynced = newEvent.source && newEvent.source !== 'local';
+
+    if (isSynced) {
+      // Persist synced event override (reminders, notificationsDisabled, time, title, notes, etc.)
+      saveSyncedEventOverride(newEvent.id, {
+        title: newEvent.title,
+        dateKey: newEvent.dateKey,
+        startHour: newEvent.startHour,
+        startMinute: newEvent.startMinute,
+        durationMinutes: newEvent.durationMinutes,
+        isAllDay: newEvent.isAllDay,
+        location: newEvent.location,
+        notes: newEvent.notes,
+        reminders: newEvent.reminders,
+        notificationsDisabled: newEvent.notificationsDisabled,
+      });
+
+      setActiveMeetings((prev) => {
+        const updated = prev.map((m) =>
+          m.id === newEvent.id
+            ? {
+                ...m,
+                ...newEvent,
+              }
+            : m
+        );
+        try {
+          localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+
+      // Immediately update native Android AlarmManager for this event
+      scheduleEventNotificationsViaBridge(newEvent);
+      showToast(
+        newEvent.notificationsDisabled
+          ? `🔕 已關閉「${newEvent.title}」的提醒通知`
+          : `🔔 已更新「${newEvent.title}」的通知與行程設定！`
+      );
+      return;
+    }
+
     saveCustomEvent(newEvent);
     setCustomEvents(getCustomEvents());
 
@@ -642,10 +699,30 @@ export const App: React.FC = () => {
     showToast(`✨ 行程「${newEvent.title}」已儲存！已即時連動專屬幹話`);
   };
 
-  const handleDeleteCustomEvent = (eventId: string) => {
-    deleteCustomEvent(eventId);
-    setCustomEvents(getCustomEvents());
-    deleteNativeDeviceCalendarEvent(eventId).catch(() => {});
+  const handleDeleteCustomEvent = (
+    eventId: string,
+    eventObj?: CustomCalendarEvent | CalendarMeeting
+  ) => {
+    const isLocalCustom =
+      customEvents.some((e) => e.id === eventId) || eventObj?.source === 'local';
+
+    if (isLocalCustom) {
+      deleteCustomEvent(eventId);
+      setCustomEvents(getCustomEvents());
+      deleteNativeDeviceCalendarEvent(eventId).catch(() => {});
+    } else {
+      // Mark synced/preset event as deleted and remove immediately from activeMeetings
+      markSyncedEventDeleted(eventId);
+      setActiveMeetings((prev) => {
+        const next = prev.filter((m) => m.id !== eventId);
+        try {
+          localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+      cancelEventNotificationsViaBridge(eventId);
+    }
+
     showToast('🗑️ 行程已成功刪除');
   };
 
@@ -1021,6 +1098,7 @@ export const App: React.FC = () => {
               onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
               onOpenAddEvent={(targetDateKey) => handleOpenAddEvent(targetDateKey || currentQuote?.date)}
               onEditEvent={handleEditMeeting}
+              onDeleteEvent={(evt) => handleDeleteCustomEvent(evt.id, evt)}
               onShowToast={showToast}
             />
 
@@ -1184,6 +1262,7 @@ export const App: React.FC = () => {
         onSelectDate={handleJumpToDate}
         onOpenAddEvent={(dateStr) => handleOpenAddEvent(dateStr)}
         onEditEvent={handleEditMeeting}
+        onDeleteEvent={(evt) => handleDeleteCustomEvent(evt.id, evt)}
         onShowToast={showToast}
         isTodayUnlocked={isTodayUnlocked}
       />

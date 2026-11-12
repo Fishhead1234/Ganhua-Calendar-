@@ -32,6 +32,7 @@ public class EventReminderReceiver extends BroadcastReceiver {
         String reminderText = intent.getStringExtra("reminderText");
         String roast = intent.getStringExtra("roast");
         int reminderIndex = intent.getIntExtra("reminderIndex", 0);
+        long triggerMinute = intent.getLongExtra("triggerMinute", 0L);
 
         if (title == null || title.isEmpty()) {
             title = "社畜行程";
@@ -43,8 +44,8 @@ public class EventReminderReceiver extends BroadcastReceiver {
             roast = "深呼吸，肉體出席點頭就好，靈魂請準時請假。";
         }
 
-        // Deduplication: prevent duplicate firing for the exact same event reminder
-        String notifKey = (dateKey != null ? dateKey : "") + "_" + title + "_" + (timeStr != null ? timeStr : "") + "_" + reminderIndex;
+        // Deduplication: prevent duplicate firing for the exact same event reminder & scheduled minute
+        String notifKey = (dateKey != null ? dateKey : "") + "_" + title + "_" + (timeStr != null ? timeStr : "") + "_" + reminderIndex + "_" + triggerMinute;
         android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
         if (prefs.getBoolean("fired_" + notifKey, false)) {
             // Already fired and displayed to user! Skip duplicate.

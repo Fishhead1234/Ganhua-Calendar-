@@ -15,8 +15,10 @@ export const SCHOOL_PARENT_QUOTES = (specialEventsQuotesData as any[]).filter(
 
 export interface EventReminder {
   id: string;
-  value: number; // e.g. 1, 15, 30, 2
-  unit: 'minutes' | 'hours' | 'days';
+  value: number; // e.g. 0 (on time), 1, 10, 15, 30
+  unit: 'minutes' | 'hours' | 'days' | 'exact';
+  exactDate?: string; // YYYY-MM-DD (used when unit === 'exact')
+  exactTime?: string; // HH:mm (used when unit === 'exact')
 }
 
 export interface CalendarMeeting {
@@ -35,6 +37,7 @@ export interface CalendarMeeting {
   calendarName?: string;
   calendarColor?: string;
   reminders?: EventReminder[];
+  notificationsDisabled?: boolean;
 }
 
 export interface CalendarRoastResult {
@@ -1369,7 +1372,7 @@ export async function fetchNativeDeviceCalendarEvents(
           return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
         });
 
-        return meetings;
+        return applySyncedEventCustomizations(meetings);
       }
     } catch (e) {
       console.warn('AndroidCalendarBridge.getEventsInstancesJson error:', e);
@@ -1432,7 +1435,7 @@ export async function fetchNativeDeviceCalendarEvents(
             calendarColor,
           };
         });
-      return meetings;
+      return applySyncedEventCustomizations(meetings);
     } catch (pluginErr) {
       console.warn('CapacitorCalendar plugin failed, falling back to Ganhua bridge:', pluginErr);
     }
@@ -1499,7 +1502,7 @@ export async function fetchNativeDeviceCalendarEvents(
           calendarColor,
         };
       });
-    return meetings;
+    return applySyncedEventCustomizations(meetings);
   }
 
   throw new Error('未偵測到手機行事曆支援外掛，請確認 App 是否已授權讀取日曆權限。');
@@ -1924,7 +1927,7 @@ export async function fetchLiveCalendarFeed(
     return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
   });
 
-  return allMeetings;
+  return applySyncedEventCustomizations(allMeetings);
 }
 
 /**
@@ -1984,16 +1987,78 @@ export interface CustomCalendarEvent {
   isAllDay: boolean;
   notes?: string;
   location?: string;
-  source: 'local';
+  source: 'local' | 'synced' | 'preset';
   createdAt?: number;
   calendarName?: string;
   calendarColor?: string;
   reminders?: EventReminder[];
+  notificationsDisabled?: boolean;
 }
 
 const CUSTOM_EVENTS_STORAGE_KEY = 'user_custom_events';
+const DELETED_SYNCED_EVENT_IDS_KEY = 'deleted_synced_event_ids';
+const SYNCED_EVENT_OVERRIDES_KEY = 'synced_event_overrides';
 
-export function scheduleEventNotificationsViaBridge(event: CustomCalendarEvent): void {
+export function getDeletedSyncedEventIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(DELETED_SYNCED_EVENT_IDS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function markSyncedEventDeleted(eventId: string): void {
+  if (typeof window === 'undefined' || !eventId) return;
+  const ids = getDeletedSyncedEventIds();
+  if (!ids.includes(eventId)) {
+    localStorage.setItem(DELETED_SYNCED_EVENT_IDS_KEY, JSON.stringify([...ids, eventId]));
+  }
+  cancelEventNotificationsViaBridge(eventId);
+}
+
+export function getSyncedEventOverrides(): Record<string, Partial<CalendarMeeting>> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(SYNCED_EVENT_OVERRIDES_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveSyncedEventOverride(eventId: string, override: Partial<CalendarMeeting>): void {
+  if (typeof window === 'undefined' || !eventId) return;
+  const overrides = getSyncedEventOverrides();
+  overrides[eventId] = { ...(overrides[eventId] || {}), ...override };
+  localStorage.setItem(SYNCED_EVENT_OVERRIDES_KEY, JSON.stringify(overrides));
+}
+
+export function clearSyncedEventCustomizations(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(DELETED_SYNCED_EVENT_IDS_KEY);
+    localStorage.removeItem(SYNCED_EVENT_OVERRIDES_KEY);
+  } catch {}
+}
+
+export function applySyncedEventCustomizations(events: CalendarMeeting[]): CalendarMeeting[] {
+  const deletedIds = new Set(getDeletedSyncedEventIds());
+  const overrides = getSyncedEventOverrides();
+  return (events || [])
+    .filter((ev) => !deletedIds.has(String(ev.id)))
+    .map((ev) => {
+      const ov = overrides[String(ev.id)];
+      return ov ? { ...ev, ...ov } : ev;
+    });
+}
+
+export function scheduleEventNotificationsViaBridge(event: CustomCalendarEvent | CalendarMeeting): void {
   try {
     if (typeof window !== 'undefined' && (window as any).AndroidCalendarBridge?.scheduleEventNotifications) {
       (window as any).AndroidCalendarBridge.scheduleEventNotifications(JSON.stringify(event));
@@ -2108,6 +2173,7 @@ export function customEventToMeeting(e: CustomCalendarEvent): CalendarMeeting {
     calendarName: e.calendarName,
     calendarColor: e.calendarColor,
     reminders: e.reminders,
+    notificationsDisabled: e.notificationsDisabled,
   };
 }
 
@@ -2167,9 +2233,12 @@ export function getMergedEvents(
 ): CalendarMeeting[] {
   const customEvents = getCustomEventsForDate(targetDateKey);
 
+  // Apply user deletions and notification/detail overrides to synced meetings
+  const customizedSynced = applySyncedEventCustomizations(syncedEvents);
+
   // Synced meetings: ONLY include if dateKey strictly matches targetDateKey!
   // This prevents yesterday's events (like Nov 1 flights) from leaking onto Nov 2.
-  const relevantSynced = syncedEvents.filter((ev) => {
+  const relevantSynced = customizedSynced.filter((ev) => {
     if (ev.source === 'local') return false; // avoid duplicate
     if (ev.dateKey) return ev.dateKey === targetDateKey;
     return false;

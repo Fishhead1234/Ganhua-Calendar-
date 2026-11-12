@@ -304,115 +304,194 @@ public class AndroidCalendarBridge {
     }
 
     /**
+     * Compute reminder trigger timestamp in milliseconds.
+     * Supports relative ('minutes', 'hours', 'days') and absolute ('exact' with exactDate & exactTime).
+     */
+    private long computeTriggerTimeMs(JSONObject rem, long eventStartMs, String defaultDateKey) {
+        String unit = rem.optString("unit", "minutes");
+        if ("exact".equals(unit)) {
+            String exactDate = rem.optString("exactDate", defaultDateKey);
+            String exactTime = rem.optString("exactTime", "");
+            if (exactTime == null || !exactTime.contains(":")) return -1L;
+            String[] dParts = (exactDate != null && !exactDate.isEmpty() ? exactDate : defaultDateKey).split("-");
+            String[] tParts = exactTime.split(":");
+            if (dParts.length < 3 || tParts.length < 2) return -1L;
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.set(
+                    Integer.parseInt(dParts[0]),
+                    Integer.parseInt(dParts[1]) - 1,
+                    Integer.parseInt(dParts[2]),
+                    Integer.parseInt(tParts[0]),
+                    Integer.parseInt(tParts[1]),
+                    0
+                );
+                cal.set(Calendar.MILLISECOND, 0);
+                return cal.getTimeInMillis();
+            } catch (Exception ignored) {
+                return -1L;
+            }
+        }
+        int val = rem.optInt("value", 10);
+        long offsetMs;
+        if ("minutes".equals(unit)) {
+            offsetMs = (long) val * 60 * 1000L;
+        } else if ("days".equals(unit)) {
+            offsetMs = (long) val * 86400 * 1000L;
+        } else {
+            offsetMs = (long) val * 3600 * 1000L;
+        }
+        return eventStartMs - offsetMs;
+    }
+
+    private String formatReminderUnitText(JSONObject rem) {
+        String unit = rem.optString("unit", "minutes");
+        if ("exact".equals(unit)) {
+            String exactTime = rem.optString("exactTime", "");
+            return "指定提醒 " + exactTime;
+        }
+        int val = rem.optInt("value", 10);
+        if ("minutes".equals(unit)) {
+            return val == 0 ? "行程開始提醒" : (val + " 分鐘後開始");
+        } else if ("days".equals(unit)) {
+            return val + " 天後開始";
+        } else {
+            return val + " 小時後開始";
+        }
+    }
+
+    private int scheduleRemindersForEvent(
+            AlarmManager am,
+            android.content.SharedPreferences prefs,
+            JSONObject obj,
+            long now,
+            boolean forceCancelFirst
+    ) throws Exception {
+        String id = obj.optString("id");
+        String title = obj.optString("title", "社畜行程");
+        String dateKey = obj.optString("dateKey");
+        int startHour = obj.optInt("startHour", 9);
+        int startMinute = obj.optInt("startMinute", 0);
+        boolean isAllDay = obj.optBoolean("isAllDay", false);
+        boolean notificationsDisabled = obj.optBoolean("notificationsDisabled", false);
+
+        if (id == null || id.isEmpty() || dateKey == null || dateKey.isEmpty()) {
+            return 0;
+        }
+
+        if (forceCancelFirst || notificationsDisabled) {
+            cancelEventNotifications(id);
+        }
+
+        if (notificationsDisabled) {
+            return 0;
+        }
+
+        // If client explicitly sent empty reminders list, respect it as no notifications
+        if (obj.has("reminders") && !obj.isNull("reminders")) {
+            JSONArray explicitRem = obj.optJSONArray("reminders");
+            if (explicitRem != null && explicitRem.length() == 0) {
+                cancelEventNotifications(id);
+                return 0;
+            }
+        }
+
+        String roast = obj.optString("roast");
+        if (roast == null || roast.isEmpty()) {
+            roast = generateFunnyMeetingRoast(title, startHour);
+        }
+
+        String[] parts = dateKey.split("-");
+        if (parts.length < 3) return 0;
+
+        int year = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]) - 1;
+        int day = Integer.parseInt(parts[2]);
+
+        Calendar eventTime = Calendar.getInstance();
+        eventTime.set(year, month, day, isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute, 0);
+        eventTime.set(Calendar.MILLISECOND, 0);
+        long eventStartMs = eventTime.getTimeInMillis();
+
+        // Allow reminder scheduling as long as reminders themselves might be future or event hasn't ended
+        long durationMs = (long) obj.optInt("durationMinutes", 60) * 60 * 1000L;
+        if (eventStartMs + durationMs < now) {
+            return 0;
+        }
+
+        if (eventStartMs - now > 14L * 86400 * 1000L) {
+            return 0;
+        }
+
+        JSONArray reminders = obj.optJSONArray("reminders");
+        if (reminders == null) {
+            reminders = new JSONArray();
+            JSONObject defRem = new JSONObject();
+            defRem.put("value", isAllDay ? 0 : 10);
+            defRem.put("unit", "minutes");
+            reminders.put(defRem);
+        }
+
+        StringBuilder trackedCodes = new StringBuilder();
+        int scheduledCount = 0;
+        int maxRem = Math.min(reminders.length(), 3);
+        String timeStr = String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute);
+
+        for (int i = 0; i < maxRem; i++) {
+            JSONObject rem = reminders.getJSONObject(i);
+            long triggerMs = computeTriggerTimeMs(rem, eventStartMs, dateKey);
+            if (triggerMs <= now + 5000L) {
+                continue;
+            }
+
+            long triggerMinute = triggerMs / 60000L;
+            String notifKey = dateKey + "_" + title + "_" + timeStr + "_" + i + "_" + triggerMinute;
+            if (prefs.getBoolean("fired_" + notifKey, false)) {
+                continue;
+            }
+
+            String unitText = formatReminderUnitText(rem);
+            Intent intent = new Intent(context, EventReminderReceiver.class);
+            intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
+            intent.putExtra("eventId", id);
+            intent.putExtra("reminderIndex", i);
+            intent.putExtra("triggerMinute", triggerMinute);
+            intent.putExtra("title", title);
+            intent.putExtra("dateKey", dateKey);
+            intent.putExtra("timeStr", timeStr);
+            intent.putExtra("reminderText", unitText);
+            intent.putExtra("roast", roast);
+
+            int requestCode = Math.abs(notifKey.hashCode());
+            int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
+            }
+            PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
+
+            safeScheduleAlarm(am, triggerMs, pi);
+            if (trackedCodes.length() > 0) trackedCodes.append(",");
+            trackedCodes.append(requestCode);
+            scheduledCount++;
+        }
+
+        if (trackedCodes.length() > 0) {
+            prefs.edit().putString("reqCodes_" + id, trackedCodes.toString()).apply();
+        }
+        return scheduledCount;
+    }
+
+    /**
      * Schedule up to 3 custom reminder notifications for an event via AlarmManager
      */
     @JavascriptInterface
     public String scheduleEventNotifications(String eventJson) {
         try {
             JSONObject obj = new JSONObject(eventJson);
-            String id = obj.optString("id");
-            String title = obj.optString("title", "社畜行程");
-            String dateKey = obj.optString("dateKey");
-            int startHour = obj.optInt("startHour", 9);
-            int startMinute = obj.optInt("startMinute", 0);
-            boolean isAllDay = obj.optBoolean("isAllDay", false);
-            String roast = obj.optString("roast");
-            if (roast == null || roast.isEmpty()) {
-                roast = generateFunnyMeetingRoast(title, startHour);
-            }
-
-            if (id == null || id.isEmpty() || dateKey == null || dateKey.isEmpty()) {
-                return "{\"error\": \"Invalid event data\"}";
-            }
-
-            // Always cancel existing reminders for this event first
-            cancelEventNotifications(id);
-
-            JSONArray reminders = obj.optJSONArray("reminders");
-            // If no reminders configured, default to 10 minutes before (or at start for all-day) like Google Calendar
-            if (reminders == null || reminders.length() == 0) {
-                reminders = new JSONArray();
-                JSONObject defRem = new JSONObject();
-                if (isAllDay) {
-                    defRem.put("value", 0);
-                    defRem.put("unit", "minutes");
-                } else {
-                    defRem.put("value", 10);
-                    defRem.put("unit", "minutes");
-                }
-                reminders.put(defRem);
-            }
-
-            String[] parts = dateKey.split("-");
-            if (parts.length < 3) return "{\"error\": \"Invalid dateKey format\"}";
-            int year = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]) - 1;
-            int day = Integer.parseInt(parts[2]);
-
-            Calendar eventTime = Calendar.getInstance();
-            eventTime.set(year, month, day, isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute, 0);
-            eventTime.set(Calendar.MILLISECOND, 0);
-            long eventStartMs = eventTime.getTimeInMillis();
-
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (am == null) return "{\"error\": \"AlarmManager unavailable\"}";
-
-            int scheduledCount = 0;
-            int maxReminders = Math.min(reminders.length(), 3);
-            long now = System.currentTimeMillis();
-
-            for (int i = 0; i < maxReminders; i++) {
-                JSONObject rem = reminders.getJSONObject(i);
-                int val = rem.optInt("value", 10);
-                String unit = rem.optString("unit", "minutes");
-
-                long offsetMs;
-                String unitText;
-                if ("minutes".equals(unit)) {
-                    offsetMs = (long) val * 60 * 1000L;
-                    unitText = val == 0 ? "即刻開始" : (val + " 分鐘後開始");
-                } else if ("days".equals(unit)) {
-                    offsetMs = (long) val * 86400 * 1000L;
-                    unitText = val + " 天後開始";
-                } else {
-                    offsetMs = (long) val * 3600 * 1000L;
-                    unitText = val + " 小時後開始";
-                }
-
-                long triggerMs = eventStartMs - offsetMs;
-                // Never schedule alarms for the past or immediate 5 seconds
-                if (triggerMs <= now + 5000L) {
-                    continue;
-                }
-
-                android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
-                String timeStr = String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute);
-                String notifKey = dateKey + "_" + title + "_" + timeStr + "_" + i;
-                if (prefs.getBoolean("fired_" + notifKey, false)) {
-                    continue;
-                }
-
-                Intent intent = new Intent(context, EventReminderReceiver.class);
-                intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
-                intent.putExtra("eventId", id);
-                intent.putExtra("reminderIndex", i);
-                intent.putExtra("title", title);
-                intent.putExtra("dateKey", dateKey);
-                intent.putExtra("timeStr", timeStr);
-                intent.putExtra("reminderText", unitText);
-                intent.putExtra("roast", roast);
-
-                int requestCode = Math.abs(notifKey.hashCode());
-                int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
-                }
-
-                PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
-                safeScheduleAlarm(am, triggerMs, pi);
-                scheduledCount++;
-            }
-
+            android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
+            int scheduledCount = scheduleRemindersForEvent(am, prefs, obj, System.currentTimeMillis(), true);
             return "{\"scheduled\": " + scheduledCount + ", \"success\": true}";
         } catch (Exception e) {
             return "{\"error\": \"" + e.getMessage() + "\"}";
@@ -582,109 +661,7 @@ public class AndroidCalendarBridge {
 
             for (int e = 0; e < events.length(); e++) {
                 JSONObject obj = events.getJSONObject(e);
-                String id = obj.optString("id", "evt_" + e);
-                String title = obj.optString("title", "社畜行程");
-                String dateKey = obj.optString("dateKey");
-                int startHour = obj.optInt("startHour", 9);
-                int startMinute = obj.optInt("startMinute", 0);
-                boolean isAllDay = obj.optBoolean("isAllDay", false);
-                String roast = obj.optString("roast");
-                if (roast == null || roast.isEmpty()) {
-                    roast = generateFunnyMeetingRoast(title, startHour);
-                }
-
-                if (dateKey == null || dateKey.isEmpty()) continue;
-                String[] parts = dateKey.split("-");
-                if (parts.length < 3) continue;
-
-                int year = Integer.parseInt(parts[0]);
-                int month = Integer.parseInt(parts[1]) - 1;
-                int day = Integer.parseInt(parts[2]);
-
-                Calendar eventTime = Calendar.getInstance();
-                eventTime.set(year, month, day, isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute, 0);
-                eventTime.set(Calendar.MILLISECOND, 0);
-                long eventStartMs = eventTime.getTimeInMillis();
-
-                // If event ended in the past, skip
-                long durationMs = (long) obj.optInt("durationMinutes", 60) * 60 * 1000L;
-                if (eventStartMs + durationMs < now) {
-                    continue;
-                }
-
-                // If event is more than 14 days in future, skip
-                if (eventStartMs - now > 14L * 86400 * 1000L) {
-                    continue;
-                }
-
-                JSONArray reminders = obj.optJSONArray("reminders");
-                // Default to 10 minutes before (or at start for all-day) like Google Calendar
-                if (reminders == null || reminders.length() == 0) {
-                    reminders = new JSONArray();
-                    JSONObject defRem = new JSONObject();
-                    if (isAllDay) {
-                        defRem.put("value", 0);
-                        defRem.put("unit", "minutes");
-                    } else {
-                        defRem.put("value", 10);
-                        defRem.put("unit", "minutes");
-                    }
-                    reminders.put(defRem);
-                }
-
-                int maxRem = Math.min(reminders.length(), 3);
-                for (int i = 0; i < maxRem; i++) {
-                    JSONObject rem = reminders.getJSONObject(i);
-                    int val = rem.optInt("value", 10);
-                    String unit = rem.optString("unit", "minutes");
-
-                    long offsetMs;
-                    String unitText;
-                    if ("minutes".equals(unit)) {
-                        offsetMs = (long) val * 60 * 1000L;
-                        unitText = val == 0 ? "即刻開始" : (val + " 分鐘後開始");
-                    } else if ("days".equals(unit)) {
-                        offsetMs = (long) val * 86400 * 1000L;
-                        unitText = val + " 天後開始";
-                    } else {
-                        offsetMs = (long) val * 3600 * 1000L;
-                        unitText = val + " 小時後開始";
-                    }
-
-                    long triggerMs = eventStartMs - offsetMs;
-                    // Never schedule alarms for the past or immediate 5 seconds
-                    if (triggerMs <= now + 5000L) {
-                        continue;
-                    }
-
-                    String timeStr = String.format(Locale.getDefault(), "%02d:%02d", isAllDay ? 9 : startHour, isAllDay ? 0 : startMinute);
-                    String notifKey = dateKey + "_" + title + "_" + timeStr + "_" + i;
-                    if (prefs.getBoolean("fired_" + notifKey, false)) {
-                        // Already notified to user
-                        continue;
-                    }
-
-                    Intent intent = new Intent(context, EventReminderReceiver.class);
-                    intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
-                    intent.putExtra("eventId", id);
-                    intent.putExtra("reminderIndex", i);
-                    intent.putExtra("title", title);
-                    intent.putExtra("dateKey", dateKey);
-                    intent.putExtra("timeStr", timeStr);
-                    intent.putExtra("reminderText", unitText);
-                    intent.putExtra("roast", roast);
-
-                    // Stable deterministic request code based on notifKey
-                    int requestCode = Math.abs(notifKey.hashCode());
-                    int pendingFlag = PendingIntent.FLAG_UPDATE_CURRENT;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
-                    }
-                    PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
-
-                    safeScheduleAlarm(am, triggerMs, pi);
-                    totalScheduled++;
-                }
+                totalScheduled += scheduleRemindersForEvent(am, prefs, obj, now, false);
             }
 
             return "{\"success\": true, \"scheduledCount\": " + totalScheduled + "}";
@@ -695,7 +672,7 @@ public class AndroidCalendarBridge {
     }
 
     /**
-     * Cancel all active reminder notifications for an event
+     * Cancel all active reminder notifications and tray banners for an event
      */
     @JavascriptInterface
     public String cancelEventNotifications(String eventId) {
@@ -704,6 +681,35 @@ public class AndroidCalendarBridge {
         }
         try {
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            android.content.SharedPreferences prefs = context.getSharedPreferences("ganhua_reminders", Context.MODE_PRIVATE);
+
+            String savedCodes = prefs.getString("reqCodes_" + eventId, "");
+            if (savedCodes != null && !savedCodes.isEmpty()) {
+                for (String codeStr : savedCodes.split(",")) {
+                    try {
+                        int requestCode = Integer.parseInt(codeStr.trim());
+                        if (am != null) {
+                            Intent intent = new Intent(context, EventReminderReceiver.class);
+                            intent.setAction(EventReminderReceiver.ACTION_EVENT_REMINDER);
+                            int pendingFlag = PendingIntent.FLAG_NO_CREATE;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                pendingFlag |= PendingIntent.FLAG_IMMUTABLE;
+                            }
+                            PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, pendingFlag);
+                            if (pi != null) {
+                                am.cancel(pi);
+                                pi.cancel();
+                            }
+                        }
+                        if (nm != null) {
+                            nm.cancel(requestCode);
+                        }
+                    } catch (NumberFormatException ignored) {}
+                }
+                prefs.edit().remove("reqCodes_" + eventId).apply();
+            }
+
             if (am != null) {
                 for (int i = 0; i < 3; i++) {
                     int requestCode = (eventId + "_" + i).hashCode();

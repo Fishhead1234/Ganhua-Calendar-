@@ -12,10 +12,12 @@ import {
   Tag,
   Sparkles,
   Bell,
+  BellOff,
+  Trash2,
   Copy,
   Check,
 } from 'lucide-react';
-import { CalendarMeeting } from '../services/calendarService';
+import { CalendarMeeting, EventReminder } from '../services/calendarService';
 import { BirthdayWishGenerator } from './BirthdayWishGenerator';
 
 interface DailyAgendaStripProps {
@@ -27,6 +29,7 @@ interface DailyAgendaStripProps {
   onOpenSyncModal: () => void;
   onOpenAddEvent?: (targetDateKey?: string) => void;
   onEditEvent?: (event: CalendarMeeting) => void;
+  onDeleteEvent?: (event: CalendarMeeting) => void;
   onShowToast?: (msg: string) => void;
 }
 
@@ -108,6 +111,17 @@ export function generateMeetingRoastTag(title: string, startHour: number): strin
 
 const WEEKDAY_NAMES = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
 
+const formatReminderShort = (r: EventReminder): string => {
+  if (r.unit === 'exact') {
+    return `指定 ${r.exactTime || ''}`.trim();
+  }
+  if (r.unit === 'minutes' && r.value === 0) {
+    return '準時提醒';
+  }
+  const unitLabel = r.unit === 'hours' ? '小時' : r.unit === 'days' ? '天' : '分鐘';
+  return `${r.value} ${unitLabel}前`;
+};
+
 export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
   events,
   allEvents = [],
@@ -117,6 +131,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
   onOpenSyncModal,
   onOpenAddEvent,
   onEditEvent,
+  onDeleteEvent,
   onShowToast,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -351,14 +366,21 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0 ml-1">
-            {evt.reminders && evt.reminders.length > 0 && (
+            {evt.notificationsDisabled ? (
+              <span
+                className="text-[9px] px-1.5 py-0.2 rounded-full bg-stone-100 text-stone-500 border border-stone-200 font-bold flex items-center gap-0.5 shadow-2xs"
+                title="已關閉此行程通知"
+              >
+                🔕
+              </span>
+            ) : evt.reminders && evt.reminders.length > 0 ? (
               <span
                 className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold flex items-center gap-0.5 shadow-2xs"
                 title={`已設定 ${evt.reminders.length} 組提醒`}
               >
-                🔔 x{evt.reminders.length}
+                🔔 {evt.reminders.length === 1 ? formatReminderShort(evt.reminders[0]) : `x${evt.reminders.length}`}
               </span>
-            )}
+            ) : null}
 
             {!isExpanded && (
               <span className="text-[#6E6A63] font-medium text-[10px] hidden sm:inline">
@@ -463,59 +485,128 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
               </div>
             </div>
 
-            {/* 7. Reminders list (if set) */}
-            {evt.reminders && evt.reminders.length > 0 && (
-              <div className="flex items-center gap-2 text-[11px] text-[#785A3C] bg-amber-50 p-2 rounded-xl border border-amber-200">
-                <Bell className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                <span>
-                  已設定 {evt.reminders.length} 組通知：
-                  {evt.reminders.map((r, i) => (
-                    <span key={r.id} className="font-bold ml-1">
-                      {r.value}{' '}
-                      {r.unit === 'hours' ? '小時' : r.unit === 'days' ? '天' : '分鐘'}前
-                      {i < (evt.reminders?.length || 0) - 1 ? '、' : ''}
-                    </span>
-                  ))}
-                </span>
-              </div>
-            )}
-
-            {/* 8. Action Buttons Strip */}
-            <div className="flex items-center justify-between pt-1 border-t border-[#2D2D2D]/10 text-[11px]">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCopyEventDetails(evt);
-                }}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#2D2D2D]/20 hover:bg-[#F3EFE6] text-[#2D2D2D] font-bold shadow-2xs cursor-pointer active:scale-95 transition"
-                title="複製完整行程資訊"
-              >
-                {copiedEventId === evt.id ? (
-                  <>
-                    <Check className="w-3 h-3 text-emerald-600" />
-                    <span className="text-emerald-700">已複製明細</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3 text-[#6E6A63]" />
-                    <span>複製行程明細</span>
-                  </>
-                )}
-              </button>
-
-              <div className="flex items-center gap-2">
-                {isCustom && onEditEvent && (
+            {/* 7. Reminders list */}
+            {evt.notificationsDisabled ? (
+              <div className="flex items-center justify-between gap-2 text-[11px] text-stone-500 bg-stone-100 p-2 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-1.5">
+                  <BellOff className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                  <span>已關閉此行程通知</span>
+                </div>
+                {onEditEvent && (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEditEvent(evt);
                     }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2D2D2D] hover:bg-[#C83E31] text-[#FAF7F0] font-bold shadow-2xs cursor-pointer active:scale-95 transition"
+                    className="text-[10px] font-bold text-[#C83E31] hover:underline cursor-pointer"
+                  >
+                    修改通知時間
+                  </button>
+                )}
+              </div>
+            ) : evt.reminders && evt.reminders.length > 0 ? (
+              <div className="flex items-center justify-between gap-2 text-[11px] text-[#785A3C] bg-amber-50 p-2 rounded-xl border border-amber-200">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Bell className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span className="truncate">
+                    已設定 {evt.reminders.length} 組通知：
+                    {evt.reminders.map((r, i) => (
+                      <span key={r.id} className="font-bold ml-1">
+                        {formatReminderShort(r)}
+                        {i < (evt.reminders?.length || 0) - 1 ? '、' : ''}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+                {onEditEvent && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditEvent(evt);
+                    }}
+                    className="text-[10px] font-bold text-[#C83E31] hover:underline cursor-pointer shrink-0"
+                  >
+                    改通知
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-2 text-[11px] text-[#785A3C] bg-amber-50/60 p-2 rounded-xl border border-amber-200/60">
+                <div className="flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>預設通知：{evt.isAllDay ? '當天 09:00 準時提醒' : '開始前 10 分鐘提醒'}</span>
+                </div>
+                {onEditEvent && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditEvent(evt);
+                    }}
+                    className="text-[10px] font-bold text-[#C83E31] hover:underline cursor-pointer shrink-0"
+                  >
+                    自訂通知
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* 8. Action Buttons Strip */}
+            <div className="flex items-center justify-between pt-1 border-t border-[#2D2D2D]/10 text-[11px] gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopyEventDetails(evt);
+                }}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-[#2D2D2D]/20 hover:bg-[#F3EFE6] text-[#2D2D2D] font-bold shadow-2xs cursor-pointer active:scale-95 transition"
+                title="複製完整行程資訊"
+              >
+                {copiedEventId === evt.id ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    <span className="text-emerald-700">已複製</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3 text-[#6E6A63]" />
+                    <span>複製</span>
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center gap-1.5 ml-auto">
+                {onEditEvent && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditEvent(evt);
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FAF7F0] font-bold shadow-2xs cursor-pointer active:scale-95 transition"
+                    title="編輯行程與通知時間"
                   >
                     <Edit2 className="w-3 h-3 text-[#D4B483]" />
-                    <span>編輯行程</span>
+                    <span>編輯 / 改通知</span>
+                  </button>
+                )}
+
+                {onDeleteEvent && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`確定要刪除「${evt.title}」此行程嗎？`)) {
+                        onDeleteEvent(evt);
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold shadow-2xs cursor-pointer active:scale-95 transition"
+                    title="刪除此行程"
+                  >
+                    <Trash2 className="w-3 h-3 text-red-600" />
+                    <span>刪除</span>
                   </button>
                 )}
 

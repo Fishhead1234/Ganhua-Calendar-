@@ -10,10 +10,11 @@ import {
   Tag,
   AlertCircle,
   Bell,
+  BellOff,
   Plus,
   MapPin,
 } from 'lucide-react';
-import { CustomCalendarEvent, EventReminder } from '../services/calendarService';
+import { CalendarMeeting, CustomCalendarEvent, EventReminder } from '../services/calendarService';
 import specialEventsData from '../data/special_events_quotes.json';
 import { SpecialEventQuote } from '../utils/eventRoastMatcher';
 
@@ -21,9 +22,9 @@ interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialDate?: string; // YYYY-MM-DD
-  editingEvent?: CustomCalendarEvent | null;
+  editingEvent?: (CustomCalendarEvent | CalendarMeeting) | null;
   onSave: (event: CustomCalendarEvent) => void;
-  onDelete?: (eventId: string) => void;
+  onDelete?: (eventId: string, eventObj?: CustomCalendarEvent | CalendarMeeting) => void;
 }
 
 interface QuickChip {
@@ -78,8 +79,9 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [notificationsDisabled, setNotificationsDisabled] = useState(false);
   const [reminders, setReminders] = useState<EventReminder[]>([
-    { id: 'rem_1', value: 1, unit: 'hours' },
+    { id: 'rem_1', value: 10, unit: 'minutes' },
   ]);
 
   // Sync state when opening modal or changing editing event
@@ -88,23 +90,30 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       setErrorMsg(null);
       if (editingEvent) {
         setTitle(editingEvent.title);
-        setDateKey(editingEvent.dateKey);
-        setIsAllDay(editingEvent.isAllDay);
-        const sH = String(editingEvent.startHour).padStart(2, '0');
-        const sM = String(editingEvent.startMinute).padStart(2, '0');
+        setDateKey(editingEvent.dateKey || initialDate || getTodayStr());
+        setIsAllDay(Boolean(editingEvent.isAllDay));
+        const sH = String(editingEvent.startHour ?? 9).padStart(2, '0');
+        const sM = String(editingEvent.startMinute ?? 0).padStart(2, '0');
         setStartTime(`${sH}:${sM}`);
 
-        const totalMinutes = editingEvent.startHour * 60 + editingEvent.startMinute + editingEvent.durationMinutes;
+        const totalMinutes = (editingEvent.startHour ?? 9) * 60 + (editingEvent.startMinute ?? 0) + (editingEvent.durationMinutes ?? 60);
         const eH = String(Math.floor((totalMinutes / 60) % 24)).padStart(2, '0');
         const eM = String(totalMinutes % 60).padStart(2, '0');
         setEndTime(`${eH}:${eM}`);
         setLocation(editingEvent.location || '');
         setNotes(editingEvent.notes || '');
-        setReminders(
-          editingEvent.reminders && editingEvent.reminders.length > 0
-            ? editingEvent.reminders
-            : [{ id: 'rem_1', value: 1, unit: 'hours' }]
-        );
+
+        const disabled = Boolean(editingEvent.notificationsDisabled);
+        setNotificationsDisabled(disabled);
+
+        if (disabled) {
+          setReminders([]);
+        } else if (editingEvent.reminders && editingEvent.reminders.length > 0) {
+          setReminders(editingEvent.reminders);
+        } else {
+          // Default to 10 mins before (or 0 mins for all-day) matching native bridge behavior
+          setReminders([{ id: 'rem_1', value: editingEvent.isAllDay ? 0 : 10, unit: 'minutes' }]);
+        }
       } else {
         const defaults = getUpcomingDefaultTimes();
         setTitle('');
@@ -114,27 +123,73 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
         setEndTime(defaults.end);
         setLocation('');
         setNotes('');
-        setReminders([{ id: 'rem_1', value: 1, unit: 'hours' }]);
+        setNotificationsDisabled(false);
+        setReminders([{ id: 'rem_1', value: 10, unit: 'minutes' }]);
       }
     }
   }, [isOpen, editingEvent, initialDate]);
 
-  const handleAddReminder = (val = 1, unit: 'minutes' | 'hours' | 'days' = 'hours') => {
+  const handleAddReminder = (
+    val = 10,
+    unit: 'minutes' | 'hours' | 'days' | 'exact' = 'minutes'
+  ) => {
+    setNotificationsDisabled(false);
     if (reminders.length >= 3) return;
-    setReminders((prev) => [
-      ...prev,
-      { id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, value: val, unit },
-    ]);
+    const newRem: EventReminder = {
+      id: `rem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      value: val,
+      unit,
+      ...(unit === 'exact' ? { exactDate: dateKey, exactTime: startTime } : {}),
+    };
+    setReminders((prev) => [...prev, newRem]);
   };
 
   const handleRemoveReminder = (id: string) => {
-    setReminders((prev) => prev.filter((r) => r.id !== id));
+    setReminders((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      if (next.length === 0) {
+        setNotificationsDisabled(true);
+      }
+      return next;
+    });
   };
 
   const handleUpdateReminder = (id: string, updates: Partial<EventReminder>) => {
+    setNotificationsDisabled(false);
     setReminders((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+      prev.map((r) => {
+        if (r.id !== id) return r;
+        const merged = { ...r, ...updates };
+        if (updates.unit === 'exact') {
+          merged.exactDate = merged.exactDate || dateKey;
+          merged.exactTime = merged.exactTime || startTime;
+        }
+        return merged;
+      })
     );
+  };
+
+  // Helper to preview exact notification trigger time string
+  const computeReminderPreview = (rem: EventReminder): string => {
+    if (rem.unit === 'exact') {
+      const dStr = rem.exactDate || dateKey;
+      const tStr = rem.exactTime || startTime;
+      return `將於 ${dStr} ${tStr} 發送通知`;
+    }
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const [sH, sM] = (isAllDay ? '09:00' : startTime).split(':').map(Number);
+    const eventDt = new Date(y, (m || 1) - 1, d || 1, sH || 0, sM || 0, 0);
+    let offsetMs = 0;
+    if (rem.unit === 'minutes') offsetMs = rem.value * 60 * 1000;
+    else if (rem.unit === 'hours') offsetMs = rem.value * 3600 * 1000;
+    else if (rem.unit === 'days') offsetMs = rem.value * 86400 * 1000;
+    const trigDt = new Date(eventDt.getTime() - offsetMs);
+    const tY = trigDt.getFullYear();
+    const tMo = String(trigDt.getMonth() + 1).padStart(2, '0');
+    const tD = String(trigDt.getDate()).padStart(2, '0');
+    const tH = String(trigDt.getHours()).padStart(2, '0');
+    const tMin = String(trigDt.getMinutes()).padStart(2, '0');
+    return `預計於 ${tY}-${tMo}-${tD} ${tH}:${tMin} 提醒`;
   };
 
   // Live match against special events quotes based on title keyword
@@ -198,9 +253,12 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       isAllDay,
       location: location.trim() || undefined,
       notes: notes.trim() || undefined,
-      reminders,
-      source: 'local',
-      createdAt: editingEvent?.createdAt || Date.now(),
+      reminders: notificationsDisabled ? [] : reminders,
+      notificationsDisabled,
+      source: editingEvent?.source || 'local',
+      calendarName: editingEvent?.calendarName,
+      calendarColor: editingEvent?.calendarColor,
+      createdAt: (editingEvent as CustomCalendarEvent | undefined)?.createdAt || Date.now(),
     };
 
     onSave(newEvent);
@@ -210,11 +268,13 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   const handleDelete = () => {
     if (editingEvent && onDelete) {
       if (window.confirm(`確定要刪除「${editingEvent.title}」此行程嗎？`)) {
-        onDelete(editingEvent.id);
+        onDelete(editingEvent.id, editingEvent);
         onClose();
       }
     }
   };
+
+  const isSyncedEvent = Boolean(editingEvent && editingEvent.source && editingEvent.source !== 'local');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -227,7 +287,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner" />
             <span className="font-serif font-black text-sm tracking-widest text-[#F9F6F0]">
-              {editingEvent ? '編輯社畜行程' : '新增社畜行程'}
+              {editingEvent ? (isSyncedEvent ? '編輯同步行程與通知' : '編輯社畜行程') : '新增社畜行程'}
             </span>
           </div>
 
@@ -246,6 +306,12 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
             <div className="p-2.5 rounded-xl bg-[#C83E31]/10 border border-[#C83E31]/30 text-[#C83E31] text-xs font-sans font-bold flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {isSyncedEvent && (
+            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-sans leading-relaxed">
+              📡 <strong>同步連動行程：</strong>您可以自由修改下方的「通知時間」、行程時間與備忘，或點擊底部「刪除行程」將其從日曆中隱藏移除。
             </div>
           )}
 
@@ -380,108 +446,184 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
             />
           </div>
 
-          {/* 6. Appointment Reminders (最多 3 組通知) */}
-          <div className="space-y-2 pt-1 border-t border-[#2D2D2D]/10">
-            <div className="flex items-center justify-between">
+          {/* 6. Appointment Reminders (支持相對時間、指定精準通知時間與關閉通知) */}
+          <div className="space-y-2.5 pt-2 border-t border-[#2D2D2D]/10">
+            <div className="flex items-center justify-between gap-2">
               <label className="text-xs font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
-                <Bell className="w-3.5 h-3.5 text-[#C83E31]" />
-                <span>行程提醒通知（最多 3 組）</span>
+                {notificationsDisabled ? (
+                  <BellOff className="w-3.5 h-3.5 text-[#6E6A63]" />
+                ) : (
+                  <Bell className="w-3.5 h-3.5 text-[#C83E31]" />
+                )}
+                <span>行程通知時間設定</span>
               </label>
-              <span className="text-[10px] font-sans font-bold text-[#6E6A63]">
-                {reminders.length} / 3 組
-              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (notificationsDisabled) {
+                    setNotificationsDisabled(false);
+                    if (reminders.length === 0) {
+                      setReminders([{ id: `rem_${Date.now()}`, value: 10, unit: 'minutes' }]);
+                    }
+                  } else {
+                    setNotificationsDisabled(true);
+                  }
+                }}
+                className={`px-2.5 py-1 rounded-full text-[10px] font-sans font-bold border transition cursor-pointer flex items-center gap-1 ${
+                  notificationsDisabled
+                    ? 'bg-stone-200 text-stone-600 border-stone-300 hover:bg-stone-300'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                }`}
+              >
+                {notificationsDisabled ? (
+                  <>
+                    <BellOff className="w-3 h-3" />
+                    <span>已關閉通知（點此開啟）</span>
+                  </>
+                ) : (
+                  <>
+                    <Bell className="w-3 h-3" />
+                    <span>通知已開啟（{reminders.length}/3 組）</span>
+                  </>
+                )}
+              </button>
             </div>
 
-            {/* Reminder rows */}
-            <div className="space-y-1.5">
-              {reminders.map((rem, idx) => (
-                <div
-                  key={rem.id}
-                  className="flex items-center gap-2 bg-[#F9F6F0] p-2 rounded-xl border-2 border-[#2D2D2D]/20 shadow-xs"
-                >
-                  <span className="text-xs font-serif font-bold text-[#6E6A63] w-5 text-center">
-                    #{idx + 1}
-                  </span>
-
-                  <input
-                    type="number"
-                    min="1"
-                    max="120"
-                    value={rem.value}
-                    onChange={(e) =>
-                      handleUpdateReminder(rem.id, {
-                        value: Math.max(1, parseInt(e.target.value, 10) || 1),
-                      })
-                    }
-                    className="w-16 px-2.5 py-1.5 rounded-lg border border-[#2D2D2D]/30 bg-white text-xs font-mono font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483]"
-                  />
-
-                  <select
-                    value={rem.unit}
-                    onChange={(e) =>
-                      handleUpdateReminder(rem.id, {
-                        unit: e.target.value as 'minutes' | 'hours' | 'days',
-                      })
-                    }
-                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-[#2D2D2D]/30 bg-white text-xs font-sans font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483] cursor-pointer"
-                  >
-                    <option value="minutes">分鐘前提醒</option>
-                    <option value="hours">小時前提醒</option>
-                    <option value="days">天前提醒</option>
-                  </select>
-
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveReminder(rem.id)}
-                    className="w-7 h-7 rounded-lg text-[#6E6A63] hover:text-[#C83E31] hover:bg-[#C83E31]/10 flex items-center justify-center transition cursor-pointer shrink-0"
-                    title="移除此提醒"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick reminder chips & Add button */}
-            <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1">
-              <div className="flex flex-wrap gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleAddReminder(2, 'hours')}
-                  disabled={reminders.length >= 3}
-                  className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none"
-                >
-                  + 2小時前
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddReminder(1, 'days')}
-                  disabled={reminders.length >= 3}
-                  className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none"
-                >
-                  + 1天前
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddReminder(3, 'days')}
-                  disabled={reminders.length >= 3}
-                  className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none"
-                >
-                  + 3天前
-                </button>
+            {notificationsDisabled ? (
+              <div className="p-3 rounded-xl bg-stone-100 border border-stone-200 text-center text-xs font-sans text-stone-500">
+                🔕 此行程將不會發送任何手機推播通知。
               </div>
+            ) : (
+              <>
+                {/* Reminder rows */}
+                <div className="space-y-2">
+                  {reminders.map((rem, idx) => (
+                    <div
+                      key={rem.id}
+                      className="bg-[#F9F6F0] p-2.5 rounded-xl border-2 border-[#2D2D2D]/20 shadow-xs space-y-1.5"
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+                        <span className="text-[11px] font-serif font-bold text-[#6E6A63] w-5 text-center shrink-0">
+                          #{idx + 1}
+                        </span>
 
-              {reminders.length < 3 && (
-                <button
-                  type="button"
-                  onClick={() => handleAddReminder(1, 'hours')}
-                  className="inline-flex items-center gap-1 text-[11px] font-sans font-bold text-[#C83E31] hover:underline cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>新增提醒</span>
-                </button>
-              )}
-            </div>
+                        {rem.unit !== 'exact' ? (
+                          <input
+                            type="number"
+                            min="0"
+                            max="1440"
+                            value={rem.value}
+                            onChange={(e) =>
+                              handleUpdateReminder(rem.id, {
+                                value: Math.max(0, parseInt(e.target.value, 10) || 0),
+                              })
+                            }
+                            className="w-16 px-2 py-1.5 rounded-lg border border-[#2D2D2D]/30 bg-white text-xs font-mono font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483]"
+                          />
+                        ) : null}
+
+                        <select
+                          value={rem.unit}
+                          onChange={(e) =>
+                            handleUpdateReminder(rem.id, {
+                              unit: e.target.value as 'minutes' | 'hours' | 'days' | 'exact',
+                            })
+                          }
+                          className="flex-1 min-w-[110px] px-2 py-1.5 rounded-lg border border-[#2D2D2D]/30 bg-white text-xs font-sans font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483] cursor-pointer"
+                        >
+                          <option value="minutes">分鐘前提醒（0=準時）</option>
+                          <option value="hours">小時前提醒</option>
+                          <option value="days">天前提醒</option>
+                          <option value="exact">⏰ 指定日期與時間</option>
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveReminder(rem.id)}
+                          className="w-7 h-7 rounded-lg text-[#6E6A63] hover:text-[#C83E31] hover:bg-[#C83E31]/10 flex items-center justify-center transition cursor-pointer shrink-0 ml-auto"
+                          title="移除此通知"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Exact date/time inputs when unit === 'exact' */}
+                      {rem.unit === 'exact' && (
+                        <div className="grid grid-cols-2 gap-2 pl-6 pt-0.5">
+                          <input
+                            type="date"
+                            value={rem.exactDate || dateKey}
+                            onChange={(e) =>
+                              handleUpdateReminder(rem.id, { exactDate: e.target.value })
+                            }
+                            className="px-2 py-1 rounded-lg border border-[#2D2D2D]/30 bg-white text-[11px] font-mono font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483]"
+                          />
+                          <input
+                            type="time"
+                            value={rem.exactTime || startTime}
+                            onChange={(e) =>
+                              handleUpdateReminder(rem.id, { exactTime: e.target.value })
+                            }
+                            className="px-2 py-1 rounded-lg border border-[#2D2D2D]/30 bg-white text-[11px] font-mono font-bold text-[#2D2D2D] focus:outline-none focus:ring-1 focus:ring-[#D4B483]"
+                          />
+                        </div>
+                      )}
+
+                      <div className="text-[10px] font-mono text-[#785A3C] pl-6">
+                        {computeReminderPreview(rem)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Quick reminder chips & Add button */}
+                <div className="flex flex-wrap items-center justify-between gap-1.5 pt-1">
+                  <div className="flex flex-wrap gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleAddReminder(0, 'minutes')}
+                      disabled={reminders.length >= 3}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    >
+                      + 準時
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddReminder(10, 'minutes')}
+                      disabled={reminders.length >= 3}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    >
+                      + 10分前
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddReminder(30, 'minutes')}
+                      disabled={reminders.length >= 3}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    >
+                      + 30分前
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddReminder(1, 'hours')}
+                      disabled={reminders.length >= 3}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#FAF7F0] hover:bg-[#F2ECE1] text-[#2D2D2D] border border-[#2D2D2D]/20 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    >
+                      + 1小時前
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddReminder(0, 'exact')}
+                      disabled={reminders.length >= 3}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    >
+                      + ⏰ 指定時間
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* 6. Live Roast Preview Box */}

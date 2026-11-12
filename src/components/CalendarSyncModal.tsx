@@ -27,6 +27,7 @@ import {
   saveEnabledCalendarIds,
   syncAllCalendarRemindersViaBridge,
   cancelAllCalendarRemindersViaBridge,
+  clearSyncedEventCustomizations,
 } from '../services/calendarService';
 import { APP_VERSION } from '../constants/version';
 
@@ -279,6 +280,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
     // 4. Cancel bridge reminders & clear notifications tray
     cancelAllCalendarRemindersViaBridge();
+    clearSyncedEventCustomizations();
 
     setSuccessMsg('✅ 已完全解除連動並清空快取，日曆已恢復純淨常規狀態！');
     setTimeout(() => setSuccessMsg(null), 3500);
