@@ -117,10 +117,11 @@ public class SurvivalStampWidgetProvider extends AppWidgetProvider {
                 }
             }
 
-            // 4. Also immediately refresh 4x2, 4x4 and daily desk widgets
+            // 4. Also immediately refresh 4x2, 4x4 and 4x5 daily desk widgets
             MonthlyLargeWidgetProvider.updateAllWidgets(context);
             MonthlySplitWidgetProvider.updateAllWidgets(context);
             GanhuaWidgetProvider.updateAllWidgets(context);
+            DeskCardWidgetProvider.updateAllWidgets(context);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +156,20 @@ public class SurvivalStampWidgetProvider extends AppWidgetProvider {
 
             String survivedJson = prefs.getString("survived_dates_json", "[]");
             boolean isTodaySurvived = survivedJson.contains(todayYmd);
-            int streakCount = prefs.getInt("streak_count", 3);
+            int streakCount = prefs.getInt("streak_count", -1);
+            String streakStr = prefs.getString("streak_str", "");
+            if (streakStr != null && !streakStr.isEmpty()) {
+                try {
+                    String digits = streakStr.replaceAll("[^0-9]", "");
+                    if (!digits.isEmpty()) {
+                        int parsed = Integer.parseInt(digits);
+                        if (parsed > streakCount) {
+                            streakCount = parsed;
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+            if (streakCount < 0) streakCount = 3;
 
             // Render high-DPI 1x1 Canvas Bitmap with High-Contrast Color Flip
             Bitmap bitmap = renderStampBitmap(isTodaySurvived, streakCount);

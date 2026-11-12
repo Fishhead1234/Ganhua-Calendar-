@@ -43,14 +43,15 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
             int dayNum = cal.get(Calendar.DAY_OF_MONTH);
             String monthEn = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.ENGLISH).toUpperCase();
             String weekdayEn = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ENGLISH).toUpperCase();
-            String defaultMonthStr = monthEn + " • " + weekdayEn;
+            String monthStr = monthEn + " • " + weekdayEn;
+            String dayStr = String.valueOf(dayNum);
 
-            String monthStr = prefs.getString("month_str", defaultMonthStr);
-            String dayStr = prefs.getString("day_str", String.valueOf(dayNum));
             String characterStr = prefs.getString("character_str", "🐱 厭世社畜貓");
             String characterKey = prefs.getString("character_key", "cat");
             String quoteStr = prefs.getString("quote_str", "週五下午四點後開會的人，靈魂注定得不到安息。");
-            String yijiStr = prefs.getString("yiji_str", "宜：假裝網路不順退出會議・眼神渙散點頭");
+            String rawYiji = prefs.getString("yiji_str", "宜：假裝網路不順退出會議・眼神渙散點頭");
+            String cleanYiji = rawYiji != null ? rawYiji.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim() : "帶薪拉屎";
+            String yijiStr = "宜：" + cleanYiji;
             String offworkStr = prefs.getString("offwork_str", "目標 18:00 下班");
             String streakStr = prefs.getString("streak_str", "🔥 連續生還 3 天");
 
@@ -63,18 +64,31 @@ public class GanhuaWidgetProvider extends AppWidgetProvider {
             views.setTextViewText(R.id.tv_widget_offwork, offworkStr);
             views.setTextViewText(R.id.tv_widget_streak, streakStr);
 
-            // Load exact scene illustration if custom avatar is available
+            // Load exact scene illustration from native sprite sheet or custom avatar
             boolean loadedCustom = false;
-            File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
-            if (avatarFile.exists() && avatarFile.length() > 0) {
+            String syncedSheet = prefs.getString("sprite_sheet", "");
+            String syncedPos = prefs.getString("sprite_position", "");
+            if (syncedSheet != null && !syncedSheet.isEmpty()) {
                 try {
-                    Bitmap bitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
-                    if (bitmap != null) {
-                        views.setImageViewBitmap(R.id.iv_widget_avatar, bitmap);
+                    Bitmap spriteBmp = DeskCardWidgetProvider.getSpriteCellBitmap(context, syncedSheet, syncedPos, characterKey);
+                    if (spriteBmp != null) {
+                        views.setImageViewBitmap(R.id.iv_widget_avatar, spriteBmp);
                         loadedCustom = true;
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception ignored) {}
+            }
+            if (!loadedCustom) {
+                File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
+                if (avatarFile.exists() && avatarFile.length() > 0) {
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                        if (bitmap != null) {
+                            views.setImageViewBitmap(R.id.iv_widget_avatar, bitmap);
+                            loadedCustom = true;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
 

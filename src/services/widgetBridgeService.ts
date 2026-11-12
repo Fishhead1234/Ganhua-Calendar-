@@ -2,6 +2,7 @@ import { CalendarQuote, CHARACTER_META } from '../types/calendar';
 import { parseQuoteDateDisplay } from '../components/DeskCalendarCard';
 import { getLunarDetails } from '../utils/lunarUtils';
 import { toLocalDateKey } from '../utils/dateUtils';
+import { stripYiJiPrefix } from '../utils/quoteFormatter';
 import { CalendarMeeting } from './calendarService';
 
 async function extractSpriteAvatarBase64(
@@ -135,7 +136,11 @@ export async function syncNativeWidgetData(
   const todayKeyStr = toLocalDateKey(new Date());
   const isTodayUnlocked = lastTornToDate === todayKeyStr;
 
+  const cleanYi = stripYiJiPrefix(quote.yi || '帶薪拉屎');
+  const cleanJi = stripYiJiPrefix(quote.ji || '認真打開銀行帳戶看餘額');
+
   const payload = {
+    syncedDateKey: quote.date || todayKeyStr,
     monthStr: `${dateInfo.monthEn} • ${dateInfo.weekdayEn}`,
     dayStr: String(dateInfo.dayNumber),
     lunarStr: lunar.lunarMonthDay,
@@ -144,11 +149,15 @@ export async function syncNativeWidgetData(
     characterStr: charMeta?.badge || '🐱 厭世社畜貓',
     characterKey: quote.character || 'cat',
     quoteStr: quote.quote,
-    yijiStr: `宜：${quote.yi || '帶薪拉屎'}`,
-    yiStr: quote.yi || '',
-    jiStr: quote.ji || '',
+    subtextStr: quote.subtext || '',
+    spriteSheet: quote.spriteSheet || '',
+    spritePosition: quote.spritePosition || '',
+    yijiStr: `宜：${cleanYi}`,
+    yiStr: cleanYi,
+    jiStr: cleanJi,
     offworkStr: `目標 ${offWorkHour}:00 下班`,
     streakStr: `🔥 連續生還 ${streakCount} 天`,
+    streakCount: typeof streakCount === 'number' ? streakCount : 3,
     meetingCount: activeMeetings?.length || 0,
     survivedDatesJson: JSON.stringify(survivedDates || []),
     eventsJson: JSON.stringify(allMeetings && allMeetings.length > 0 ? allMeetings : (activeMeetings || [])),

@@ -44,6 +44,11 @@ export function getFallbackLunarDate(targetDate: Date): string {
   return `農曆 ${lunarMonth}月${lunarDay}`;
 }
 
+export function stripYiJiPrefix(text?: string): string {
+  if (!text) return '';
+  return text.replace(/^(宜|忌)\s*[：:]\s*/g, '').replace(/^(宜|忌)\s*[：:]\s*/g, '').trim();
+}
+
 export function formatQuoteFrom365(
   raw: RawStaticQuote365,
   dateObj: Date
@@ -59,8 +64,8 @@ export function formatQuoteFrom365(
 
   // Seeded pick for Yi / Ji based on day of year
   const seed = raw.dayOfYear || (raw.month * 31 + raw.day);
-  const yi = raw.yi || YI_SAMPLES[seed % YI_SAMPLES.length];
-  const ji = raw.ji || JI_SAMPLES[(seed + 3) % JI_SAMPLES.length];
+  const yi = stripYiJiPrefix(raw.yi || YI_SAMPLES[seed % YI_SAMPLES.length]);
+  const ji = stripYiJiPrefix(raw.ji || JI_SAMPLES[(seed + 3) % JI_SAMPLES.length]);
   const lunarDate = raw.lunarDate || getFallbackLunarDate(dateObj);
 
   return {

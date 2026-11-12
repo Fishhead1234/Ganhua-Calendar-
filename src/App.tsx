@@ -350,7 +350,7 @@ export const App: React.FC = () => {
 
   // Today's quote strictly locked for Native Widgets to prevent future/past date spoilers
   const { currentQuote: todayQuoteToSync } = useTodayQuote({
-    dateOffset: isTodayUnlocked ? 0 : -1,
+    dateOffset: 0,
     isPro,
     isAdmin,
     allowFutureDates: false,
@@ -361,8 +361,18 @@ export const App: React.FC = () => {
     calendarEvents: todayMeetings,
     specialQuoteCycleIndex,
     activePresetId: activePresetId || undefined,
-    userCardMode: currentCardViewMode,
+    userCardMode: cardViewModeMap[todayKey],
   });
+
+  // Ensure if dateOffset is 0 (viewing Today), Today is marked unlocked in localStorage
+  useEffect(() => {
+    if (persisted.dateOffset === 0 && !isTodayUnlocked) {
+      try {
+        localStorage.setItem('last_torn_to_date', todayKey);
+      } catch {}
+      setIsTodayUnlocked(true);
+    }
+  }, [persisted.dateOffset, isTodayUnlocked, todayKey]);
 
   const syncAllCalendarSources = async (): Promise<CalendarMeeting[]> => {
     setIsCalendarSyncing(true);
@@ -798,53 +808,66 @@ export const App: React.FC = () => {
     window.addEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
 
     // Read pending widget date from native Capacitor plugin if cold-started
-    const win = window as any;
-    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingWidgetDate) {
-      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingWidgetDate().then((res: any) => {
-        if (res?.date && /^\d{4}-\d{2}-\d{2}$/.test(res.date)) {
-          const [y, m, d] = res.date.split('-').map(Number);
-          if (y && m && d) {
-            handleJumpToDate(new Date(y, m - 1, d));
+    const syncFromNativeWidgets = () => {
+      const win = window as any;
+      if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingWidgetDate) {
+        win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingWidgetDate().then((res: any) => {
+          if (res?.date && /^\d{4}-\d{2}-\d{2}$/.test(res.date)) {
+            const [y, m, d] = res.date.split('-').map(Number);
+            if (y && m && d) {
+              handleJumpToDate(new Date(y, m - 1, d));
+            }
           }
-        }
-      }).catch(() => {});
-    }
+        }).catch(() => {});
+      }
 
-    // Read pending 1x1 widget survival stamps
-    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingSurvivedSync) {
-      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingSurvivedSync().then((res: any) => {
-        if (res?.survivedDatesJson) {
-          try {
-            const list = JSON.parse(res.survivedDatesJson);
-            if (Array.isArray(list) && list.length > 0) {
-              setPersisted((prev) => ({
-                ...prev,
-                survivedDates: Array.from(new Set([...prev.survivedDates, ...list])),
-                streakCount:
-                  res.streakCount && res.streakCount > prev.streakCount
-                    ? res.streakCount
-                    : prev.streakCount,
-              }));
-            }
-          } catch {}
-        }
-      }).catch(() => {});
-    }
+      // Read pending 1x1 / 4x5 widget survival stamps
+      if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingSurvivedSync) {
+        win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingSurvivedSync().then((res: any) => {
+          if (res?.hasPending && res?.survivedDatesJson) {
+            try {
+              const list = JSON.parse(res.survivedDatesJson);
+              if (Array.isArray(list) && list.length > 0) {
+                setPersisted((prev) => ({
+                  ...prev,
+                  survivedDates: Array.from(new Set([...prev.survivedDates, ...list])),
+                  streakCount:
+                    typeof res.streakCount === 'number' && res.streakCount > prev.streakCount
+                      ? res.streakCount
+                      : prev.streakCount,
+                }));
+              }
+            } catch {}
+          }
+        }).catch(() => {});
+      }
 
-    // Read pending torn status from 4x5 Desk Card Widget
-    if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingTornSync) {
-      win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingTornSync().then((res: any) => {
-        if (res?.lastTornToDate) {
-          try {
-            localStorage.setItem('last_torn_to_date', res.lastTornToDate);
-            const todayKey = toLocalDateKey(new Date());
-            if (res.lastTornToDate === todayKey) {
-              setIsTodayUnlocked(true);
-            }
-          } catch {}
-        }
-      }).catch(() => {});
-    }
+      // Read pending torn status from 4x5 Desk Card Widget
+      if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingTornSync) {
+        win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingTornSync().then((res: any) => {
+          if (res?.lastTornToDate) {
+            try {
+              localStorage.setItem('last_torn_to_date', res.lastTornToDate);
+              const curTodayKey = toLocalDateKey(new Date());
+              if (res.lastTornToDate === curTodayKey) {
+                setIsTodayUnlocked(true);
+                setPersisted((prev) => (prev.dateOffset < 0 ? { ...prev, dateOffset: 0 } : prev));
+              }
+            } catch {}
+          }
+        }).catch(() => {});
+      }
+    };
+
+    syncFromNativeWidgets();
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        syncFromNativeWidgets();
+      }
+    };
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
 
     // Check URL parameters (?select_date=YYYY-MM-DD)
     if (typeof window !== 'undefined') {
@@ -861,6 +884,8 @@ export const App: React.FC = () => {
     return () => {
       window.removeEventListener('widgetSelectDate', handleWidgetDateEvent);
       window.removeEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
     };
   }, []);
 

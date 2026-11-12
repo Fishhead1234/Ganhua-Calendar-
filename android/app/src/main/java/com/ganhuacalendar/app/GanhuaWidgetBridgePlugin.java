@@ -37,6 +37,7 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
     @PluginMethod
     public void updateWidgetData(PluginCall call) {
         try {
+            String syncedDateKey = call.getString("syncedDateKey", "");
             String monthStr = call.getString("monthStr", "");
             String dayStr = call.getString("dayStr", "");
             String lunarStr = call.getString("lunarStr", "");
@@ -44,11 +45,15 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             String solarTerm = call.getString("solarTerm", "");
             String characterStr = call.getString("characterStr", "🐱 厭世社畜貓");
             String quoteStr = call.getString("quoteStr", "");
+            String subtextStr = call.getString("subtextStr", "");
+            String spriteSheet = call.getString("spriteSheet", "");
+            String spritePosition = call.getString("spritePosition", "");
             String yijiStr = call.getString("yijiStr", "");
             String yiStr = call.getString("yiStr", "");
             String jiStr = call.getString("jiStr", "");
             String offworkStr = call.getString("offworkStr", "目標 18:00 下班");
             String streakStr = call.getString("streakStr", "🔥 連續生還 3 天");
+            Integer streakCountVal = call.getInt("streakCount");
             String characterKey = call.getString("characterKey", "cat");
             String avatarBase64 = call.getString("avatarBase64", "");
             int meetingCount = call.getInt("meetingCount", 0);
@@ -57,11 +62,35 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             String lastTornToDate = call.getString("lastTornToDate", "");
             boolean isTodayUnlocked = Boolean.TRUE.equals(call.getBoolean("isTodayUnlocked", false));
 
+            // Strip any duplicate "宜：" or "忌：" prefixes
+            if (yiStr != null) {
+                yiStr = yiStr.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim();
+            } else {
+                yiStr = "";
+            }
+            if (jiStr != null) {
+                jiStr = jiStr.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim();
+            } else {
+                jiStr = "";
+            }
+            if (!yiStr.isEmpty()) {
+                yijiStr = "宜：" + yiStr;
+            } else if (yijiStr != null && !yijiStr.isEmpty()) {
+                yijiStr = "宜：" + yijiStr.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim();
+            }
+
+            Calendar todayCal = Calendar.getInstance();
+            int todayYear = todayCal.get(Calendar.YEAR);
+            int todayMonth = todayCal.get(Calendar.MONTH);
+            int todayDay = todayCal.get(Calendar.DAY_OF_MONTH);
+            String todayYmd = String.format(java.util.Locale.US, "%04d-%02d-%02d", todayYear, todayMonth + 1, todayDay);
+
             SharedPreferences prefs = getContext().getSharedPreferences(
                     GanhuaWidgetProvider.PREFS_NAME,
                     Context.MODE_PRIVATE
             );
             SharedPreferences.Editor editor = prefs.edit();
+            if (syncedDateKey != null && !syncedDateKey.isEmpty()) editor.putString("synced_date_key", syncedDateKey);
             if (!monthStr.isEmpty()) editor.putString("month_str", monthStr);
             if (!dayStr.isEmpty()) editor.putString("day_str", dayStr);
             if (!lunarStr.isEmpty()) editor.putString("lunar_str", lunarStr);
@@ -69,17 +98,40 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
             if (!solarTerm.isEmpty()) editor.putString("solar_term", solarTerm);
             if (!characterStr.isEmpty()) editor.putString("character_str", characterStr);
             if (!quoteStr.isEmpty()) editor.putString("quote_str", quoteStr);
-            if (!yijiStr.isEmpty()) editor.putString("yiji_str", yijiStr);
+            if (subtextStr != null && !subtextStr.isEmpty()) editor.putString("subtext_str", subtextStr);
+            if (spriteSheet != null && !spriteSheet.isEmpty()) editor.putString("sprite_sheet", spriteSheet);
+            if (spritePosition != null && !spritePosition.isEmpty()) editor.putString("sprite_position", spritePosition);
+            if (yijiStr != null && !yijiStr.isEmpty()) editor.putString("yiji_str", yijiStr);
             if (!yiStr.isEmpty()) editor.putString("yi_str", yiStr);
             if (!jiStr.isEmpty()) editor.putString("ji_str", jiStr);
             if (!offworkStr.isEmpty()) editor.putString("offwork_str", offworkStr);
             if (!streakStr.isEmpty()) editor.putString("streak_str", streakStr);
+            if (streakCountVal != null) {
+                editor.putInt("streak_count", streakCountVal);
+            } else if (!streakStr.isEmpty()) {
+                try {
+                    String digits = streakStr.replaceAll("[^0-9]", "");
+                    if (!digits.isEmpty()) {
+                        editor.putInt("streak_count", Integer.parseInt(digits));
+                    }
+                } catch (Exception ignored) {}
+            }
             if (!characterKey.isEmpty()) editor.putString("character_key", characterKey);
             if (!lastTornToDate.isEmpty()) editor.putString("last_torn_to_date", lastTornToDate);
             editor.putBoolean("is_today_unlocked", isTodayUnlocked);
             editor.putInt("meeting_count", meetingCount);
             if (!survivedDatesJson.isEmpty()) editor.putString("survived_dates_json", survivedDatesJson);
             if (eventsJson != null && !eventsJson.isEmpty()) editor.putString("events_json", eventsJson);
+
+            // Keep 4x5 Desk Card and 4x4 Monthly Widget aligned with Today when syncing from App
+            if (isTodayUnlocked || todayYmd.equals(lastTornToDate) || todayYmd.equals(syncedDateKey)) {
+                editor.putString(DeskCardWidgetProvider.PREF_DESK_DATE, todayYmd);
+                editor.putString("desk_last_auto_today", todayYmd);
+            }
+            editor.putInt("widget_view_year", todayYear);
+            editor.putInt("widget_view_month", todayMonth);
+            editor.putString("widget_selected_date", todayYmd);
+            editor.putString("widget_monthly_last_today", todayYmd);
 
             // If an avatar image is supplied, save to internal files dir
             if (avatarBase64 != null && !avatarBase64.isEmpty()) {
@@ -103,11 +155,12 @@ public class GanhuaWidgetBridgePlugin extends Plugin {
 
             editor.apply();
 
-            // Refresh all 4 widget types placed on Android Home Screen
+            // Refresh all 5 widget types placed on Android Home Screen
             GanhuaWidgetProvider.updateAllWidgets(getContext());
             MonthlySplitWidgetProvider.updateAllWidgets(getContext());
             MonthlyLargeWidgetProvider.updateAllWidgets(getContext());
             DeskCardWidgetProvider.updateAllWidgets(getContext());
+            SurvivalStampWidgetProvider.updateAllWidgets(getContext());
 
             JSObject res = new JSObject();
             res.put("success", true);

@@ -30,8 +30,8 @@
     "sceneId": "cat_sprint_home",
     "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "0% 0%",
-    "yi": "宜：在車上安靜放空、偷吸手搖飲",
-    "ji": "忌：問小孩今天在學校學了什麼"
+    "yi": "在車上安靜放空、偷吸手搖飲",
+    "ji": "問小孩今天在學校學了什麼"
   },
   {
     "id": "kid_event_02",
@@ -64,8 +64,8 @@
     "sceneId": "capy_onsen_orange",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：深呼吸積功德",
-    "ji": "忌：計算每一堂課換算成幾杯冰美式"
+    "yi": "深呼吸積功德",
+    "ji": "計算每一堂課換算成幾杯冰美式"
   },
   {
     "id": "kid_event_03",
@@ -98,8 +98,8 @@
     "sceneId": "ghost_low_battery",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：找張有靠背的椅子坐下",
-    "ji": "忌：天真以為回家後他會立刻去睡覺"
+    "yi": "找張有靠背的椅子坐下",
+    "ji": "天真以為回家後他會立刻去睡覺"
   },
   {
     "id": "kid_event_04",
@@ -132,8 +132,8 @@
     "sceneId": "ghost_phone_panic",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
     "spritePosition": "50% 100%",
-    "yi": "宜：眼觀四面耳聽八方",
-    "ji": "忌：找不到小孩還被後車狂按喇叭"
+    "yi": "眼觀四面耳聽八方",
+    "ji": "找不到小孩還被後車狂按喇叭"
   },
   {
     "id": "kid_event_05",
@@ -166,8 +166,8 @@
     "sceneId": "cat_empty_wallet",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：戴上墨鏡假裝很懂戰術",
-    "ji": "忌：太入戲跟裁判爭論"
+    "yi": "戴上墨鏡假裝很懂戰術",
+    "ji": "太入戲跟裁判爭論"
   },
   {
     "id": "kid_event_06",
@@ -200,8 +200,8 @@
     "sceneId": "capy_hammock_nap",
     "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "0% 0%",
-    "yi": "宜：把座椅向後傾斜45度",
-    "ji": "忌：睡過頭忘了去接人"
+    "yi": "把座椅向後傾斜45度",
+    "ji": "睡過頭忘了去接人"
   },
   {
     "id": "kid_event_07",
@@ -234,8 +234,8 @@
     "sceneId": "ghost_dnd_sign",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
     "spritePosition": "100% 50%",
-    "yi": "宜：已讀不回、靜待其他熱心家長回答",
-    "ji": "忌：手滑按到點頭符號"
+    "yi": "已讀不回、靜待其他熱心家長回答",
+    "ji": "手滑按到點頭符號"
   },
   {
     "id": "kid_event_08",
@@ -268,8 +268,8 @@
     "sceneId": "ghost_sunglasses_mask",
     "spriteSheet": "/assets/sheets/ghost_sheet_2.jpg",
     "spritePosition": "100% 50%",
-    "yi": "宜：自備保溫瓶裝滿熱咖啡",
-    "ji": "忌：跟別人家長比較小孩進度"
+    "yi": "自備保溫瓶裝滿熱咖啡",
+    "ji": "跟別人家長比較小孩進度"
   },
   {
     "id": "kid_event_09",
@@ -302,8 +302,8 @@
     "sceneId": "cat_red_envelope",
     "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "50% 100%",
-    "yi": "宜：忘記繳費收據上的數字",
-    "ji": "忌：期待小孩十年後會感謝你"
+    "yi": "忘記繳費收據上的數字",
+    "ji": "期待小孩十年後會感謝你"
   },
   {
     "id": "kid_event_10",
@@ -336,8 +336,8 @@
     "sceneId": "cat_pile_of_work",
     "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "0% 100%",
-    "yi": "宜：早點洗洗睡",
-    "ji": "忌：回顧自己今天看了多久的天花板"
+    "yi": "早點洗洗睡",
+    "ji": "回顧自己今天看了多久的天花板"
   },
   {
     "id": "other_bday_01",
@@ -355,8 +355,8 @@
     "sceneId": "ghost_low_battery",
     "spriteSheet": "/assets/sheets/ghost_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：一鍵複製群組祝賀詞",
-    "ji": "忌：當群組裡第一個主動祝賀的人"
+    "yi": "一鍵複製群組祝賀詞",
+    "ji": "當群組裡第一個主動祝賀的人"
   },
   {
     "id": "other_bday_02",
@@ -374,8 +374,8 @@
     "sceneId": "cat_empty_wallet",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：皮夾自備剛好的零錢百鈔",
-    "ji": "忌：問壽星平常到底熟不熟"
+    "yi": "皮夾自備剛好的零錢百鈔",
+    "ji": "問壽星平常到底熟不熟"
   },
   {
     "id": "other_bday_03",
@@ -393,8 +393,8 @@
     "sceneId": "capy_phone_scroll",
     "spriteSheet": "/assets/sheets/capybara_sheet.jpg",
     "spritePosition": "50% 50%",
-    "yi": "宜：挑一張表情敷衍卻熱情的貼圖",
-    "ji": "忌：打太多客套話引發更長的對話"
+    "yi": "挑一張表情敷衍卻熱情的貼圖",
+    "ji": "打太多客套話引發更長的對話"
   },
   {
     "id": "other_bday_04",
@@ -412,8 +412,8 @@
     "sceneId": "cat_fake_smile",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
     "spritePosition": "50% 50%",
-    "yi": "宜：保持微笑，適時點頭",
-    "ji": "忌：把真心的厭世表情露出來"
+    "yi": "保持微笑，適時點頭",
+    "ji": "把真心的厭世表情露出來"
   },
   {
     "id": "family_dinner_01",
@@ -434,8 +434,8 @@
     "sceneId": "capy_hotpot_feast",
     "spriteSheet": "/assets/sheets/capybara_sheet_2.jpg",
     "spritePosition": "50% 50%",
-    "yi": "宜：默默夾肉、猛扒白飯",
-    "ji": "忌：主動開啟工作與薪水話題"
+    "yi": "默默夾肉、猛扒白飯",
+    "ji": "主動開啟工作與薪水話題"
   },
   {
     "id": "wedding_01",
@@ -453,8 +453,8 @@
     "sceneId": "cat_red_envelope",
     "spriteSheet": "/assets/sheets/cat_sheet_2.jpg",
     "spritePosition": "50% 100%",
-    "yi": "宜：第一道菜上來就開始打包",
-    "ji": "忌：接到新娘捧花"
+    "yi": "第一道菜上來就開始打包",
+    "ji": "接到新娘捧花"
   },
   {
     "id": "medical_01",
@@ -474,7 +474,7 @@
     "sceneId": "cat_empty_wallet",
     "spriteSheet": "/assets/sheets/cat_sheet.jpg",
     "spritePosition": "100% 0%",
-    "yi": "宜：乖乖躺平聽機械鑽頭聲",
-    "ji": "忌：跟醫生吹噓自己平時有運動"
+    "yi": "乖乖躺平聽機械鑽頭聲",
+    "ji": "跟醫生吹噓自己平時有運動"
   }
 ]

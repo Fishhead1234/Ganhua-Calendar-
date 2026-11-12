@@ -158,6 +158,20 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             int viewYear = prefs.getInt("widget_view_year", todayYear);
             int viewMonth = prefs.getInt("widget_view_month", todayMonth);
             String selectedDate = prefs.getString("widget_selected_date", todayYmd);
+            String lastAutoToday = prefs.getString("widget_monthly_last_today", "");
+
+            // Automatically advance selection to Today whenever a new day begins
+            if (!todayYmd.equals(lastAutoToday)) {
+                viewYear = todayYear;
+                viewMonth = todayMonth;
+                selectedDate = todayYmd;
+                prefs.edit()
+                        .putInt("widget_view_year", todayYear)
+                        .putInt("widget_view_month", todayMonth)
+                        .putString("widget_selected_date", todayYmd)
+                        .putString("widget_monthly_last_today", todayYmd)
+                        .apply();
+            }
 
             boolean isSelectedToday = todayYmd.equals(selectedDate);
             boolean isSelectedFuture = selectedDate.compareTo(todayYmd) > 0;
@@ -435,7 +449,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                         canvas.drawText(lunarTag, cx, cy + 47, lunarSubPaint);
 
                         // Survived badge or meeting dot
-                        if (hasSurvived && isCurrentMonth && cellYmd.compareTo(todayYmd) < 0) {
+                        if (hasSurvived && isCurrentMonth && cellYmd.compareTo(todayYmd) <= 0) {
                             Paint stampTagPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                             stampTagPaint.setColor(Color.parseColor("#C83E31"));
                             stampTagPaint.setTextSize(9);
@@ -460,22 +474,40 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             int avatarSize = 175;
             RectF avRect = new RectF(28, footerY + 28, 28 + avatarSize, footerY + 28 + avatarSize);
 
+            DeskCardWidgetProvider.DeskDayQuote pastDayQuote = (!isSelectedToday && !isSelectedFuture)
+                    ? DeskCardWidgetProvider.getQuoteForDate(context, selectedDate)
+                    : null;
+
             if (isSelectedFuture) {
                 // Future Date: Do NOT draw character sprite! Draw yellow/red Talisman Seal graphic instead
                 drawTalismanSealBox(canvas, avRect);
             } else {
                 // Character Illustration Thumbnail for Today and Past Dates
                 Bitmap avatarBitmap = null;
-                File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
-                if (avatarFile.exists() && avatarFile.length() > 0) {
-                    try {
-                        avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
-                    } catch (Exception ignored) {}
+                if (isSelectedToday) {
+                    String syncedSheet = prefs.getString("sprite_sheet", "");
+                    String syncedPos = prefs.getString("sprite_position", "");
+                    if (syncedSheet != null && !syncedSheet.isEmpty()) {
+                        avatarBitmap = DeskCardWidgetProvider.getSpriteCellBitmap(context, syncedSheet, syncedPos, characterKey);
+                    }
+                    if (avatarBitmap == null) {
+                        File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
+                        if (avatarFile.exists() && avatarFile.length() > 0) {
+                            try {
+                                avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                } else if (pastDayQuote != null) {
+                    avatarBitmap = DeskCardWidgetProvider.getSpriteCellBitmap(
+                            context, pastDayQuote.spriteSheet, pastDayQuote.spritePosition, pastDayQuote.character);
                 }
+
                 if (avatarBitmap == null) {
+                    String effChar = (pastDayQuote != null) ? pastDayQuote.character : characterKey;
                     int fallbackRes = R.drawable.widget_char_cat;
-                    if ("capybara".equals(characterKey)) fallbackRes = R.drawable.widget_char_capybara;
-                    else if ("ghost".equals(characterKey)) fallbackRes = R.drawable.widget_char_ghost;
+                    if ("capybara".equals(effChar)) fallbackRes = R.drawable.widget_char_capybara;
+                    else if ("ghost".equals(effChar)) fallbackRes = R.drawable.widget_char_ghost;
                     avatarBitmap = BitmapFactory.decodeResource(context.getResources(), fallbackRes);
                 }
 
@@ -568,7 +600,8 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                 yiPaint.setTypeface(Typeface.DEFAULT_BOLD);
                 yiPaint.setTextSize(17);
                 yiPaint.setColor(Color.parseColor("#C83E31"));
-                String shortYi = yiStr.length() > 16 ? yiStr.substring(0, 16) + "…" : yiStr;
+                String cleanYi = yiStr != null ? yiStr.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim() : "";
+                String shortYi = cleanYi.length() > 16 ? cleanYi.substring(0, 16) + "…" : cleanYi;
                 canvas.drawText("宜：" + shortYi, footerTextX, footerY + 165, yiPaint);
 
                 Paint meetingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -586,49 +619,54 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                 // Past Selected Date
                 Paint pastHeaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 pastHeaderPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-                pastHeaderPaint.setTextSize(22);
+                pastHeaderPaint.setTextSize(20);
                 pastHeaderPaint.setColor(Color.parseColor("#2D2D2D"));
-                canvas.drawText("📅 " + (selMonth + 1) + "月" + selDay + "日 歷史存檔", footerTextX, footerY + 44, pastHeaderPaint);
+                boolean survived = survivedJson.contains(selectedDate);
+                String survLabel = survived ? "（💮 已生還）" : "";
+                canvas.drawText("📅 " + (selMonth + 1) + "月" + selDay + "日 歷史存檔" + survLabel, footerTextX, footerY + 42, pastHeaderPaint);
 
                 TextPaint descPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-                descPaint.setTextSize(18);
-                descPaint.setColor(Color.parseColor("#6E6A63"));
+                descPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+                descPaint.setTextSize(19);
+                descPaint.setColor(Color.parseColor("#2D2D2D"));
 
-                boolean survived = survivedJson.contains(selectedDate);
-                String statusMsg = survived
-                        ? "「當日已蓋章平安生還，順利度過社畜的一天。」"
-                        : "「當日行程已平安生還，無殘留工作事項。」";
+                String pastQuoteText = (pastDayQuote != null && pastDayQuote.quote != null)
+                        ? "「" + pastDayQuote.quote + "」"
+                        : "「當日已蓋章平安生還，順利度過社畜的一天。」";
                 StaticLayout descLayout = new StaticLayout(
-                        statusMsg,
+                        pastQuoteText,
                         descPaint,
                         (int) footerTextW,
                         Layout.Alignment.ALIGN_NORMAL,
-                        1.2f,
+                        1.18f,
                         0.0f,
                         false
                 );
                 canvas.save();
-                canvas.translate(footerTextX, footerY + 62);
+                canvas.translate(footerTextX, footerY + 56);
                 descLayout.draw(canvas);
                 canvas.restore();
 
                 Paint eventPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 eventPaint.setTypeface(Typeface.DEFAULT_BOLD);
-                eventPaint.setTextSize(17);
-                eventPaint.setColor(Color.parseColor("#2D2D2D"));
+                eventPaint.setTextSize(16);
+                eventPaint.setColor(Color.parseColor("#6E6A63"));
 
                 if (firstEventStr != null) {
                     String eventLine = "📅 " + firstEventStr;
                     if (eventLine.length() > 22) eventLine = eventLine.substring(0, 21) + "…";
-                    canvas.drawText(eventLine, footerTextX, footerY + 165, eventPaint);
+                    canvas.drawText(eventLine, footerTextX, footerY + 168, eventPaint);
                 } else {
-                    canvas.drawText("💮 歷史已生還・點擊進入查看", footerTextX, footerY + 165, eventPaint);
+                    canvas.drawText("💮 歷史存檔・再點一下跳轉該日日曆", footerTextX, footerY + 168, eventPaint);
                 }
 
                 Paint hintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                hintPaint.setTypeface(Typeface.DEFAULT_BOLD);
                 hintPaint.setTextSize(15);
                 hintPaint.setColor(Color.parseColor("#C83E31"));
-                canvas.drawText("宜：早點休息・放過自己", footerTextX, footerY + 200, hintPaint);
+                String pastYi = (pastDayQuote != null && pastDayQuote.yi != null) ? pastDayQuote.yi : "早點休息・放過自己";
+                String shortPastYi = pastYi.length() > 16 ? pastYi.substring(0, 16) + "…" : pastYi;
+                canvas.drawText("宜：" + shortPastYi, footerTextX, footerY + 200, hintPaint);
             }
 
             // Card outer stroke

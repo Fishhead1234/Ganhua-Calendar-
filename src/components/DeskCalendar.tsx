@@ -650,11 +650,15 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                   </div>
                   <div className="flex items-center gap-2 pt-0.5">
                     <span className="font-bold text-[#C83E31]">宜：</span>
-                    <span className="text-[#2D2D2D] font-medium">{quote.yi}</span>
+                    <span className="text-[#2D2D2D] font-medium">
+                      {(quote.yi || '').replace(/^(宜|忌)\s*[：:]\s*/g, '')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#6E6A63]">忌：</span>
-                    <span className="text-[#6E6A63] font-medium">{quote.ji}</span>
+                    <span className="text-[#6E6A63] font-medium">
+                      {(quote.ji || '').replace(/^(宜|忌)\s*[：:]\s*/g, '')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-[#785A3C] font-semibold text-[11px] pt-0.5 border-t border-[#2D2D2D]/10">
                     <Clock className="w-3.5 h-3.5 text-[#C83E31]" />
@@ -714,11 +718,15 @@ export const DeskCalendar: React.FC<DeskCalendarProps> = ({
                   </div>
                   <div className="flex items-center gap-2 pt-0.5">
                     <span className="font-bold text-[#C83E31]">宜：</span>
-                    <span className="text-[#2D2D2D] font-medium truncate">{quote.yi}</span>
+                    <span className="text-[#2D2D2D] font-medium truncate">
+                      {(quote.yi || '').replace(/^(宜|忌)\s*[：:]\s*/g, '')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-[#6E6A63]">忌：</span>
-                    <span className="text-[#6E6A63] font-medium truncate">{quote.ji}</span>
+                    <span className="text-[#6E6A63] font-medium truncate">
+                      {(quote.ji || '').replace(/^(宜|忌)\s*[：:]\s*/g, '')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-[#785A3C] font-semibold text-[11px] pt-0.5 border-t border-[#2D2D2D]/10">
                     <Clock className="w-3.5 h-3.5 text-[#C83E31]" />

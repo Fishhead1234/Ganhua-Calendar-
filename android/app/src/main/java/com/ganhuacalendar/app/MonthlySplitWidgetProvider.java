@@ -227,11 +227,20 @@ public class MonthlySplitWidgetProvider extends AppWidgetProvider {
 
             // Bottom Left of Right Section: Character Avatar
             Bitmap avatarBitmap = null;
-            File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
-            if (avatarFile.exists() && avatarFile.length() > 0) {
+            String syncedSheet = prefs.getString("sprite_sheet", "");
+            String syncedPos = prefs.getString("sprite_position", "");
+            if (syncedSheet != null && !syncedSheet.isEmpty()) {
                 try {
-                    avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                    avatarBitmap = DeskCardWidgetProvider.getSpriteCellBitmap(context, syncedSheet, syncedPos, characterKey);
                 } catch (Exception ignored) {}
+            }
+            if (avatarBitmap == null) {
+                File avatarFile = new File(context.getFilesDir(), "widget_current_avatar.png");
+                if (avatarFile.exists() && avatarFile.length() > 0) {
+                    try {
+                        avatarBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                    } catch (Exception ignored) {}
+                }
             }
             if (avatarBitmap == null) {
                 int fallbackRes = R.drawable.widget_char_cat;
@@ -246,7 +255,11 @@ public class MonthlySplitWidgetProvider extends AppWidgetProvider {
                 canvas.drawBitmap(roundedAvatar, rightMargin, height - avatarSize - 25, null);
             }
 
-            // Bottom Right of Right Section: Red Stamp "已生還"
+            // Bottom Right of Right Section: Stamp ("已生還" vs "待蓋章")
+            String todayYmd = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, todayDay);
+            String survivedJson = prefs.getString("survived_dates_json", "[]");
+            boolean isTodaySurvived = survivedJson.contains(todayYmd);
+
             canvas.save();
             canvas.translate(width - 130, height - 60);
             canvas.rotate(-8);
@@ -258,16 +271,16 @@ public class MonthlySplitWidgetProvider extends AppWidgetProvider {
 
             Paint stampBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             stampBorderPaint.setStyle(Paint.Style.STROKE);
-            stampBorderPaint.setStrokeWidth(3.0f);
-            stampBorderPaint.setColor(Color.parseColor("#C83E31"));
+            stampBorderPaint.setStrokeWidth(isTodaySurvived ? 3.0f : 2.0f);
+            stampBorderPaint.setColor(Color.parseColor(isTodaySurvived ? "#C83E31" : "#9E988D"));
             canvas.drawRoundRect(stampBox, 8, 8, stampBorderPaint);
 
             Paint stampTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             stampTextPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
             stampTextPaint.setTextAlign(Paint.Align.CENTER);
             stampTextPaint.setTextSize(20);
-            stampTextPaint.setColor(Color.parseColor("#C83E31"));
-            canvas.drawText("已生還", 0, 7, stampTextPaint);
+            stampTextPaint.setColor(Color.parseColor(isTodaySurvived ? "#C83E31" : "#78736B"));
+            canvas.drawText(isTodaySurvived ? "已生還" : "待蓋章", 0, 7, stampTextPaint);
 
             canvas.restore();
 

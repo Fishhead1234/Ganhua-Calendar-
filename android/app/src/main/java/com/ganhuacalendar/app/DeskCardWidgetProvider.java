@@ -212,6 +212,7 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
                     GanhuaWidgetProvider.updateAllWidgets(context);
                     MonthlySplitWidgetProvider.updateAllWidgets(context);
                     MonthlyLargeWidgetProvider.updateAllWidgets(context);
+                    SurvivalStampWidgetProvider.updateAllWidgets(context);
                 }, 180);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -227,7 +228,20 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
     private static String getEffectiveCardDate(SharedPreferences prefs, String todayKey) {
         String savedDate = prefs.getString(PREF_DESK_DATE, null);
         String lastTorn = prefs.getString(PREF_LAST_TORN_TO_DATE, "");
-        boolean isTodayUnlocked = prefs.getBoolean(PREF_IS_TODAY_UNLOCKED, false) || todayKey.equals(lastTorn);
+        String syncedDate = prefs.getString("synced_date_key", "");
+        String lastAutoToday = prefs.getString("desk_last_auto_today", "");
+        boolean isTodayUnlocked = prefs.getBoolean(PREF_IS_TODAY_UNLOCKED, false)
+                || todayKey.equals(lastTorn)
+                || todayKey.equals(syncedDate);
+
+        if (!todayKey.equals(lastAutoToday)) {
+            String target = isTodayUnlocked ? todayKey : getYesterdayKey();
+            prefs.edit()
+                    .putString(PREF_DESK_DATE, target)
+                    .putString("desk_last_auto_today", todayKey)
+                    .apply();
+            return target;
+        }
 
         if (savedDate != null && !savedDate.isEmpty()) {
             if (savedDate.compareTo(todayKey) > 0) {
@@ -236,14 +250,14 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
             return savedDate;
         }
 
-        if (isTodayUnlocked) {
-            return todayKey;
-        } else {
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_MONTH, -1);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            return sdf.format(cal.getTime());
-        }
+        return isTodayUnlocked ? todayKey : getYesterdayKey();
+    }
+
+    private static String getYesterdayKey() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        return sdf.format(cal.getTime());
     }
 
     private static void handleLockedBounce(Context context) {
@@ -418,7 +432,52 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         boolean isToday = cardDate.equals(todayKey);
         boolean isPast = cardDate.compareTo(todayKey) < 0;
 
-        DeskDayQuote quote = getQuoteForDate(context, cardDate);
+        DeskDayQuote baseQuote = getQuoteForDate(context, cardDate);
+        DeskDayQuote quote = new DeskDayQuote();
+        quote.month = baseQuote.month;
+        quote.day = baseQuote.day;
+        quote.dateKey = baseQuote.dateKey;
+        quote.quote = baseQuote.quote;
+        quote.subtext = baseQuote.subtext;
+        quote.character = baseQuote.character;
+        quote.spriteSheet = baseQuote.spriteSheet;
+        quote.spritePosition = baseQuote.spritePosition;
+        quote.yi = baseQuote.yi;
+        quote.ji = baseQuote.ji;
+
+        // When viewing Today, strictly match the active quote & character synced from Main App!
+        if (isToday) {
+            String syncedQuote = prefs.getString("quote_str", "");
+            String syncedSubtext = prefs.getString("subtext_str", "");
+            String syncedChar = prefs.getString("character_key", "");
+            String syncedSheet = prefs.getString("sprite_sheet", "");
+            String syncedPos = prefs.getString("sprite_position", "");
+            String syncedYi = prefs.getString("yi_str", "");
+            String syncedJi = prefs.getString("ji_str", "");
+
+            if (syncedQuote != null && !syncedQuote.isEmpty()) {
+                quote.quote = syncedQuote;
+            }
+            if (syncedSubtext != null && !syncedSubtext.isEmpty()) {
+                quote.subtext = syncedSubtext;
+            }
+            if (syncedChar != null && !syncedChar.isEmpty()) {
+                quote.character = syncedChar;
+            }
+            if (syncedSheet != null && !syncedSheet.isEmpty()) {
+                quote.spriteSheet = syncedSheet;
+            }
+            if (syncedPos != null && !syncedPos.isEmpty()) {
+                quote.spritePosition = syncedPos;
+            }
+            if (syncedYi != null && !syncedYi.isEmpty()) {
+                quote.yi = syncedYi.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim();
+            }
+            if (syncedJi != null && !syncedJi.isEmpty()) {
+                quote.ji = syncedJi.replaceAll("^(宜|忌)\\s*[：:]\\s*", "").trim();
+            }
+        }
+
         String survivedJson = prefs.getString("survived_dates_json", "[]");
         boolean isSurvived = survivedJson.contains(cardDate);
 
@@ -566,7 +625,18 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         // 6. Seamless Center Character Illustration (Drawn with MULTIPLY so NO WHITE SQUARE BOX)
         float illCenterY = 650f;
         float spriteSize = 280f;
-        Bitmap spriteBitmap = getSpriteCellBitmap(context, quote.spriteSheet, quote.spritePosition, quote.character);
+        Bitmap spriteBitmap = null;
+        if (isToday && (quote.spriteSheet == null || quote.spriteSheet.isEmpty())) {
+            java.io.File avatarFile = new java.io.File(context.getFilesDir(), "widget_current_avatar.png");
+            if (avatarFile.exists() && avatarFile.length() > 0) {
+                try {
+                    spriteBitmap = BitmapFactory.decodeFile(avatarFile.getAbsolutePath());
+                } catch (Exception ignored) {}
+            }
+        }
+        if (spriteBitmap == null) {
+            spriteBitmap = getSpriteCellBitmap(context, quote.spriteSheet, quote.spritePosition, quote.character);
+        }
         if (spriteBitmap != null) {
             RectF dstRect = new RectF(
                     (width - spriteSize) / 2f,
@@ -841,32 +911,49 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         canvas.translate(cx, cy);
         canvas.rotate(-10f);
 
-        // Rectangular authentic Taiwanese red rubber stamp with double border matching Screenshot 1
         float w = 150f;
         float h = 64f;
         RectF outerRect = new RectF(-w / 2f, -h / 2f, w / 2f, h / 2f);
         RectF innerRect = new RectF(-w / 2f + 4f, -h / 2f + 4f, w / 2f - 4f, h / 2f - 4f);
 
-        Paint stampBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
-        stampBorder.setStyle(Paint.Style.STROKE);
-        stampBorder.setColor(Color.parseColor("#C83E31"));
-        stampBorder.setStrokeWidth(2.8f);
-        canvas.drawRoundRect(outerRect, 10f, 10f, stampBorder);
+        if (isSurvived) {
+            // Stamped state: Authentic Taiwanese red rubber stamp with double border
+            Paint stampBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+            stampBorder.setStyle(Paint.Style.STROKE);
+            stampBorder.setColor(Color.parseColor("#C83E31"));
+            stampBorder.setStrokeWidth(2.8f);
+            canvas.drawRoundRect(outerRect, 10f, 10f, stampBorder);
 
-        stampBorder.setStrokeWidth(1.4f);
-        canvas.drawRoundRect(innerRect, 7f, 7f, stampBorder);
+            stampBorder.setStrokeWidth(1.4f);
+            canvas.drawRoundRect(innerRect, 7f, 7f, stampBorder);
 
-        Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
-        textPaint.setTextSize(26);
-        textPaint.setColor(Color.parseColor("#C83E31"));
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("今日已生還", 0, 9f, textPaint);
+            Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+            textPaint.setTextSize(26);
+            textPaint.setColor(Color.parseColor("#C83E31"));
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(isPast ? "當日已生還" : "今日已生還", 0, 9f, textPaint);
+        } else {
+            // Unstamped state: Subtle dashed ink guide inviting 1-tap stamp
+            Paint dashBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+            dashBorder.setStyle(Paint.Style.STROKE);
+            dashBorder.setColor(Color.parseColor("#9E988D"));
+            dashBorder.setStrokeWidth(2.2f);
+            dashBorder.setPathEffect(new DashPathEffect(new float[]{8f, 6f}, 0f));
+            canvas.drawRoundRect(outerRect, 10f, 10f, dashBorder);
+
+            Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+            textPaint.setTextSize(22);
+            textPaint.setColor(Color.parseColor("#78736B"));
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("💮 點擊蓋章", 0, 8f, textPaint);
+        }
 
         canvas.restore();
     }
 
-    private static Bitmap getSpriteCellBitmap(Context context, String spriteSheet, String spritePosition, String characterKey) {
+    public static Bitmap getSpriteCellBitmap(Context context, String spriteSheet, String spritePosition, String characterKey) {
         if (spriteSheet == null || spriteSheet.isEmpty()) {
             return getFallbackAvatar(context, characterKey);
         }
@@ -924,7 +1011,7 @@ public class DeskCardWidgetProvider extends AppWidgetProvider {
         return BitmapFactory.decodeResource(context.getResources(), resId);
     }
 
-    private static DeskDayQuote getQuoteForDate(Context context, String ymd) {
+    public static DeskDayQuote getQuoteForDate(Context context, String ymd) {
         ensureQuotesLoaded(context);
         String dateKey = "01-01";
         int month = 1;

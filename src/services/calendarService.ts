@@ -5,7 +5,7 @@ import {
   getDayOfYear,
   isSchoolRoastDayOfWeek,
 } from '../utils/dateUtils';
-import { formatQuoteFrom365 } from '../utils/quoteFormatter';
+import { formatQuoteFrom365, stripYiJiPrefix } from '../utils/quoteFormatter';
 import quotes365Raw from '../data/quotes365.json';
 import specialEventsQuotesData from '../data/special_events_quotes.json';
 
@@ -1080,8 +1080,8 @@ export function resolveDayContent(
         ...base,
         quote: roast.roastQuote,
         subtext: roast.roastSubtext,
-        yi: roast.yi || base.yi,
-        ji: roast.ji || base.ji,
+        yi: stripYiJiPrefix(roast.yi || base.yi),
+        ji: stripYiJiPrefix(roast.ji || base.ji),
         character: roast.character || base.character,
         sceneId: activeSceneId,
         assetPath: roast.assetPath || (activeSceneId ? `/assets/scenes/${activeSceneId}.webp` : base.assetPath),
