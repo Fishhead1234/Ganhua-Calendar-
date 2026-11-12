@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@vercel/analytics/next': '@vercel/analytics/react',
+    },
+  },
   server: {
     port: 3002,
     host: true,
