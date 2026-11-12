@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import confetti from 'canvas-confetti';
+import { Analytics } from '@vercel/analytics/react';
 import {
   Stamp,
   Share2,
@@ -1432,6 +1433,7 @@ export const App: React.FC = () => {
           showToast(`🎂 已跳轉至生日 (${m}/${d}) 預覽專屬特權卡片！`);
         }}
       />
+      <Analytics />
     </div>
   );
 };
