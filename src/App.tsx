@@ -23,6 +23,7 @@ import { FloatingVersionBar } from './components/FloatingVersionBar';
 import { DailyAgendaStrip } from './components/DailyAgendaStrip';
 import { MonthlyCalendarModal } from './components/MonthlyCalendarModal';
 import { AddEventModal } from './components/AddEventModal';
+import { DeleteEventConfirmModal } from './components/DeleteEventConfirmModal';
 import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { toLocalDateKey, getTodayLocalDateKey } from './utils/dateUtils';
@@ -47,9 +48,11 @@ import {
   applySyncedEventCustomizations,
   saveSyncedEventOverride,
   markSyncedEventDeleted,
+  hideSyncedEvent,
   clearSyncedEventCustomizations,
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
+  deleteAndroidCalendarEventById,
   pushEventToGoogleAppsScript,
   scheduleEventNotificationsViaBridge,
   cancelEventNotificationsViaBridge,
@@ -241,6 +244,7 @@ export const App: React.FC = () => {
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
   const [addEventInitialDate, setAddEventInitialDate] = useState<string>('');
   const [editingCustomEvent, setEditingCustomEvent] = useState<CustomCalendarEvent | null>(null);
+  const [pendingDeleteEvent, setPendingDeleteEvent] = useState<CalendarMeeting | null>(null);
 
   // Merged meetings for currently viewed date
   const effectiveMeetings = useMemo(() => {
@@ -707,27 +711,74 @@ export const App: React.FC = () => {
     eventId: string,
     eventObj?: CustomCalendarEvent | CalendarMeeting
   ) => {
-    const isLocalCustom =
-      customEvents.some((e) => e.id === eventId) || eventObj?.source === 'local';
+    const target: CalendarMeeting =
+      (eventObj as CalendarMeeting) ||
+      allAppointments.find((m) => m.id === eventId) || {
+        id: eventId,
+        title: '此行程',
+        startHour: 9,
+        startMinute: 0,
+        durationMinutes: 60,
+        source: customEvents.some((e) => e.id === eventId) ? 'local' : 'synced',
+      };
+    setPendingDeleteEvent(target);
+  };
 
-    if (isLocalCustom) {
-      deleteCustomEvent(eventId);
-      setCustomEvents(getCustomEvents());
-      deleteNativeDeviceCalendarEvent(eventId).catch(() => {});
-    } else {
-      // Mark synced/preset event as deleted and remove immediately from activeMeetings
-      markSyncedEventDeleted(eventId);
+  const handleConfirmDeleteLocal = (evt: CalendarMeeting) => {
+    deleteCustomEvent(evt.id);
+    setCustomEvents(getCustomEvents());
+    deleteNativeDeviceCalendarEvent(evt.id).catch(() => {});
+    cancelEventNotificationsViaBridge(evt.id);
+    setPendingDeleteEvent(null);
+    showToast('🗑️ 行程已成功刪除');
+  };
+
+  const handleConfirmHideSynced = (evt: CalendarMeeting) => {
+    hideSyncedEvent(evt.id);
+    setActiveMeetings((prev) => {
+      const next = prev.filter((m) => m.id !== evt.id);
+      try {
+        localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    cancelEventNotificationsViaBridge(evt.id);
+    setPendingDeleteEvent(null);
+    showToast('🙈 已僅在幹話日曆隱藏此行程');
+  };
+
+  const handleConfirmDeleteGoogle = (evt: CalendarMeeting) => {
+    if (!evt.eventId || evt.eventId <= 0) {
+      handleConfirmHideSynced(evt);
+      return;
+    }
+
+    const result = deleteAndroidCalendarEventById(evt.eventId);
+    if (result.missingPermission) {
+      showToast('📅 請先允許「行事曆寫入」權限，再點擊一次刪除');
+      return;
+    }
+
+    if (result.success) {
+      const removedIds: string[] = [];
       setActiveMeetings((prev) => {
-        const next = prev.filter((m) => m.id !== eventId);
+        const next = prev.filter((m) => {
+          const isMatch = m.id === evt.id || (m.eventId && m.eventId === evt.eventId);
+          if (isMatch) removedIds.push(m.id);
+          return !isMatch;
+        });
         try {
           localStorage.setItem('ganhua_calendar_meetings', JSON.stringify(next));
         } catch {}
         return next;
       });
-      cancelEventNotificationsViaBridge(eventId);
+      removedIds.forEach((id) => cancelEventNotificationsViaBridge(id));
+      cancelEventNotificationsViaBridge(evt.id);
+      setPendingDeleteEvent(null);
+      showToast('🗑️ 已同步從 Google 行事曆刪除此行程');
+    } else {
+      showToast('⚠️ 無法從系統日曆刪除，可改用「僅在幹話日曆隱藏」');
     }
-
-    showToast('🗑️ 行程已成功刪除');
   };
 
   const handleJumpToDate = (targetDate: Date) => {
@@ -1293,6 +1344,20 @@ export const App: React.FC = () => {
         editingEvent={editingCustomEvent}
         onSave={handleSaveCustomEvent}
         onDelete={handleDeleteCustomEvent}
+      />
+
+      {/* Safe Two-Way Delete Confirmation Modal */}
+      <DeleteEventConfirmModal
+        event={pendingDeleteEvent}
+        isLocalCustom={Boolean(
+          pendingDeleteEvent &&
+            (customEvents.some((e) => e.id === pendingDeleteEvent.id) ||
+              pendingDeleteEvent.source === 'local')
+        )}
+        onClose={() => setPendingDeleteEvent(null)}
+        onDeleteLocal={handleConfirmDeleteLocal}
+        onHideInApp={handleConfirmHideSynced}
+        onDeleteFromGoogle={handleConfirmDeleteGoogle}
       />
 
       {/* Floating Version Quick-Switcher (Only visible when dev mode unlocked via 7-tap) */}

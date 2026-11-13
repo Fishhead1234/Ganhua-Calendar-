@@ -33,6 +33,9 @@ export interface CalendarMeeting {
   location?: string;
   isAllDay?: boolean;
   source?: 'local' | 'synced' | 'preset';
+  eventId?: number;
+  accessLevel?: number;
+  isReadOnly?: boolean;
   calendarId?: string;
   calendarName?: string;
   calendarColor?: string;
@@ -1357,6 +1360,14 @@ export async function fetchNativeDeviceCalendarEvents(
               dateKey: e.dateKey,
               isAllDay: Boolean(e.isAllDay),
               source: 'synced' as const,
+              eventId: e.eventId !== undefined && e.eventId !== null ? Number(e.eventId) : undefined,
+              accessLevel: e.accessLevel !== undefined && e.accessLevel !== null ? Number(e.accessLevel) : undefined,
+              isReadOnly:
+                typeof e.isReadOnly === 'boolean'
+                  ? e.isReadOnly
+                  : e.accessLevel !== undefined && e.accessLevel !== null
+                  ? Number(e.accessLevel) < 500
+                  : true,
               calendarId: calIdStr,
               calendarName,
               calendarColor,
@@ -1997,12 +2008,13 @@ export interface CustomCalendarEvent {
 
 const CUSTOM_EVENTS_STORAGE_KEY = 'user_custom_events';
 const DELETED_SYNCED_EVENT_IDS_KEY = 'deleted_synced_event_ids';
+const HIDDEN_EVENT_IDS_KEY = 'hidden_event_ids';
 const SYNCED_EVENT_OVERRIDES_KEY = 'synced_event_overrides';
 
-export function getDeletedSyncedEventIds(): string[] {
+function readIdListFromStorage(key: string): string[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(DELETED_SYNCED_EVENT_IDS_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.map(String) : [];
@@ -2011,13 +2023,27 @@ export function getDeletedSyncedEventIds(): string[] {
   }
 }
 
-export function markSyncedEventDeleted(eventId: string): void {
+export function getHiddenEventIds(): string[] {
+  const hidden = readIdListFromStorage(HIDDEN_EVENT_IDS_KEY);
+  const legacyDeleted = readIdListFromStorage(DELETED_SYNCED_EVENT_IDS_KEY);
+  return Array.from(new Set([...hidden, ...legacyDeleted]));
+}
+
+export function getDeletedSyncedEventIds(): string[] {
+  return getHiddenEventIds();
+}
+
+export function hideSyncedEvent(eventId: string): void {
   if (typeof window === 'undefined' || !eventId) return;
-  const ids = getDeletedSyncedEventIds();
+  const ids = readIdListFromStorage(HIDDEN_EVENT_IDS_KEY);
   if (!ids.includes(eventId)) {
-    localStorage.setItem(DELETED_SYNCED_EVENT_IDS_KEY, JSON.stringify([...ids, eventId]));
+    localStorage.setItem(HIDDEN_EVENT_IDS_KEY, JSON.stringify([...ids, eventId]));
   }
   cancelEventNotificationsViaBridge(eventId);
+}
+
+export function markSyncedEventDeleted(eventId: string): void {
+  hideSyncedEvent(eventId);
 }
 
 export function getSyncedEventOverrides(): Record<string, Partial<CalendarMeeting>> {
@@ -2043,6 +2069,7 @@ export function clearSyncedEventCustomizations(): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem(DELETED_SYNCED_EVENT_IDS_KEY);
+    localStorage.removeItem(HIDDEN_EVENT_IDS_KEY);
     localStorage.removeItem(SYNCED_EVENT_OVERRIDES_KEY);
   } catch {}
 }
@@ -2326,6 +2353,29 @@ export async function deleteNativeDeviceCalendarEvent(id: string): Promise<boole
     }
   }
   return false;
+}
+
+export function deleteAndroidCalendarEventById(
+  eventId: number
+): { success: boolean; missingPermission?: boolean } {
+  if (typeof window === 'undefined' || !eventId || eventId <= 0) {
+    return { success: false };
+  }
+  const bridge = (window as any).AndroidCalendarBridge;
+  if (!bridge?.deleteCalendarEvent) {
+    return { success: false };
+  }
+  if (bridge.hasWriteCalendarPermission && !bridge.hasWriteCalendarPermission()) {
+    bridge.requestWriteCalendarPermission?.();
+    return { success: false, missingPermission: true };
+  }
+  try {
+    const deleted = Boolean(bridge.deleteCalendarEvent(eventId));
+    return { success: deleted };
+  } catch (e) {
+    console.warn('AndroidCalendarBridge.deleteCalendarEvent error:', e);
+    return { success: false };
+  }
 }
 
 /**

@@ -1,6 +1,7 @@
 package com.ganhuacalendar.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,6 +17,7 @@ import android.provider.CalendarContract;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
@@ -65,7 +67,8 @@ public class AndroidCalendarBridge {
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.CALENDAR_COLOR,
-            CalendarContract.Calendars.IS_PRIMARY
+            CalendarContract.Calendars.IS_PRIMARY,
+            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL
         };
 
         try (Cursor cursor = resolver.query(
@@ -81,6 +84,7 @@ public class AndroidCalendarBridge {
                 int accIdx = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME);
                 int colorIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
                 int primaryIdx = cursor.getColumnIndex(CalendarContract.Calendars.IS_PRIMARY);
+                int accessIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL);
 
                 while (cursor.moveToNext()) {
                     String id = String.valueOf(cursor.getLong(idIdx));
@@ -90,6 +94,7 @@ public class AndroidCalendarBridge {
                     }
                     String accountName = accIdx != -1 ? cursor.getString(accIdx) : "";
                     boolean isPrimary = primaryIdx != -1 && cursor.getInt(primaryIdx) != 0;
+                    int accessLevel = (accessIdx != -1 && !cursor.isNull(accessIdx)) ? cursor.getInt(accessIdx) : 0;
 
                     String colorHex = "#2D2D2D";
                     if (colorIdx != -1 && !cursor.isNull(colorIdx)) {
@@ -104,6 +109,8 @@ public class AndroidCalendarBridge {
                     obj.put("accountName", accountName != null ? accountName : "");
                     obj.put("color", colorHex);
                     obj.put("isPrimary", isPrimary);
+                    obj.put("accessLevel", accessLevel);
+                    obj.put("isReadOnly", accessLevel < CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR);
 
                     array.put(obj);
                 }
@@ -143,6 +150,7 @@ public class AndroidCalendarBridge {
             CalendarContract.Instances.ALL_DAY,
             CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
             CalendarContract.Instances.CALENDAR_COLOR,
+            CalendarContract.Instances.CALENDAR_ACCESS_LEVEL,
             CalendarContract.Instances.EVENT_LOCATION,
             CalendarContract.Instances.DESCRIPTION
         };
@@ -163,6 +171,7 @@ public class AndroidCalendarBridge {
                 int allDayIdx = cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY);
                 int calNameIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_DISPLAY_NAME);
                 int calColorIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_COLOR);
+                int accessIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_ACCESS_LEVEL);
                 int descIdx = cursor.getColumnIndex(CalendarContract.Instances.DESCRIPTION);
                 int locIdx = cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION);
 
@@ -180,6 +189,8 @@ public class AndroidCalendarBridge {
                     boolean isAllDay = allDayIdx != -1 && cursor.getInt(allDayIdx) != 0;
 
                     String calName = calNameIdx != -1 ? cursor.getString(calNameIdx) : "";
+                    int accessLevel = (accessIdx != -1 && !cursor.isNull(accessIdx)) ? cursor.getInt(accessIdx) : 0;
+                    boolean isReadOnly = accessLevel < CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR;
                     String colorHex = "#2D2D2D";
                     if (calColorIdx != -1 && !cursor.isNull(calColorIdx)) {
                         colorHex = String.format("#%06X", (0xFFFFFF & cursor.getInt(calColorIdx)));
@@ -209,7 +220,10 @@ public class AndroidCalendarBridge {
 
                     JSONObject obj = new JSONObject();
                     obj.put("id", "inst_" + eventId + "_" + begin);
+                    obj.put("eventId", eventId);
                     obj.put("calendarId", String.valueOf(calId));
+                    obj.put("accessLevel", accessLevel);
+                    obj.put("isReadOnly", isReadOnly);
                     obj.put("title", title);
                     obj.put("startHour", startHour);
                     obj.put("startMinute", startMinute);
@@ -823,6 +837,53 @@ public class AndroidCalendarBridge {
             } catch (Exception e4) {
                 return false;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Check whether WRITE_CALENDAR permission is currently granted.
+     */
+    @JavascriptInterface
+    public boolean hasWriteCalendarPermission() {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Request WRITE_CALENDAR permission at runtime if not yet granted.
+     */
+    @JavascriptInterface
+    public void requestWriteCalendarPermission() {
+        if (context instanceof Activity) {
+            Activity activity = (Activity) context;
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    new String[]{ Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR },
+                    103
+                );
+            }
+        }
+    }
+
+    /**
+     * Delete an event from Android's system CalendarContract.Events database.
+     * Deletion automatically syncs back to Google Calendar.
+     */
+    @JavascriptInterface
+    public boolean deleteCalendarEvent(long eventId) {
+        if (eventId <= 0) {
+            return false;
+        }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        try {
+            Uri deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId);
+            int rows = context.getContentResolver().delete(deleteUri, null, null);
+            return rows > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -598,9 +598,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (window.confirm(`確定要刪除「${evt.title}」此行程嗎？`)) {
-                        onDeleteEvent(evt);
-                      }
+                      onDeleteEvent(evt);
                     }}
                     className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold shadow-2xs cursor-pointer active:scale-95 transition"
                     title="刪除此行程"

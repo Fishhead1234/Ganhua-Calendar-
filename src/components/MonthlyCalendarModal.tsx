@@ -482,9 +482,7 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm(`確定要刪除「${m.title}」此行程嗎？`)) {
-                              onDeleteEvent(m);
-                            }
+                            onDeleteEvent(m);
                           }}
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-[10px] font-sans font-bold transition shadow-2xs active:scale-95 cursor-pointer"
                           title="刪除此行程"

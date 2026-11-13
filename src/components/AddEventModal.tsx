@@ -267,10 +267,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
 
   const handleDelete = () => {
     if (editingEvent && onDelete) {
-      if (window.confirm(`確定要刪除「${editingEvent.title}」此行程嗎？`)) {
-        onDelete(editingEvent.id, editingEvent);
-        onClose();
-      }
+      onDelete(editingEvent.id, editingEvent);
+      onClose();
     }
   };
 

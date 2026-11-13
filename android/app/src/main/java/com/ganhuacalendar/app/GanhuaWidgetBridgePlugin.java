@@ -28,7 +28,7 @@ import java.util.Calendar;
     permissions = {
         @Permission(
             alias = "calendar",
-            strings = { Manifest.permission.READ_CALENDAR }
+            strings = { Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR }
         )
     }
 )
