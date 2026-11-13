@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from './utils/confettiHelper';
 import {
   Stamp,
   Share2,
@@ -480,16 +480,12 @@ export const App: React.FC = () => {
   // Confetti celebration if today is user's birthday
   useEffect(() => {
     if (isBirthday && isToday) {
-      try {
-        confetti({
-          particleCount: 80,
-          spread: 85,
-          origin: { y: 0.6 },
-          colors: ['#C83E31', '#D4B483', '#FAF7F0', '#E58C8A'],
-        });
-      } catch {
-        // ignore
-      }
+      fireConfetti({
+        particleCount: 80,
+        spread: 85,
+        origin: { y: 0.6 },
+        colors: ['#C83E31', '#D4B483', '#FAF7F0', '#E58C8A'],
+      });
     }
   }, [isBirthday, isToday]);
 
@@ -580,14 +576,12 @@ export const App: React.FC = () => {
         }
 
         // Confetti celebration
-        try {
-          confetti({
-            particleCount: 70,
-            spread: 75,
-            origin: { y: 0.6 },
-            colors: ['#C83E31', '#D4B483', '#2D2D2D', '#FAF7F0'],
-          });
-        } catch {}
+        fireConfetti({
+          particleCount: 70,
+          spread: 75,
+          origin: { y: 0.6 },
+          colors: ['#C83E31', '#D4B483', '#2D2D2D', '#FAF7F0'],
+        });
 
         showToast('🎉 新的一天正式解鎖！今日幹話已揭曉');
       }
@@ -908,16 +902,12 @@ export const App: React.FC = () => {
     const alreadyStamped = persisted.survivedDates.includes(currentQuote.date);
 
     if (!alreadyStamped) {
-      try {
-        confetti({
-          particleCount: 50,
-          spread: 65,
-          origin: { y: 0.7 },
-          colors: ['#C83E31', '#D4B483', '#2D2D2D'],
-        });
-      } catch {
-        // ignore
-      }
+      fireConfetti({
+        particleCount: 50,
+        spread: 65,
+        origin: { y: 0.7 },
+        colors: ['#C83E31', '#D4B483', '#2D2D2D'],
+      });
       setPersisted((prev) => ({
         ...prev,
         survivedDates: [...prev.survivedDates, currentQuote.date],
