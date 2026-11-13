@@ -52,6 +52,7 @@ import {
   clearSyncedEventCustomizations,
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
+  createAndroidCalendarEvent,
   deleteAndroidCalendarEventById,
   pushEventToGoogleAppsScript,
   scheduleEventNotificationsViaBridge,
@@ -643,7 +644,10 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleSaveCustomEvent = (newEvent: CustomCalendarEvent) => {
+  const handleSaveCustomEvent = async (
+    newEvent: CustomCalendarEvent,
+    targetCalendarId?: string
+  ) => {
     const isSynced = newEvent.source && newEvent.source !== 'local';
 
     if (isSynced) {
@@ -686,20 +690,75 @@ export const App: React.FC = () => {
       return;
     }
 
+    const [y, m, d] = newEvent.dateKey.split('-').map(Number);
+    const sDate = new Date(
+      y,
+      (m || 1) - 1,
+      d || 1,
+      newEvent.isAllDay ? 0 : newEvent.startHour,
+      newEvent.isAllDay ? 0 : newEvent.startMinute
+    );
+    const eDate = newEvent.isAllDay
+      ? new Date(y, (m || 1) - 1, d || 1, 23, 59, 59)
+      : new Date(sDate.getTime() + newEvent.durationMinutes * 60 * 1000);
+
+    // 1. If user chose a writable Google / Android calendar, write directly via AndroidCalendarBridge
+    if (targetCalendarId && targetCalendarId !== 'local') {
+      try {
+        localStorage.setItem('default_write_calendar_id', targetCalendarId);
+      } catch {}
+
+      const created = createAndroidCalendarEvent({
+        calendarId: targetCalendarId,
+        title: newEvent.title,
+        startMs: sDate.getTime(),
+        endMs: eDate.getTime(),
+        isAllDay: newEvent.isAllDay,
+        notes: newEvent.notes,
+        reminders: newEvent.notificationsDisabled ? [] : newEvent.reminders,
+      });
+
+      if (created.eventId > 0) {
+        const synced = await syncAllCalendarSources();
+        const matched = synced.find((ev) => ev.eventId === created.eventId);
+        if (matched) {
+          saveSyncedEventOverride(matched.id, {
+            reminders: newEvent.reminders,
+            notificationsDisabled: newEvent.notificationsDisabled,
+          });
+          scheduleEventNotificationsViaBridge({
+            ...matched,
+            reminders: newEvent.reminders,
+            notificationsDisabled: newEvent.notificationsDisabled,
+          });
+        }
+        showToast(
+          `✨ 行程「${newEvent.title}」已同步寫入 ${newEvent.calendarName || 'Google 行事曆'}！`
+        );
+        return;
+      }
+
+      if (created.missingPermission) {
+        saveCustomEvent(newEvent);
+        setCustomEvents(getCustomEvents());
+        showToast('📅 請先授予「行事曆寫入」權限，已先暫存於幹話日曆本機');
+        return;
+      }
+    }
+
+    // 2. Local-only save (or web fallback)
     saveCustomEvent(newEvent);
     setCustomEvents(getCustomEvents());
 
-    // 2. Native device calendar write (Capacitor)
-    const [y, m, d] = newEvent.dateKey.split('-').map(Number);
-    const sDate = new Date(y, (m || 1) - 1, d || 1, newEvent.startHour, newEvent.startMinute);
-    const eDate = new Date(sDate.getTime() + newEvent.durationMinutes * 60 * 1000);
-    writeNativeDeviceCalendarEvent({
-      title: newEvent.title,
-      startDate: sDate,
-      endDate: eDate,
-      isAllDay: newEvent.isAllDay,
-      notes: newEvent.notes,
-    }).catch(() => {});
+    if (!targetCalendarId) {
+      writeNativeDeviceCalendarEvent({
+        title: newEvent.title,
+        startDate: sDate,
+        endDate: eDate,
+        isAllDay: newEvent.isAllDay,
+        notes: newEvent.notes,
+      }).catch(() => {});
+    }
 
     // 3. Google Apps Script Push (Two-way web bridge)
     pushEventToGoogleAppsScript(newEvent).catch(() => {});

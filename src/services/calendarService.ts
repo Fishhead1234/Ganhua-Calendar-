@@ -1146,6 +1146,8 @@ export interface DeviceCalendarSource {
   accountName?: string;
   color?: string;
   isPrimary?: boolean;
+  accessLevel?: number;
+  isReadOnly?: boolean;
 }
 
 const ENABLED_CALENDARS_STORAGE_KEY = 'enabled_calendar_ids';
@@ -1190,6 +1192,13 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
             accountName,
             color: c.color || '#2D2D2D',
             isPrimary: Boolean(c.isPrimary),
+            accessLevel: c.accessLevel !== undefined && c.accessLevel !== null ? Number(c.accessLevel) : undefined,
+            isReadOnly:
+              typeof c.isReadOnly === 'boolean'
+                ? c.isReadOnly
+                : c.accessLevel !== undefined && c.accessLevel !== null
+                ? Number(c.accessLevel) < 500
+                : undefined,
           };
         });
       }
@@ -2353,6 +2362,46 @@ export async function deleteNativeDeviceCalendarEvent(id: string): Promise<boole
     }
   }
   return false;
+}
+
+export function createAndroidCalendarEvent(params: {
+  calendarId: string;
+  title: string;
+  startMs: number;
+  endMs: number;
+  isAllDay: boolean;
+  notes?: string;
+  reminders?: EventReminder[];
+}): { eventId: number; missingPermission?: boolean } {
+  if (typeof window === 'undefined' || !params.calendarId) {
+    return { eventId: -1 };
+  }
+  const bridge = (window as any).AndroidCalendarBridge;
+  if (!bridge?.createCalendarEvent) {
+    return { eventId: -1 };
+  }
+  if (bridge.hasWriteCalendarPermission && !bridge.hasWriteCalendarPermission()) {
+    bridge.requestWriteCalendarPermission?.();
+    return { eventId: -1, missingPermission: true };
+  }
+  try {
+    const remindersJson = JSON.stringify((params.reminders || []).slice(0, 3));
+    const eventId = Number(
+      bridge.createCalendarEvent(
+        params.calendarId,
+        params.title,
+        params.startMs,
+        params.endMs,
+        Boolean(params.isAllDay),
+        params.notes || '',
+        remindersJson
+      )
+    );
+    return { eventId: Number.isFinite(eventId) ? eventId : -1 };
+  } catch (e) {
+    console.warn('AndroidCalendarBridge.createCalendarEvent error:', e);
+    return { eventId: -1 };
+  }
 }
 
 export function deleteAndroidCalendarEventById(

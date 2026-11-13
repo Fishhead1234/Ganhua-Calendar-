@@ -13,8 +13,15 @@ import {
   BellOff,
   Plus,
   MapPin,
+  FolderOpen,
 } from 'lucide-react';
-import { CalendarMeeting, CustomCalendarEvent, EventReminder } from '../services/calendarService';
+import {
+  CalendarMeeting,
+  CustomCalendarEvent,
+  DeviceCalendarSource,
+  EventReminder,
+  fetchDeviceCalendars,
+} from '../services/calendarService';
 import specialEventsData from '../data/special_events_quotes.json';
 import { SpecialEventQuote } from '../utils/eventRoastMatcher';
 
@@ -23,7 +30,7 @@ interface AddEventModalProps {
   onClose: () => void;
   initialDate?: string; // YYYY-MM-DD
   editingEvent?: (CustomCalendarEvent | CalendarMeeting) | null;
-  onSave: (event: CustomCalendarEvent) => void;
+  onSave: (event: CustomCalendarEvent, targetCalendarId?: string) => void;
   onDelete?: (eventId: string, eventObj?: CustomCalendarEvent | CalendarMeeting) => void;
 }
 
@@ -83,6 +90,43 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   const [reminders, setReminders] = useState<EventReminder[]>([
     { id: 'rem_1', value: 10, unit: 'minutes' },
   ]);
+  const [writableCalendars, setWritableCalendars] = useState<DeviceCalendarSource[]>([]);
+  const [targetCalendarId, setTargetCalendarId] = useState<string>('local');
+
+  // Load writable Google / Android calendars when creating a new event
+  useEffect(() => {
+    if (!isOpen || editingEvent) return;
+    let cancelled = false;
+    fetchDeviceCalendars()
+      .then((cals) => {
+        if (cancelled) return;
+        const writable = cals.filter((c) =>
+          typeof c.accessLevel === 'number' ? c.accessLevel >= 500 : c.isReadOnly === false
+        );
+        setWritableCalendars(writable);
+
+        let savedDefault: string | null = null;
+        try {
+          savedDefault = localStorage.getItem('default_write_calendar_id');
+        } catch {}
+
+        if (savedDefault && (savedDefault === 'local' || writable.some((c) => c.id === savedDefault))) {
+          setTargetCalendarId(savedDefault);
+        } else {
+          const primary = writable.find((c) => c.isPrimary) || writable[0];
+          setTargetCalendarId(primary ? primary.id : 'local');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setWritableCalendars([]);
+          setTargetCalendarId('local');
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, editingEvent]);
 
   // Sync state when opening modal or changing editing event
   useEffect(() => {
@@ -241,6 +285,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       ? new Date(y, (m || 1) - 1, d || 1, 23, 59, 59)
       : new Date(startDateObj.getTime() + durationMinutes * 60 * 1000);
 
+    const selectedCal = writableCalendars.find((c) => c.id === targetCalendarId);
+
     const newEvent: CustomCalendarEvent = {
       id: editingEvent ? editingEvent.id : `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       title: title.trim(),
@@ -256,12 +302,12 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
       reminders: notificationsDisabled ? [] : reminders,
       notificationsDisabled,
       source: editingEvent?.source || 'local',
-      calendarName: editingEvent?.calendarName,
-      calendarColor: editingEvent?.calendarColor,
+      calendarName: editingEvent?.calendarName || selectedCal?.name,
+      calendarColor: editingEvent?.calendarColor || selectedCal?.color,
       createdAt: (editingEvent as CustomCalendarEvent | undefined)?.createdAt || Date.now(),
     };
 
-    onSave(newEvent);
+    onSave(newEvent, !editingEvent ? targetCalendarId : undefined);
     onClose();
   };
 
@@ -310,6 +356,36 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           {isSyncedEvent && (
             <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-sans leading-relaxed">
               📡 <strong>同步連動行程：</strong>您可以自由修改下方的「通知時間」、行程時間與備忘，或點擊底部「刪除行程」將其從日曆中隱藏移除。
+            </div>
+          )}
+
+          {/* Target Google / Android Calendar Selector (for new events) */}
+          {!editingEvent && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
+                <FolderOpen className="w-3.5 h-3.5 text-[#C83E31]" />
+                <span>📂 儲存至行事曆</span>
+              </label>
+              <select
+                value={targetCalendarId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setTargetCalendarId(val);
+                  try {
+                    localStorage.setItem('default_write_calendar_id', val);
+                  } catch {}
+                }}
+                className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#2D2D2D] bg-[#F9F6F0] text-xs font-sans font-bold text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#D4B483] shadow-xs cursor-pointer"
+              >
+                {writableCalendars.map((cal) => (
+                  <option key={cal.id} value={cal.id}>
+                    {cal.name}
+                    {cal.accountName && cal.accountName !== cal.name ? ` (${cal.accountName})` : ''}
+                    {cal.isPrimary ? ' ★預設' : ''}
+                  </option>
+                ))}
+                <option value="local">📱 僅儲存在幹話日曆 (本機)</option>
+              </select>
             </div>
           )}
 

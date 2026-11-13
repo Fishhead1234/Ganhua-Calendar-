@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -887,6 +888,129 @@ public class AndroidCalendarBridge {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Create an event directly in a specific Android / Google Calendar.
+     * Inserts reminders (up to 3) into CalendarContract.Reminders.CONTENT_URI.
+     * Returns the newly created CalendarContract.Events._ID, or -1 on failure.
+     */
+    @JavascriptInterface
+    public long createCalendarEvent(
+            String calendarId,
+            String title,
+            long startMs,
+            long endMs,
+            boolean isAllDay,
+            String notes,
+            String remindersJson
+    ) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            requestWriteCalendarPermission();
+            return -1L;
+        }
+
+        if (calendarId == null || calendarId.trim().isEmpty()) {
+            return -1L;
+        }
+
+        try {
+            long calId = Long.parseLong(calendarId.trim());
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues values = new ContentValues();
+            values.put(CalendarContract.Events.CALENDAR_ID, calId);
+            values.put(CalendarContract.Events.TITLE, (title != null && !title.trim().isEmpty()) ? title.trim() : "未命名行程");
+            values.put(CalendarContract.Events.DESCRIPTION, notes != null ? notes : "");
+
+            long effectiveStartMs = startMs;
+            if (isAllDay) {
+                Calendar localCal = Calendar.getInstance();
+                localCal.setTimeInMillis(startMs);
+                Calendar utcStart = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                utcStart.clear();
+                utcStart.set(
+                    localCal.get(Calendar.YEAR),
+                    localCal.get(Calendar.MONTH),
+                    localCal.get(Calendar.DAY_OF_MONTH),
+                    0, 0, 0
+                );
+                long utcStartMs = utcStart.getTimeInMillis();
+                long dayCount = Math.max(1L, Math.round((double) Math.max(86400000L, endMs - startMs) / 86400000.0));
+                long utcEndMs = utcStartMs + dayCount * 86400000L;
+
+                values.put(CalendarContract.Events.ALL_DAY, 1);
+                values.put(CalendarContract.Events.EVENT_TIMEZONE, "UTC");
+                values.put(CalendarContract.Events.DTSTART, utcStartMs);
+                values.put(CalendarContract.Events.DTEND, utcEndMs);
+                effectiveStartMs = utcStartMs;
+            } else {
+                long safeEndMs = Math.max(endMs, startMs + 15L * 60L * 1000L);
+                values.put(CalendarContract.Events.ALL_DAY, 0);
+                values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+                values.put(CalendarContract.Events.DTSTART, startMs);
+                values.put(CalendarContract.Events.DTEND, safeEndMs);
+            }
+
+            Uri insertedUri = resolver.insert(CalendarContract.Events.CONTENT_URI, values);
+            if (insertedUri == null) {
+                return -1L;
+            }
+
+            long eventId = ContentUris.parseId(insertedUri);
+            if (eventId <= 0) {
+                return -1L;
+            }
+
+            // Insert up to 3 reminders into CalendarContract.Reminders.CONTENT_URI
+            if (remindersJson != null && !remindersJson.trim().isEmpty()) {
+                try {
+                    JSONArray reminders = new JSONArray(remindersJson);
+                    int count = Math.min(3, reminders.length());
+                    for (int i = 0; i < count; i++) {
+                        JSONObject rem = reminders.optJSONObject(i);
+                        if (rem == null) continue;
+
+                        String unit = rem.optString("unit", "minutes");
+                        int value = rem.optInt("value", 10);
+                        int minutes = 10;
+
+                        if ("minutes".equals(unit)) {
+                            minutes = Math.max(0, value);
+                        } else if ("hours".equals(unit)) {
+                            minutes = Math.max(0, value * 60);
+                        } else if ("days".equals(unit)) {
+                            minutes = Math.max(0, value * 1440);
+                        } else if ("exact".equals(unit)) {
+                            String exactDate = rem.optString("exactDate", "");
+                            String exactTime = rem.optString("exactTime", "");
+                            if (!exactDate.isEmpty() && !exactTime.isEmpty()) {
+                                try {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+                                    Date exactDt = sdf.parse(exactDate + " " + exactTime);
+                                    if (exactDt != null) {
+                                        long diffMins = Math.round((effectiveStartMs - exactDt.getTime()) / 60000.0);
+                                        minutes = (int) Math.max(0L, diffMins);
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }
+
+                        ContentValues remValues = new ContentValues();
+                        remValues.put(CalendarContract.Reminders.EVENT_ID, eventId);
+                        remValues.put(CalendarContract.Reminders.MINUTES, minutes);
+                        remValues.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+                        resolver.insert(CalendarContract.Reminders.CONTENT_URI, remValues);
+                    }
+                } catch (Exception remEx) {
+                    remEx.printStackTrace();
+                }
+            }
+
+            return eventId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1L;
         }
     }
 }
