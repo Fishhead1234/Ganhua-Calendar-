@@ -260,8 +260,8 @@ export const App: React.FC = () => {
   }, [activeMeetings, customEvents]);
 
   const roastResult: CalendarRoastResult = useMemo(() => {
-    return analyzeCalendarEvents(effectiveMeetings, activePresetId || undefined);
-  }, [effectiveMeetings, activePresetId]);
+    return analyzeCalendarEvents(effectiveMeetings, activePresetId || undefined, 0, currentDateObj);
+  }, [effectiveMeetings, activePresetId, currentDateObj]);
 
   const todayKey = useMemo(() => getTodayYmd(), []);
 
@@ -279,7 +279,7 @@ export const App: React.FC = () => {
   }, [activeMeetings, customEvents, todayKey]);
 
   const todayRoastResult: CalendarRoastResult = useMemo(() => {
-    return analyzeCalendarEvents(todayMeetings, activePresetId || undefined);
+    return analyzeCalendarEvents(todayMeetings, activePresetId || undefined, 0, new Date());
   }, [todayMeetings, activePresetId]);
 
   const isEmbedMode = useMemo(() => {

@@ -711,6 +711,23 @@ export function analyzeCalendarEvents(
     };
   }
 
+  // 1-F-2. Weekend Mode (Saturday & Sunday): Never trigger corporate meeting roasts or office density roasts
+  const isWeekend = targetDate.getDay() === 0 || targetDate.getDay() === 6;
+  if (isWeekend) {
+    return {
+      meetingsCount: 0,
+      hasFridayLateMeeting: false,
+      hasBackToBackMeetings: false,
+      totalMeetingHours: 0,
+      summaryBadge: '🛋️ 週末放空模式（不談公事）',
+      roastQuote: '',
+      roastSubtext: '',
+      yi: '',
+      ji: '',
+      eventType: 'weekend_chill',
+    };
+  }
+
   // 1-G. 1-on-1 / 績效面談
   if (hasReviewOr1on1) {
     return {
@@ -973,7 +990,25 @@ export function resolveDayContent(
   // 1. Base 365 daily quote
   const list = (options.quotes && options.quotes.length > 0 ? options.quotes : quotes365Raw) as RawStaticQuote365[];
   const found = list.find((q) => q && q.month === targetMonth && q.day === targetDay) || list[0];
-  const base = formatQuoteFrom365(found, targetDate);
+  const isWeekend = targetDate.getDay() === 0 || targetDate.getDay() === 6;
+  let selectedRaw = found;
+
+  // Weekend Mode: never show "workplace" quotes on Saturday or Sunday
+  if (isWeekend && selectedRaw?.theme === 'workplace') {
+    const weekendPool = list.filter(
+      (q) => q && (q.theme === 'layflat' || q.theme === 'money' || q.theme === 'social_battery')
+    );
+    if (weekendPool.length > 0) {
+      const seedStr = `${dateStr}-${targetDate.getFullYear()}`;
+      let hash = 0;
+      for (let i = 0; i < seedStr.length; i++) {
+        hash = (hash * 31 + seedStr.charCodeAt(i)) >>> 0;
+      }
+      selectedRaw = weekendPool[hash % weekendPool.length];
+    }
+  }
+
+  const base = formatQuoteFrom365(selectedRaw, targetDate);
 
   // Character theme override
   if (options.selectedThemeFilter && options.selectedThemeFilter !== 'all') {
@@ -1027,20 +1062,21 @@ export function resolveDayContent(
     const isOtherPersonBday = roast.eventType === 'other_person_birthday';
     const isSchoolEvent = roast.eventType === 'school_parent';
 
-    // STRICT RULE: Never override main card for other person's birthday!
-    // When someone else's birthday is on the calendar, keep normal daily quote and character illustration from quotes365.json
-    if (isOtherPersonBday) {
+    // STRICT RULE: Never override main card for other person's birthday or normal weekend events!
+    // When someone else's birthday or a normal weekend event is on the calendar, keep the relaxed daily quote from quotes365.json
+    if (isOtherPersonBday || roast.eventType === 'weekend_chill') {
+      const isChillWeekend = roast.eventType === 'weekend_chill';
       return {
         ...base,
         hasRoastOverride: false,
-        roastBadge: '',
-        eventLabel: undefined,
+        roastBadge: isChillWeekend ? roast.summaryBadge : '',
+        eventLabel: isChillWeekend ? roast.summaryBadge : undefined,
         roastAvailable: false,
         canToggleRoast: false,
         currentMode: 'original',
-        meetingsCount: roast.meetingsCount,
-        timedMeetingsCount: timedEvents.length,
-        totalMeetingHours: roast.totalMeetingHours,
+        meetingsCount: isChillWeekend ? 0 : roast.meetingsCount,
+        timedMeetingsCount: isChillWeekend ? 0 : timedEvents.length,
+        totalMeetingHours: isChillWeekend ? 0 : roast.totalMeetingHours,
         extractedName: roast.extractedName,
         specialEventCandidatesCount: 1,
         specialEventIndex: 0,
