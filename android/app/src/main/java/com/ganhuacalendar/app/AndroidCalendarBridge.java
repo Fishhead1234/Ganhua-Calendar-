@@ -33,9 +33,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class AndroidCalendarBridge {
@@ -160,6 +166,7 @@ public class AndroidCalendarBridge {
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         SimpleDateFormat localDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Set<String> seenInstanceKeys = new HashSet<>();
 
         try (Cursor cursor = resolver.query(uri, projection, null, null, CalendarContract.Instances.BEGIN + " ASC")) {
             if (cursor != null) {
@@ -213,6 +220,8 @@ public class AndroidCalendarBridge {
                                             (startHour >= 16 || (startHour == 15 && startMinute >= 45));
                     }
 
+                    seenInstanceKeys.add(eventId + "_" + dateKey);
+
                     JSONObject obj = new JSONObject();
                     obj.put("id", "inst_" + eventId + "_" + begin);
                     obj.put("eventId", eventId);
@@ -235,7 +244,386 @@ public class AndroidCalendarBridge {
             e.printStackTrace();
         }
 
+        // Supplement with CalendarContract.Events.CONTENT_URI for any calendars/RRULEs
+        // whose Instances were not expanded by Android's CalendarProvider (e.g., SYNC_EVENTS=0 or subscribed feeds)
+        supplementMissingEventsAndRecurrences(
+            resolver,
+            array,
+            seenInstanceKeys,
+            bufferedStart,
+            bufferedEnd,
+            utcDateFormat,
+            localDateFormat
+        );
+
         return array.toString();
+    }
+
+    private void supplementMissingEventsAndRecurrences(
+            ContentResolver resolver,
+            JSONArray array,
+            Set<String> seenInstanceKeys,
+            long rangeStartMs,
+            long rangeEndMs,
+            SimpleDateFormat utcDateFormat,
+            SimpleDateFormat localDateFormat
+    ) {
+        Map<Long, String> calNames = new HashMap<>();
+        Map<Long, String> calColors = new HashMap<>();
+        try (Cursor calCursor = resolver.query(
+                CalendarContract.Calendars.CONTENT_URI,
+                new String[]{
+                    CalendarContract.Calendars._ID,
+                    CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+                    CalendarContract.Calendars.CALENDAR_COLOR
+                },
+                null, null, null)) {
+            if (calCursor != null) {
+                int idIdx = calCursor.getColumnIndex(CalendarContract.Calendars._ID);
+                int nameIdx = calCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+                int colorIdx = calCursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
+                while (calCursor.moveToNext()) {
+                    long cId = calCursor.getLong(idIdx);
+                    String cName = nameIdx != -1 ? calCursor.getString(nameIdx) : "";
+                    String cColor = "#2D2D2D";
+                    if (colorIdx != -1 && !calCursor.isNull(colorIdx)) {
+                        cColor = String.format("#%06X", (0xFFFFFF & calCursor.getInt(colorIdx)));
+                    }
+                    calNames.put(cId, cName != null ? cName : "");
+                    calColors.put(cId, cColor);
+                }
+            }
+        } catch (Exception ignored) {}
+
+        String[] eventsProjection = new String[]{
+            CalendarContract.Events._ID,
+            CalendarContract.Events.CALENDAR_ID,
+            CalendarContract.Events.TITLE,
+            CalendarContract.Events.DTSTART,
+            CalendarContract.Events.DTEND,
+            CalendarContract.Events.DURATION,
+            CalendarContract.Events.ALL_DAY,
+            CalendarContract.Events.RRULE,
+            CalendarContract.Events.EXDATE,
+            CalendarContract.Events.EVENT_TIMEZONE
+        };
+
+        try (Cursor evCursor = resolver.query(
+                CalendarContract.Events.CONTENT_URI,
+                eventsProjection,
+                CalendarContract.Events.DELETED + " != 1",
+                null,
+                null)) {
+            if (evCursor == null) return;
+
+            int idIdx = evCursor.getColumnIndex(CalendarContract.Events._ID);
+            int calIdIdx = evCursor.getColumnIndex(CalendarContract.Events.CALENDAR_ID);
+            int titleIdx = evCursor.getColumnIndex(CalendarContract.Events.TITLE);
+            int dtStartIdx = evCursor.getColumnIndex(CalendarContract.Events.DTSTART);
+            int dtEndIdx = evCursor.getColumnIndex(CalendarContract.Events.DTEND);
+            int durIdx = evCursor.getColumnIndex(CalendarContract.Events.DURATION);
+            int allDayIdx = evCursor.getColumnIndex(CalendarContract.Events.ALL_DAY);
+            int rruleIdx = evCursor.getColumnIndex(CalendarContract.Events.RRULE);
+            int exdateIdx = evCursor.getColumnIndex(CalendarContract.Events.EXDATE);
+            int tzIdx = evCursor.getColumnIndex(CalendarContract.Events.EVENT_TIMEZONE);
+
+            Calendar localCal = Calendar.getInstance();
+
+            while (evCursor.moveToNext()) {
+                long eventId = evCursor.getLong(idIdx);
+                long calId = evCursor.getLong(calIdIdx);
+                String title = evCursor.getString(titleIdx);
+                if (title == null || title.trim().isEmpty()) {
+                    title = "未命名行程";
+                }
+                if (evCursor.isNull(dtStartIdx)) continue;
+                long dtStart = evCursor.getLong(dtStartIdx);
+                long dtEnd = (!evCursor.isNull(dtEndIdx)) ? evCursor.getLong(dtEndIdx) : 0L;
+                String durationStr = durIdx != -1 ? evCursor.getString(durIdx) : null;
+                boolean isAllDay = allDayIdx != -1 && evCursor.getInt(allDayIdx) != 0;
+                String rrule = rruleIdx != -1 ? evCursor.getString(rruleIdx) : null;
+                String exdate = exdateIdx != -1 ? evCursor.getString(exdateIdx) : null;
+                String tzId = tzIdx != -1 ? evCursor.getString(tzIdx) : null;
+
+                long durationMs = (dtEnd > dtStart)
+                    ? (dtEnd - dtStart)
+                    : parseRfcDurationMs(durationStr, isAllDay ? 86400000L : 3600000L);
+
+                String calName = calNames.containsKey(calId) ? calNames.get(calId) : "";
+                String colorHex = calColors.containsKey(calId) ? calColors.get(calId) : "#2D2D2D";
+
+                if (rrule == null || rrule.trim().isEmpty()) {
+                    // Single non-recurring event
+                    if (dtStart >= rangeStartMs && dtStart <= rangeEndMs) {
+                        addEventOccurrenceJson(
+                            array, seenInstanceKeys, eventId, calId, title,
+                            dtStart, dtStart + durationMs, isAllDay,
+                            calName, colorHex, utcDateFormat, localDateFormat, localCal
+                        );
+                    }
+                } else {
+                    // Recurring event: expand RRULE across [rangeStartMs, rangeEndMs]
+                    List<Long> occurrences = expandRRuleOccurrences(
+                        dtStart, isAllDay, rrule, exdate, tzId, rangeStartMs, rangeEndMs
+                    );
+                    for (long occStart : occurrences) {
+                        addEventOccurrenceJson(
+                            array, seenInstanceKeys, eventId, calId, title,
+                            occStart, occStart + durationMs, isAllDay,
+                            calName, colorHex, utcDateFormat, localDateFormat, localCal
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addEventOccurrenceJson(
+            JSONArray array,
+            Set<String> seenInstanceKeys,
+            long eventId,
+            long calId,
+            String title,
+            long begin,
+            long end,
+            boolean isAllDay,
+            String calName,
+            String colorHex,
+            SimpleDateFormat utcDateFormat,
+            SimpleDateFormat localDateFormat,
+            Calendar localCal
+    ) throws Exception {
+        String dateKey;
+        int startHour;
+        int startMinute;
+        int durationMinutes;
+        boolean isFridayAfterFour;
+
+        if (isAllDay) {
+            dateKey = utcDateFormat.format(new Date(begin));
+            startHour = 9;
+            startMinute = 0;
+            durationMinutes = 480;
+            isFridayAfterFour = false;
+        } else {
+            localCal.setTimeInMillis(begin);
+            dateKey = localDateFormat.format(new Date(begin));
+            startHour = localCal.get(Calendar.HOUR_OF_DAY);
+            startMinute = localCal.get(Calendar.MINUTE);
+            durationMinutes = (int) Math.max(15, (end - begin) / (1000 * 60));
+            isFridayAfterFour = (localCal.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) &&
+                                (startHour >= 16 || (startHour == 15 && startMinute >= 45));
+        }
+
+        String dedupeKey = eventId + "_" + dateKey;
+        if (seenInstanceKeys.contains(dedupeKey)) {
+            return;
+        }
+        seenInstanceKeys.add(dedupeKey);
+
+        JSONObject obj = new JSONObject();
+        obj.put("id", "inst_" + eventId + "_" + begin);
+        obj.put("eventId", eventId);
+        obj.put("calendarId", String.valueOf(calId));
+        obj.put("title", title);
+        obj.put("startHour", startHour);
+        obj.put("startMinute", startMinute);
+        obj.put("durationMinutes", durationMinutes);
+        obj.put("dateKey", dateKey);
+        obj.put("isAllDay", isAllDay);
+        obj.put("isFridayAfterFour", isFridayAfterFour);
+        obj.put("source", "synced");
+        obj.put("calendarName", calName);
+        obj.put("calendarColor", colorHex);
+
+        array.put(obj);
+    }
+
+    private long parseRfcDurationMs(String durationStr, long fallbackMs) {
+        if (durationStr == null || durationStr.trim().isEmpty()) return fallbackMs;
+        try {
+            String s = durationStr.trim().toUpperCase(Locale.US);
+            long totalMs = 0L;
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)([WDHMS])").matcher(s);
+            while (m.find()) {
+                long val = Long.parseLong(m.group(1));
+                String unit = m.group(2);
+                if ("W".equals(unit)) totalMs += val * 7L * 86400000L;
+                else if ("D".equals(unit)) totalMs += val * 86400000L;
+                else if ("H".equals(unit)) totalMs += val * 3600000L;
+                else if ("M".equals(unit)) totalMs += val * 60000L;
+                else if ("S".equals(unit)) totalMs += val * 1000L;
+            }
+            return totalMs > 0L ? totalMs : fallbackMs;
+        } catch (Exception ignored) {
+            return fallbackMs;
+        }
+    }
+
+    private List<Long> expandRRuleOccurrences(
+            long dtStart,
+            boolean isAllDay,
+            String rrule,
+            String exdate,
+            String tzId,
+            long rangeStartMs,
+            long rangeEndMs
+    ) {
+        List<Long> results = new ArrayList<>();
+        if (dtStart > rangeEndMs) return results;
+
+        try {
+            String freq = "";
+            int interval = 1;
+            int countLimit = Integer.MAX_VALUE;
+            long untilMs = Long.MAX_VALUE;
+            List<Integer> byDays = new ArrayList<>();
+
+            String[] parts = rrule.toUpperCase(Locale.US).split(";");
+            for (String part : parts) {
+                int eq = part.indexOf('=');
+                if (eq <= 0) continue;
+                String k = part.substring(0, eq).trim();
+                String v = part.substring(eq + 1).trim();
+                if ("FREQ".equals(k)) {
+                    freq = v;
+                } else if ("INTERVAL".equals(k)) {
+                    try { interval = Math.max(1, Integer.parseInt(v)); } catch (Exception ignored) {}
+                } else if ("COUNT".equals(k)) {
+                    try { countLimit = Math.max(1, Integer.parseInt(v)); } catch (Exception ignored) {}
+                } else if ("UNTIL".equals(k)) {
+                    untilMs = parseRfcUntilMs(v, untilMs);
+                } else if ("BYDAY".equals(k)) {
+                    for (String d : v.split(",")) {
+                        int dow = rfcDayToCalendarDay(d.trim());
+                        if (dow != -1) byDays.add(dow);
+                    }
+                }
+            }
+
+            if (freq.isEmpty()) return results;
+            long effectiveEnd = Math.min(rangeEndMs, untilMs);
+            if (dtStart > effectiveEnd) return results;
+
+            Set<String> excludedDates = new HashSet<>();
+            if (exdate != null && !exdate.trim().isEmpty()) {
+                for (String ex : exdate.split(",")) {
+                    String clean = ex.trim().replaceAll("[^0-9]", "");
+                    if (clean.length() >= 8) {
+                        excludedDates.add(clean.substring(0, 4) + "-" + clean.substring(4, 6) + "-" + clean.substring(6, 8));
+                    }
+                }
+            }
+
+            TimeZone tz = isAllDay
+                ? TimeZone.getTimeZone("UTC")
+                : (tzId != null && !tzId.isEmpty() ? TimeZone.getTimeZone(tzId) : TimeZone.getDefault());
+            SimpleDateFormat keyFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            keyFmt.setTimeZone(tz);
+
+            Calendar cal = Calendar.getInstance(tz);
+            cal.setTimeInMillis(dtStart);
+            int origHour = cal.get(Calendar.HOUR_OF_DAY);
+            int origMin = cal.get(Calendar.MINUTE);
+            int origSec = cal.get(Calendar.SECOND);
+
+            int generatedCount = 0;
+            int maxIterations = 2500;
+
+            if ("WEEKLY".equals(freq) && !byDays.isEmpty()) {
+                // Step week by week from dtStart's week
+                Calendar weekCal = Calendar.getInstance(tz);
+                weekCal.setTimeInMillis(dtStart);
+                weekCal.set(Calendar.DAY_OF_WEEK, weekCal.getFirstDayOfWeek());
+                weekCal.set(Calendar.HOUR_OF_DAY, origHour);
+                weekCal.set(Calendar.MINUTE, origMin);
+                weekCal.set(Calendar.SECOND, origSec);
+                weekCal.set(Calendar.MILLISECOND, 0);
+
+                for (int iter = 0; iter < maxIterations; iter++) {
+                    if (weekCal.getTimeInMillis() > effectiveEnd + 7L * 86400000L) break;
+
+                    for (int offset = 0; offset < 7; offset++) {
+                        Calendar dayCal = (Calendar) weekCal.clone();
+                        dayCal.add(Calendar.DAY_OF_MONTH, offset);
+                        int dow = dayCal.get(Calendar.DAY_OF_WEEK);
+                        if (!byDays.contains(dow)) continue;
+
+                        long ts = dayCal.getTimeInMillis();
+                        if (ts < dtStart) continue;
+                        if (ts > effectiveEnd) return results;
+
+                        generatedCount++;
+                        if (generatedCount > countLimit) return results;
+
+                        if (ts >= rangeStartMs) {
+                            String dk = keyFmt.format(new Date(ts));
+                            if (!excludedDates.contains(dk)) {
+                                results.add(ts);
+                            }
+                        }
+                    }
+                    weekCal.add(Calendar.WEEK_OF_YEAR, interval);
+                }
+            } else {
+                for (int iter = 0; iter < maxIterations; iter++) {
+                    long ts = cal.getTimeInMillis();
+                    if (ts > effectiveEnd) break;
+
+                    generatedCount++;
+                    if (generatedCount > countLimit) break;
+
+                    if (ts >= rangeStartMs) {
+                        String dk = keyFmt.format(new Date(ts));
+                        if (!excludedDates.contains(dk)) {
+                            results.add(ts);
+                        }
+                    }
+
+                    if ("DAILY".equals(freq)) {
+                        cal.add(Calendar.DAY_OF_MONTH, interval);
+                    } else if ("WEEKLY".equals(freq)) {
+                        cal.add(Calendar.WEEK_OF_YEAR, interval);
+                    } else if ("MONTHLY".equals(freq)) {
+                        cal.add(Calendar.MONTH, interval);
+                    } else if ("YEARLY".equals(freq)) {
+                        cal.add(Calendar.YEAR, interval);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
+        return results;
+    }
+
+    private int rfcDayToCalendarDay(String token) {
+        if (token.endsWith("SU")) return Calendar.SUNDAY;
+        if (token.endsWith("MO")) return Calendar.MONDAY;
+        if (token.endsWith("TU")) return Calendar.TUESDAY;
+        if (token.endsWith("WE")) return Calendar.WEDNESDAY;
+        if (token.endsWith("TH")) return Calendar.THURSDAY;
+        if (token.endsWith("FR")) return Calendar.FRIDAY;
+        if (token.endsWith("SA")) return Calendar.SATURDAY;
+        return -1;
+    }
+
+    private long parseRfcUntilMs(String untilStr, long fallback) {
+        try {
+            String digits = untilStr.replaceAll("[^0-9]", "");
+            if (digits.length() >= 8) {
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.US);
+                fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Date d = fmt.parse(digits.substring(0, 8));
+                if (d != null) {
+                    return d.getTime() + 86399999L;
+                }
+            }
+        } catch (Exception ignored) {}
+        return fallback;
     }
 
     /**
