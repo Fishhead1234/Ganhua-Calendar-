@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { fireConfetti } from './utils/confettiHelper';
 import {
   Stamp,
@@ -170,7 +171,46 @@ function loadPersistedState(): PersistedState {
   };
 }
 
+const WebBlockedScreen: React.FC = () => (
+  <div className="min-h-screen bg-[#F9F6F0] text-[#2D2D2D] flex items-center justify-center p-6">
+    <div className="w-full max-w-md bg-[#FAF7F0] rounded-[28px] border-2 border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.14),0_6px_0_#2D2D2D] overflow-hidden text-center">
+      <div className="bg-[#2D2D2D] text-[#FAF7F0] px-6 py-4 flex items-center justify-between">
+        <span className="font-mono text-xs tracking-widest text-[#D4B483] font-bold">GAN-HUA DESK CALENDAR</span>
+        <span className="text-[11px] font-sans px-2.5 py-0.5 rounded-full bg-[#C83E31] text-white font-bold">APP ONLY</span>
+      </div>
+      <div className="p-8 space-y-4">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-[#F3EFE6] border-2 border-[#2D2D2D] flex items-center justify-center text-3xl shadow-xs">
+          📱
+        </div>
+        <h1 className="font-serif font-black text-2xl text-[#2D2D2D]">
+          幹話日曆僅限手機 App 使用
+        </h1>
+        <p className="font-sans text-sm text-[#6E6A63] leading-relaxed">
+          本服務已關閉網頁瀏覽器存取，請透過 Android / iOS 官方手機應用程式開啟完整日曆、桌面小工具與行事曆提醒功能。
+        </p>
+        <div className="pt-2 border-t border-[#2D2D2D]/10 flex items-center justify-center gap-4 text-xs font-sans text-[#6E6A63]">
+          <a href="/privacy.html" className="underline hover:text-[#2D2D2D]">
+            隱私權政策 (Privacy Policy)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 export const App: React.FC = () => {
+  const isNativeApp =
+    Capacitor.isNativePlatform() ||
+    (typeof window !== 'undefined' && typeof (window as any).AndroidCalendarBridge !== 'undefined');
+
+  if (!isNativeApp) {
+    return <WebBlockedScreen />;
+  }
+
+  return <NativeCalendarApp />;
+};
+
+const NativeCalendarApp: React.FC = () => {
   const allQuotes = quotesData as CalendarQuote[];
   const {
     tier,
