@@ -152,10 +152,7 @@ public class AndroidCalendarBridge {
             CalendarContract.Instances.END,
             CalendarContract.Instances.ALL_DAY,
             CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
-            CalendarContract.Instances.CALENDAR_COLOR,
-            CalendarContract.Instances.CALENDAR_ACCESS_LEVEL,
-            CalendarContract.Instances.EVENT_LOCATION,
-            CalendarContract.Instances.DESCRIPTION
+            CalendarContract.Instances.CALENDAR_COLOR
         };
 
         // All-day timestamps in Android are stored at 00:00:00 UTC. Use UTC to extract correct YYYY-MM-DD!
@@ -174,9 +171,6 @@ public class AndroidCalendarBridge {
                 int allDayIdx = cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY);
                 int calNameIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_DISPLAY_NAME);
                 int calColorIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_COLOR);
-                int accessIdx = cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_ACCESS_LEVEL);
-                int descIdx = cursor.getColumnIndex(CalendarContract.Instances.DESCRIPTION);
-                int locIdx = cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION);
 
                 Calendar localCal = Calendar.getInstance();
 
@@ -192,8 +186,6 @@ public class AndroidCalendarBridge {
                     boolean isAllDay = allDayIdx != -1 && cursor.getInt(allDayIdx) != 0;
 
                     String calName = calNameIdx != -1 ? cursor.getString(calNameIdx) : "";
-                    int accessLevel = (accessIdx != -1 && !cursor.isNull(accessIdx)) ? cursor.getInt(accessIdx) : 0;
-                    boolean isReadOnly = accessLevel < CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR;
                     String colorHex = "#2D2D2D";
                     if (calColorIdx != -1 && !cursor.isNull(calColorIdx)) {
                         colorHex = String.format("#%06X", (0xFFFFFF & cursor.getInt(calColorIdx)));
@@ -225,8 +217,6 @@ public class AndroidCalendarBridge {
                     obj.put("id", "inst_" + eventId + "_" + begin);
                     obj.put("eventId", eventId);
                     obj.put("calendarId", String.valueOf(calId));
-                    obj.put("accessLevel", accessLevel);
-                    obj.put("isReadOnly", isReadOnly);
                     obj.put("title", title);
                     obj.put("startHour", startHour);
                     obj.put("startMinute", startMinute);
@@ -237,12 +227,6 @@ public class AndroidCalendarBridge {
                     obj.put("source", "synced");
                     obj.put("calendarName", calName);
                     obj.put("calendarColor", colorHex);
-                    if (descIdx != -1) {
-                        obj.put("notes", cursor.getString(descIdx));
-                    }
-                    if (locIdx != -1) {
-                        obj.put("location", cursor.getString(locIdx));
-                    }
 
                     array.put(obj);
                 }

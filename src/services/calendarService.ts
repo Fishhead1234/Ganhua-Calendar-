@@ -1402,53 +1402,60 @@ export async function fetchNativeDeviceCalendarEvents(
         endOfDay.getTime()
       );
       const rawEvents: any[] = JSON.parse(jsonStr || '[]');
-      if (Array.isArray(rawEvents) && rawEvents.length > 0) {
-        const meetings: CalendarMeeting[] = rawEvents
-          .filter((e) => isEventEnabled(e.calendarId))
-          .map((e, idx) => {
-            const rawCalId = e.calendarId;
-            const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
-              ? String(rawCalId)
+      const meetings: CalendarMeeting[] = (Array.isArray(rawEvents) ? rawEvents : [])
+        .filter((e) => isEventEnabled(e.calendarId))
+        .map((e, idx) => {
+          const rawCalId = e.calendarId;
+          const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
+            ? String(rawCalId)
+            : undefined;
+          const matchedCal = calIdStr ? calendarMap.get(calIdStr) : undefined;
+          const calendarName = matchedCal?.name || e.calendarName || matchedCal?.accountName || '手機日曆';
+          const calendarColor = matchedCal?.color || e.calendarColor || '#2D2D2D';
+          const accessLevel =
+            matchedCal?.accessLevel !== undefined
+              ? matchedCal.accessLevel
+              : e.accessLevel !== undefined && e.accessLevel !== null
+              ? Number(e.accessLevel)
               : undefined;
-            const matchedCal = calIdStr ? calendarMap.get(calIdStr) : undefined;
-            const calendarName = matchedCal?.name || e.calendarName || matchedCal?.accountName || '手機日曆';
-            const calendarColor = matchedCal?.color || e.calendarColor || '#2D2D2D';
+          const isReadOnly =
+            matchedCal?.isReadOnly !== undefined
+              ? matchedCal.isReadOnly
+              : typeof e.isReadOnly === 'boolean'
+              ? e.isReadOnly
+              : accessLevel !== undefined
+              ? accessLevel < 500
+              : true;
 
-            return {
-              id: String(e.id || `native-inst-${idx + 1}`),
-              title: e.title || '未命名行程',
-              startHour: Number(e.startHour ?? 9),
-              startMinute: Number(e.startMinute ?? 0),
-              durationMinutes: Number(e.durationMinutes ?? 60),
-              isFridayAfterFour: Boolean(e.isFridayAfterFour),
-              dateKey: e.dateKey,
-              isAllDay: Boolean(e.isAllDay),
-              source: 'synced' as const,
-              eventId: e.eventId !== undefined && e.eventId !== null ? Number(e.eventId) : undefined,
-              accessLevel: e.accessLevel !== undefined && e.accessLevel !== null ? Number(e.accessLevel) : undefined,
-              isReadOnly:
-                typeof e.isReadOnly === 'boolean'
-                  ? e.isReadOnly
-                  : e.accessLevel !== undefined && e.accessLevel !== null
-                  ? Number(e.accessLevel) < 500
-                  : true,
-              calendarId: calIdStr,
-              calendarName,
-              calendarColor,
-              notes: e.notes || undefined,
-              location: e.location || undefined,
-            };
-          });
-
-        meetings.sort((a, b) => {
-          if ((a.dateKey || '') !== (b.dateKey || '')) {
-            return (a.dateKey || '').localeCompare(b.dateKey || '');
-          }
-          return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
+          return {
+            id: String(e.id || `native-inst-${idx + 1}`),
+            title: e.title || '未命名行程',
+            startHour: Number(e.startHour ?? 9),
+            startMinute: Number(e.startMinute ?? 0),
+            durationMinutes: Number(e.durationMinutes ?? 60),
+            isFridayAfterFour: Boolean(e.isFridayAfterFour),
+            dateKey: e.dateKey,
+            isAllDay: Boolean(e.isAllDay),
+            source: 'synced' as const,
+            eventId: e.eventId !== undefined && e.eventId !== null ? Number(e.eventId) : undefined,
+            accessLevel,
+            isReadOnly,
+            calendarId: calIdStr,
+            calendarName,
+            calendarColor,
+            notes: e.notes || undefined,
+            location: e.location || undefined,
+          };
         });
 
-        return applySyncedEventCustomizations(meetings);
-      }
+      meetings.sort((a, b) => {
+        if ((a.dateKey || '') !== (b.dateKey || '')) {
+          return (a.dateKey || '').localeCompare(b.dateKey || '');
+        }
+        return a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute);
+      });
+
+      return applySyncedEventCustomizations(meetings);
     } catch (e) {
       console.warn('AndroidCalendarBridge.getEventsInstancesJson error:', e);
     }
