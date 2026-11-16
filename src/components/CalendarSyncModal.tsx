@@ -215,10 +215,16 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
     try {
       const meetings = await fetchNativeDeviceCalendarEvents();
+      const refreshedCals = await fetchDeviceCalendars();
+      setDeviceCalendars(refreshedCals);
+      const savedIds = getEnabledCalendarIds();
+      setEnabledCalendarIds(
+        savedIds && savedIds.length > 0 ? savedIds.map(String) : refreshedCals.map((c) => String(c.id))
+      );
       onUpdateMeetings(meetings, null);
       onToggleConnected(true);
       syncAllCalendarRemindersViaBridge(meetings);
-      setSuccessMsg(`📱 手機行事曆同步成功！已讀取今日 ${meetings.length} 場行程，並已排定提醒通知。`);
+      setSuccessMsg(`📱 手機行事曆同步成功！已讀取 ${meetings.length} 場行程，並已排定提醒通知。`);
     } catch (err: any) {
       setErrorMsg(err.message || '讀取手機行事曆失敗，請確認已授權日曆讀取權限。');
     } finally {
@@ -425,6 +431,13 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                 {/* Multi-Calendar Checklist */}
                 {deviceCalendars.length > 0 && (() => {
                   const enabledInList = deviceCalendars.filter((c) => enabledCalendarIds.includes(String(c.id)));
+                  const eventCountByCalId = new Map<string, number>();
+                  activeMeetings.forEach((m) => {
+                    if (m.calendarId) {
+                      const key = String(m.calendarId);
+                      eventCountByCalId.set(key, (eventCountByCalId.get(key) || 0) + 1);
+                    }
+                  });
                   return (
                     <div className="bg-[#FAF7F0] p-4 rounded-2xl border-2 border-[#2D2D2D]/20 text-left space-y-3 pt-3 mt-2">
                       <div className="flex items-center justify-between">
@@ -500,7 +513,9 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                                     : 'bg-stone-200 text-stone-500'
                                 }`}
                               >
-                                {isChecked ? '已啟用' : '已停用'}
+                                {isChecked
+                                  ? `已啟用 (${eventCountByCalId.get(String(cal.id)) || 0} 筆)`
+                                  : '已停用'}
                               </span>
                             </label>
                           );

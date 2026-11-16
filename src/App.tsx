@@ -50,6 +50,7 @@ import {
   markSyncedEventDeleted,
   hideSyncedEvent,
   clearSyncedEventCustomizations,
+  clearEnabledCalendarIds,
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
   createAndroidCalendarEvent,
@@ -464,6 +465,7 @@ export const App: React.FC = () => {
     }
     cancelAllCalendarRemindersViaBridge();
     clearSyncedEventCustomizations();
+    clearEnabledCalendarIds();
     setPersisted((prev) => ({ ...prev, calendarConnected: false }));
     showToast('✕ 已完全解除行事曆連動，恢復每日常規 365 幹話！');
   };

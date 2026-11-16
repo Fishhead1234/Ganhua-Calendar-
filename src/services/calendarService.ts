@@ -1206,6 +1206,14 @@ export function saveEnabledCalendarIds(ids: string[]): void {
   localStorage.setItem(ENABLED_CALENDARS_STORAGE_KEY, JSON.stringify(normalized));
 }
 
+export function clearEnabledCalendarIds(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(ENABLED_CALENDARS_STORAGE_KEY);
+    localStorage.removeItem('ganhua_enabled_calendar_ids');
+  } catch {}
+}
+
 export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
   const win = typeof window !== 'undefined' ? (window as any) : {};
   let calendars: DeviceCalendarSource[] = [];
@@ -1316,10 +1324,16 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
     }
   }
 
-  // ONLY default to selecting all calendars on the very first run when localStorage.getItem('enabled_calendar_ids') === null
+  // Default to selecting all calendars when enabled_calendar_ids was cleared by Unsync (null or empty)
   const rawSaved = typeof window !== 'undefined' ? localStorage.getItem(ENABLED_CALENDARS_STORAGE_KEY) : null;
-  if (rawSaved === null) {
-    saveEnabledCalendarIds(uniqueCalendars.map((c) => c.id));
+  let parsedSaved: string[] | null = null;
+  try {
+    parsedSaved = rawSaved ? JSON.parse(rawSaved).map(String) : null;
+  } catch {
+    parsedSaved = null;
+  }
+  if (rawSaved === null || !Array.isArray(parsedSaved) || parsedSaved.length === 0) {
+    saveEnabledCalendarIds(uniqueCalendars.map((c) => String(c.id)));
   }
 
   return uniqueCalendars;
@@ -1354,14 +1368,19 @@ export async function fetchNativeDeviceCalendarEvents(
     console.warn('Failed to load device calendars for mapping:', err);
   }
 
-  const enabledIds = getEnabledCalendarIds();
-  const enabledSet = enabledIds !== null ? new Set(enabledIds.map(String)) : null;
-  const allEnabled = enabledSet === null || (allCalendars.length > 0 && allCalendars.every((c) => enabledSet.has(c.id)));
+  let enabledIds = getEnabledCalendarIds();
+  if ((!enabledIds || enabledIds.length === 0) && allCalendars.length > 0) {
+    enabledIds = allCalendars.map((c) => String(c.id));
+    saveEnabledCalendarIds(enabledIds);
+  }
+  const normalizedEnabledIds = enabledIds !== null ? enabledIds.map(String) : null;
+  const enabledSet = normalizedEnabledIds !== null ? new Set(normalizedEnabledIds) : null;
+  const allEnabled = enabledSet === null || (allCalendars.length > 0 && allCalendars.every((c) => enabledSet.has(String(c.id))));
 
   const isEventEnabled = (rawCalId: any): boolean => {
-    if (enabledSet === null) return true; // first run default
+    if (normalizedEnabledIds === null) return true; // first run default
     if (rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== '') {
-      return enabledSet.has(String(rawCalId));
+      return normalizedEnabledIds.includes(String(rawCalId));
     }
     // If event.calendarId is missing/unmapped, include if all calendars are enabled
     return allEnabled;

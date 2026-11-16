@@ -137,9 +137,11 @@ public class AndroidCalendarBridge {
         JSONArray array = new JSONArray();
         ContentResolver resolver = context.getContentResolver();
 
+        long bufferedStart = Math.max(0L, startMs - 86400000L);
+        long bufferedEnd = endMs + 86400000L;
         Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(builder, startMs);
-        ContentUris.appendId(builder, endMs);
+        ContentUris.appendId(builder, bufferedStart);
+        ContentUris.appendId(builder, bufferedEnd);
         Uri uri = builder.build();
 
         String[] projection = new String[]{
