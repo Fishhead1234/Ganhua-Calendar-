@@ -101,8 +101,12 @@ public class AndroidCalendarBridge {
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.IS_PRIMARY,
-            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL
+            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+            CalendarContract.Calendars.SYNC_EVENTS
         };
+
+        boolean hasWritePerm = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED;
+        boolean triggeredSync = false;
 
         try (Cursor cursor = resolver.query(
                 CalendarContract.Calendars.CONTENT_URI,
@@ -118,9 +122,11 @@ public class AndroidCalendarBridge {
                 int colorIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
                 int primaryIdx = cursor.getColumnIndex(CalendarContract.Calendars.IS_PRIMARY);
                 int accessIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL);
+                int syncIdx = cursor.getColumnIndex(CalendarContract.Calendars.SYNC_EVENTS);
 
                 while (cursor.moveToNext()) {
-                    String id = String.valueOf(cursor.getLong(idIdx));
+                    long calIdLong = cursor.getLong(idIdx);
+                    String id = String.valueOf(calIdLong);
                     String name = cursor.getString(nameIdx);
                     if (name == null || name.trim().isEmpty()) {
                         name = "未命名日曆";
@@ -128,6 +134,19 @@ public class AndroidCalendarBridge {
                     String accountName = accIdx != -1 ? cursor.getString(accIdx) : "";
                     boolean isPrimary = primaryIdx != -1 && cursor.getInt(primaryIdx) != 0;
                     int accessLevel = (accessIdx != -1 && !cursor.isNull(accessIdx)) ? cursor.getInt(accessIdx) : 0;
+                    int syncEvents = (syncIdx != -1 && !cursor.isNull(syncIdx)) ? cursor.getInt(syncIdx) : 1;
+
+                    // Force SYNC_EVENTS = 1 on sub-calendars (e.g., BSKL Calendar / Family) using per-calendar URI
+                    if (syncEvents == 0 && hasWritePerm) {
+                        try {
+                            Uri calUri = ContentUris.withAppendedId(CalendarContract.Calendars.CONTENT_URI, calIdLong);
+                            ContentValues cv = new ContentValues();
+                            cv.put(CalendarContract.Calendars.SYNC_EVENTS, 1);
+                            cv.put(CalendarContract.Calendars.VISIBLE, 1);
+                            resolver.update(calUri, cv, null, null);
+                            triggeredSync = true;
+                        } catch (Exception ignored) {}
+                    }
 
                     String colorHex = "#2D2D2D";
                     if (colorIdx != -1 && !cursor.isNull(colorIdx)) {
@@ -150,6 +169,12 @@ public class AndroidCalendarBridge {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        if (triggeredSync) {
+            try {
+                ContentResolver.requestSync(null, CalendarContract.AUTHORITY, Bundle.EMPTY);
+            } catch (Exception ignored) {}
         }
 
         return array.toString();
@@ -194,6 +219,7 @@ public class AndroidCalendarBridge {
 
         SimpleDateFormat localDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Set<String> seenInstanceKeys = new HashSet<>();
+        Set<Long> calendarsWithInstances = new HashSet<>();
 
         try (Cursor cursor = resolver.query(uri, projection, null, null, CalendarContract.Instances.BEGIN + " ASC")) {
             if (cursor != null) {
@@ -248,6 +274,7 @@ public class AndroidCalendarBridge {
                     }
 
                     seenInstanceKeys.add(eventId + "_" + dateKey);
+                    calendarsWithInstances.add(calId);
 
                     JSONObject obj = new JSONObject();
                     obj.put("id", "inst_" + eventId + "_" + begin);
@@ -279,6 +306,7 @@ public class AndroidCalendarBridge {
             resolver,
             array,
             seenInstanceKeys,
+            calendarsWithInstances,
             bufferedStart,
             bufferedEnd,
             utcDateFormat,
@@ -292,6 +320,7 @@ public class AndroidCalendarBridge {
             ContentResolver resolver,
             JSONArray array,
             Set<String> seenInstanceKeys,
+            Set<Long> calendarsWithInstances,
             long rangeStartMs,
             long rangeEndMs,
             SimpleDateFormat utcDateFormat,
@@ -337,11 +366,62 @@ public class AndroidCalendarBridge {
             CalendarContract.Events.EVENT_TIMEZONE
         };
 
+        // 1. Explicitly query Events.CONTENT_URI with WHERE CALENDAR_ID = ? for every calendar that returned 0 Instances
+        for (Long zeroCalId : calNames.keySet()) {
+            if (!calendarsWithInstances.contains(zeroCalId)) {
+                queryEventsTableForSelection(
+                    resolver,
+                    eventsProjection,
+                    CalendarContract.Events.CALENDAR_ID + " = ? AND " + CalendarContract.Events.DELETED + " != 1",
+                    new String[]{ String.valueOf(zeroCalId) },
+                    array,
+                    seenInstanceKeys,
+                    calNames,
+                    calColors,
+                    rangeStartMs,
+                    rangeEndMs,
+                    utcDateFormat,
+                    localDateFormat
+                );
+            }
+        }
+
+        // 2. Also scan remaining non-deleted events for any un-expanded RRULEs
+        queryEventsTableForSelection(
+            resolver,
+            eventsProjection,
+            CalendarContract.Events.DELETED + " != 1",
+            null,
+            array,
+            seenInstanceKeys,
+            calNames,
+            calColors,
+            rangeStartMs,
+            rangeEndMs,
+            utcDateFormat,
+            localDateFormat
+        );
+    }
+
+    private void queryEventsTableForSelection(
+            ContentResolver resolver,
+            String[] eventsProjection,
+            String selection,
+            String[] selectionArgs,
+            JSONArray array,
+            Set<String> seenInstanceKeys,
+            Map<Long, String> calNames,
+            Map<Long, String> calColors,
+            long rangeStartMs,
+            long rangeEndMs,
+            SimpleDateFormat utcDateFormat,
+            SimpleDateFormat localDateFormat
+    ) {
         try (Cursor evCursor = resolver.query(
                 CalendarContract.Events.CONTENT_URI,
                 eventsProjection,
-                CalendarContract.Events.DELETED + " != 1",
-                null,
+                selection,
+                selectionArgs,
                 null)) {
             if (evCursor == null) return;
 
