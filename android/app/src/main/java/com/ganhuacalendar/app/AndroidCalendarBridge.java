@@ -98,6 +98,9 @@ public class AndroidCalendarBridge {
         String[] projection = new String[]{
             CalendarContract.Calendars._ID,
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+            CalendarContract.Calendars.NAME,
+            CalendarContract.Calendars.CALENDAR_LOCATION,
+            CalendarContract.Calendars.OWNER_ACCOUNT,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.IS_PRIMARY,
@@ -118,6 +121,9 @@ public class AndroidCalendarBridge {
             if (cursor != null) {
                 int idIdx = cursor.getColumnIndex(CalendarContract.Calendars._ID);
                 int nameIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+                int internalNameIdx = cursor.getColumnIndex(CalendarContract.Calendars.NAME);
+                int calLocIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_LOCATION);
+                int ownerAccIdx = cursor.getColumnIndex(CalendarContract.Calendars.OWNER_ACCOUNT);
                 int accIdx = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME);
                 int colorIdx = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
                 int primaryIdx = cursor.getColumnIndex(CalendarContract.Calendars.IS_PRIMARY);
@@ -131,10 +137,26 @@ public class AndroidCalendarBridge {
                     if (name == null || name.trim().isEmpty()) {
                         name = "未命名日曆";
                     }
+                    String internalName = internalNameIdx != -1 ? cursor.getString(internalNameIdx) : "";
+                    String calLocation = calLocIdx != -1 ? cursor.getString(calLocIdx) : "";
+                    String ownerAcc = ownerAccIdx != -1 ? cursor.getString(ownerAccIdx) : "";
                     String accountName = accIdx != -1 ? cursor.getString(accIdx) : "";
                     boolean isPrimary = primaryIdx != -1 && cursor.getInt(primaryIdx) != 0;
                     int accessLevel = (accessIdx != -1 && !cursor.isNull(accessIdx)) ? cursor.getInt(accessIdx) : 0;
                     int syncEvents = (syncIdx != -1 && !cursor.isNull(syncIdx)) ? cursor.getInt(syncIdx) : 1;
+
+                    // Detect embedded .ics / webcal URL in Calendars.NAME, CALENDAR_LOCATION, or OWNER_ACCOUNT
+                    String detectedIcsUrl = "";
+                    for (String candidate : new String[]{ calLocation, internalName, ownerAcc }) {
+                        if (candidate != null) {
+                            String trimmed = candidate.trim();
+                            String lower = trimmed.toLowerCase(Locale.US);
+                            if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("webcal://")) {
+                                detectedIcsUrl = trimmed;
+                                break;
+                            }
+                        }
+                    }
 
                     // Force SYNC_EVENTS = 1 on sub-calendars (e.g., BSKL Calendar / Family) using per-calendar URI
                     if (syncEvents == 0 && hasWritePerm) {
@@ -163,6 +185,9 @@ public class AndroidCalendarBridge {
                     obj.put("isPrimary", isPrimary);
                     obj.put("accessLevel", accessLevel);
                     obj.put("isReadOnly", accessLevel < CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR);
+                    if (!detectedIcsUrl.isEmpty()) {
+                        obj.put("icsUrl", detectedIcsUrl);
+                    }
 
                     array.put(obj);
                 }
@@ -366,13 +391,13 @@ public class AndroidCalendarBridge {
             CalendarContract.Events.EVENT_TIMEZONE
         };
 
-        // 1. Explicitly query Events.CONTENT_URI with WHERE CALENDAR_ID = ? for every calendar that returned 0 Instances
+        // 1. Explicitly query Events.CONTENT_URI with WHERE CALENDAR_ID = ? AND DELETED = 0 for every calendar that returned 0 Instances
         for (Long zeroCalId : calNames.keySet()) {
             if (!calendarsWithInstances.contains(zeroCalId)) {
                 queryEventsTableForSelection(
                     resolver,
                     eventsProjection,
-                    CalendarContract.Events.CALENDAR_ID + " = ? AND " + CalendarContract.Events.DELETED + " != 1",
+                    CalendarContract.Events.CALENDAR_ID + " = ? AND " + CalendarContract.Events.DELETED + " = 0",
                     new String[]{ String.valueOf(zeroCalId) },
                     array,
                     seenInstanceKeys,

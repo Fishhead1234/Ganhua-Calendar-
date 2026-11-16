@@ -52,6 +52,7 @@ import {
   hideSyncedEvent,
   clearSyncedEventCustomizations,
   clearEnabledCalendarIds,
+  resetAllCalendarSyncData,
   writeNativeDeviceCalendarEvent,
   deleteNativeDeviceCalendarEvent,
   createAndroidCalendarEvent,
@@ -495,17 +496,7 @@ const NativeCalendarApp: React.FC = () => {
   const handleRemoveCalendarSync = () => {
     setActiveMeetings([]);
     setActivePresetId(null);
-    try {
-      localStorage.removeItem('ganhua_calendar_meetings');
-      localStorage.removeItem('ganhua_active_preset_id');
-      localStorage.removeItem('live_calendar_url');
-      localStorage.removeItem('ganhua_enabled_calendar_ids');
-    } catch {
-      // ignore
-    }
-    cancelAllCalendarRemindersViaBridge();
-    clearSyncedEventCustomizations();
-    clearEnabledCalendarIds();
+    resetAllCalendarSyncData();
     setPersisted((prev) => ({ ...prev, calendarConnected: false }));
     showToast('✕ 已完全解除行事曆連動，恢復每日常規 365 幹話！');
   };

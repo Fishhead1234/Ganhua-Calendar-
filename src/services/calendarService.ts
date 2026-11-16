@@ -1184,6 +1184,7 @@ export interface DeviceCalendarSource {
   isPrimary?: boolean;
   accessLevel?: number;
   isReadOnly?: boolean;
+  icsUrl?: string;
 }
 
 const ENABLED_CALENDARS_STORAGE_KEY = 'enabled_calendar_ids';
@@ -1212,6 +1213,31 @@ export function clearEnabledCalendarIds(): void {
     localStorage.removeItem(ENABLED_CALENDARS_STORAGE_KEY);
     localStorage.removeItem('ganhua_enabled_calendar_ids');
   } catch {}
+}
+
+export function resetAllCalendarSyncData(): void {
+  if (typeof window === 'undefined') return;
+  const keysToRemove = [
+    'ganhua_calendar_meetings',
+    'synced_calendar_events',
+    'cached_events',
+    'enabled_calendar_ids',
+    'ganhua_enabled_calendar_ids',
+    'cached_calendars',
+    'discovered_calendars',
+    'saved_ical_urls',
+    'ical_url',
+    'live_calendar_url',
+    'ganhua_active_preset_id',
+    'hidden_event_ids',
+    'deleted_synced_event_ids',
+    'synced_event_overrides',
+  ];
+  try {
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+    localStorage.setItem('is_calendar_synced', 'false');
+  } catch {}
+  cancelAllCalendarRemindersViaBridge();
 }
 
 export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
@@ -1243,6 +1269,7 @@ export async function fetchDeviceCalendars(): Promise<DeviceCalendarSource[]> {
                 : c.accessLevel !== undefined && c.accessLevel !== null
                 ? Number(c.accessLevel) < 500
                 : undefined,
+            icsUrl: typeof c.icsUrl === 'string' && c.icsUrl.trim() ? c.icsUrl.trim() : undefined,
           };
         });
       }
@@ -1502,6 +1529,34 @@ export async function fetchNativeDeviceCalendarEvents(
 
           meetings.push(baseMeeting);
         });
+
+      // Auto-fetch embedded .ics URLs for any enabled sub-calendar that still had 0 rows in Instances/Events
+      if (win.AndroidCalendarBridge?.fetchIcsUrl) {
+        for (const cal of allCalendars) {
+          if (!cal.icsUrl || !isEventEnabled(cal.id)) continue;
+          const existingCount = meetings.filter((m) => String(m.calendarId) === String(cal.id)).length;
+          if (existingCount > 0) continue;
+          try {
+            const cleanIcsUrl = cal.icsUrl.replace(/^webcal:\/\//i, 'https://');
+            const icsText = win.AndroidCalendarBridge.fetchIcsUrl(cleanIcsUrl);
+            if (icsText && !icsText.startsWith('ERROR:') && icsText.includes('BEGIN:VEVENT')) {
+              const parsedIcs = parseICSToMeetings(icsText, cal.name);
+              parsedIcs.forEach((ev, pIdx) => {
+                meetings.push({
+                  ...ev,
+                  id: `${ev.id}_cal_${cal.id}_${pIdx}`,
+                  calendarId: String(cal.id),
+                  calendarName: cal.name,
+                  calendarColor: cal.color || '#0F9D58',
+                  isReadOnly: true,
+                });
+              });
+            }
+          } catch (icsErr) {
+            console.warn(`Auto-fetch icsUrl failed for calendar ${cal.name}:`, icsErr);
+          }
+        }
+      }
 
       meetings.sort((a, b) => {
         if ((a.dateKey || '') !== (b.dateKey || '')) {

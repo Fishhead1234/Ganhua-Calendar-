@@ -25,6 +25,8 @@ import {
   fetchDeviceCalendars,
   getEnabledCalendarIds,
   saveEnabledCalendarIds,
+  clearEnabledCalendarIds,
+  resetAllCalendarSyncData,
   syncAllCalendarRemindersViaBridge,
   cancelAllCalendarRemindersViaBridge,
   clearSyncedEventCustomizations,
@@ -88,6 +90,12 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   });
 
   useEffect(() => {
+    if (!isOpen) return;
+    if (!isConnected) {
+      setDeviceCalendars([]);
+      setEnabledCalendarIds([]);
+      return;
+    }
     let isMounted = true;
     fetchDeviceCalendars().then((cals) => {
       if (!isMounted) return;
@@ -106,7 +114,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [isOpen]);
+  }, [isOpen, isConnected]);
 
   const handleToggleCalendar = async (calId: string) => {
     const idStr = String(calId);
@@ -214,13 +222,23 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     setIsLoading(true);
 
     try {
-      const nativeMeetings = await fetchNativeDeviceCalendarEvents();
+      // Start 100% fresh when clicking "一鍵同步手機行事曆"
+      if (!isConnected) {
+        clearEnabledCalendarIds();
+      }
       const refreshedCals = await fetchDeviceCalendars();
-      setDeviceCalendars(refreshedCals);
+      const allIds = refreshedCals.map((c) => String(c.id));
       const savedIds = getEnabledCalendarIds();
-      setEnabledCalendarIds(
-        savedIds && savedIds.length > 0 ? savedIds.map(String) : refreshedCals.map((c) => String(c.id))
-      );
+      const effectiveIds =
+        savedIds && savedIds.length > 0 ? savedIds.map(String) : allIds;
+      saveEnabledCalendarIds(effectiveIds);
+      setDeviceCalendars(refreshedCals);
+      setEnabledCalendarIds(effectiveIds);
+
+      const nativeMeetings = await fetchNativeDeviceCalendarEvents();
+      try {
+        localStorage.setItem('is_calendar_synced', 'true');
+      } catch {}
       // Preserve any existing iCal URL events (from Tab 2) when re-syncing native phone calendars
       const existingIcs = activeMeetings.filter((m) => String(m.id).startsWith('ics-'));
       const merged: CalendarMeeting[] = [...nativeMeetings];
@@ -294,18 +312,15 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   };
 
   const handleResetToCleanState = () => {
-    // 1. Clear saved URL input and local storage items
-    setLiveJsonUrl('');
-    try {
-      localStorage.removeItem('live_calendar_url');
-      localStorage.removeItem('ganhua_calendar_meetings');
-      localStorage.removeItem('ganhua_active_preset_id');
-      localStorage.removeItem('ganhua_enabled_calendar_ids');
-    } catch {}
+    // 1. Wipe 100% of calendar & iCal data from localStorage
+    resetAllCalendarSyncData();
 
-    // 2. Clear enabled calendar selections
+    // 2. Reset React state immediately so "已連結的行事曆來源" disappears completely
+    setLiveJsonUrl('');
+    setDeviceCalendars([]);
     setEnabledCalendarIds([]);
-    saveEnabledCalendarIds([]);
+    setSuccessMsg(null);
+    setErrorMsg(null);
 
     // 3. Clear meeting state in parent and disconnect
     onUpdateMeetings([], null);
