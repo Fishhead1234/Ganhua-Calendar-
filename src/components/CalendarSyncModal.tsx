@@ -214,17 +214,30 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
     setIsLoading(true);
 
     try {
-      const meetings = await fetchNativeDeviceCalendarEvents();
+      const nativeMeetings = await fetchNativeDeviceCalendarEvents();
       const refreshedCals = await fetchDeviceCalendars();
       setDeviceCalendars(refreshedCals);
       const savedIds = getEnabledCalendarIds();
       setEnabledCalendarIds(
         savedIds && savedIds.length > 0 ? savedIds.map(String) : refreshedCals.map((c) => String(c.id))
       );
-      onUpdateMeetings(meetings, null);
+      // Preserve any existing iCal URL events (from Tab 2) when re-syncing native phone calendars
+      const existingIcs = activeMeetings.filter((m) => String(m.id).startsWith('ics-'));
+      const merged: CalendarMeeting[] = [...nativeMeetings];
+      const seenKeys = new Set(
+        nativeMeetings.map((ev) => `${ev.dateKey || ''}_${ev.title}_${ev.startHour}_${ev.startMinute}`)
+      );
+      existingIcs.forEach((ev) => {
+        const key = `${ev.dateKey || ''}_${ev.title}_${ev.startHour}_${ev.startMinute}`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          merged.push(ev);
+        }
+      });
+      onUpdateMeetings(merged, null);
       onToggleConnected(true);
-      syncAllCalendarRemindersViaBridge(meetings);
-      setSuccessMsg(`📱 手機行事曆同步成功！已讀取 ${meetings.length} 場行程，並已排定提醒通知。`);
+      syncAllCalendarRemindersViaBridge(merged);
+      setSuccessMsg(`📱 手機行事曆同步成功！已讀取 ${merged.length} 場行程，並已排定提醒通知。`);
     } catch (err: any) {
       setErrorMsg(err.message || '讀取手機行事曆失敗，請確認已授權日曆讀取權限。');
     } finally {
@@ -476,7 +489,7 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
                       </div>
 
                       <p className="text-[11px] font-sans text-[#6E6A63] leading-relaxed">
-                        勾選您希望日曆讀取的行事曆（已為您預設勾選常用行事曆，可隨時自訂勾選或取消）：
+                        勾選您希望日曆讀取的行事曆（若外部訂閱日曆顯示 0 筆，代表 Google 日曆未將該 URL 寫入手機底層資料庫，建議改用上方「🌐 網址訂閱 (iCal)」直接貼上 `.ics` 網址）：
                       </p>
 
                       <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
