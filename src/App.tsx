@@ -522,6 +522,7 @@ export const App: React.FC = () => {
 
   // Schedule native event alarms only when appointments or notification settings change
   const lastSyncedRemindersHashRef = useRef<string>('');
+  const hasPendingWidgetDateRef = useRef<boolean>(false);
   useEffect(() => {
     const eventsToNotify = (allAppointments || []).filter(
       (a) => a.source === 'local' || persisted.calendarConnected
@@ -881,14 +882,18 @@ export const App: React.FC = () => {
 
   // Listen for native Android widget date selection deep-link & 1x1 Survival Stamp sync
   useEffect(() => {
-    const handleWidgetDateEvent = (e: any) => {
-      const dateStr = e.detail;
+    const applyWidgetJumpDate = (dateStr: string) => {
       if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
         const [y, m, d] = dateStr.split('-').map(Number);
         if (y && m && d) {
+          hasPendingWidgetDateRef.current = true;
           handleJumpToDate(new Date(y, m - 1, d));
         }
       }
+    };
+
+    const handleWidgetDateEvent = (e: any) => {
+      applyWidgetJumpDate(e.detail);
     };
     window.addEventListener('widgetSelectDate', handleWidgetDateEvent);
 
@@ -913,16 +918,21 @@ export const App: React.FC = () => {
     };
     window.addEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
 
-    // Read pending widget date from native Capacitor plugin if cold-started
+    // Read pending widget date from native Android bridge / Capacitor plugin on cold start & resume
     const syncFromNativeWidgets = () => {
       const win = window as any;
+
+      try {
+        const bridgeDate = win.AndroidCalendarBridge?.consumePendingWidgetDate?.();
+        if (bridgeDate && /^\d{4}-\d{2}-\d{2}$/.test(bridgeDate)) {
+          applyWidgetJumpDate(bridgeDate);
+        }
+      } catch {}
+
       if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingWidgetDate) {
         win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingWidgetDate().then((res: any) => {
           if (res?.date && /^\d{4}-\d{2}-\d{2}$/.test(res.date)) {
-            const [y, m, d] = res.date.split('-').map(Number);
-            if (y && m && d) {
-              handleJumpToDate(new Date(y, m - 1, d));
-            }
+            applyWidgetJumpDate(res.date);
           }
         }).catch(() => {});
       }
@@ -949,6 +959,7 @@ export const App: React.FC = () => {
       }
 
       // Read pending torn status from 4x5 Desk Card Widget
+      // IMPORTANT: Never override a past widget deep-link date (< 0) back to 0!
       if (win.Capacitor?.Plugins?.GanhuaWidgetBridge?.getPendingTornSync) {
         win.Capacitor.Plugins.GanhuaWidgetBridge.getPendingTornSync().then((res: any) => {
           if (res?.lastTornToDate) {
@@ -957,7 +968,9 @@ export const App: React.FC = () => {
               const curTodayKey = toLocalDateKey(new Date());
               if (res.lastTornToDate === curTodayKey) {
                 setIsTodayUnlocked(true);
-                setPersisted((prev) => (prev.dateOffset < 0 ? { ...prev, dateOffset: 0 } : prev));
+                if (!hasPendingWidgetDateRef.current) {
+                  setPersisted((prev) => (prev.dateOffset === -1 ? { ...prev, dateOffset: 0 } : prev));
+                }
               }
             } catch {}
           }
@@ -980,10 +993,7 @@ export const App: React.FC = () => {
       const params = new URLSearchParams(window.location.search);
       const urlDate = params.get('select_date') || params.get('jumpToYmd');
       if (urlDate && /^\d{4}-\d{2}-\d{2}$/.test(urlDate)) {
-        const [y, m, d] = urlDate.split('-').map(Number);
-        if (y && m && d) {
-          handleJumpToDate(new Date(y, m - 1, d));
-        }
+        applyWidgetJumpDate(urlDate);
       }
     }
 

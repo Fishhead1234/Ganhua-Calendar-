@@ -18,6 +18,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -701,6 +702,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
             // Header Title Touch Area: Open App
             Intent openAppIntent = new Intent(context, MainActivity.class);
             openAppIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            openAppIntent.setData(Uri.parse("ganhua://date/" + selectedDate));
             openAppIntent.putExtra("select_date", selectedDate);
             openAppIntent.putExtra("jumpToYmd", selectedDate);
             openAppIntent.putExtra("jumpToDay", selDay);
@@ -722,6 +724,7 @@ public class MonthlyLargeWidgetProvider extends AppWidgetProvider {
                     // Second Tap on already-selected cell opens MainActivity
                     Intent tapSecondIntent = new Intent(context, MainActivity.class);
                     tapSecondIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    tapSecondIntent.setData(Uri.parse("ganhua://date/" + cellYmd));
                     tapSecondIntent.putExtra("select_date", cellYmd);
                     tapSecondIntent.putExtra("jumpToYmd", cellYmd);
                     PendingIntent piCellOpen = PendingIntent.getActivity(

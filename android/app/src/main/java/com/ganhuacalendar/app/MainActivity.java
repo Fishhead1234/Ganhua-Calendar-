@@ -81,10 +81,19 @@ public class MainActivity extends BridgeActivity {
         if (selectDate == null || selectDate.isEmpty()) {
             selectDate = intent.getStringExtra("jumpToYmd");
         }
+        if ((selectDate == null || selectDate.isEmpty()) && intent.getData() != null) {
+            String segment = intent.getData().getLastPathSegment();
+            if (segment != null && segment.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                selectDate = segment;
+            }
+        }
         if (selectDate != null && !selectDate.isEmpty()) {
             final String targetDate = selectDate;
             SharedPreferences prefs = getSharedPreferences(GanhuaWidgetProvider.PREFS_NAME, Context.MODE_PRIVATE);
-            prefs.edit().putString("pending_widget_select_date", targetDate).apply();
+            prefs.edit()
+                    .putString("pending_widget_select_date", targetDate)
+                    .putString("pending_widget_date", targetDate)
+                    .apply();
 
             if (bridge != null && bridge.getWebView() != null) {
                 bridge.getWebView().post(new Runnable() {

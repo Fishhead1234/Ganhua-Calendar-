@@ -1015,5 +1015,30 @@ public class AndroidCalendarBridge {
             return -1L;
         }
     }
+
+    /**
+     * Consume any pending widget deep-link date stored by MainActivity (for cold start).
+     */
+    @JavascriptInterface
+    public String consumePendingWidgetDate() {
+        try {
+            android.content.SharedPreferences prefs = context.getSharedPreferences(
+                GanhuaWidgetProvider.PREFS_NAME,
+                Context.MODE_PRIVATE
+            );
+            String pending = prefs.getString("pending_widget_date", "");
+            if (pending == null || pending.isEmpty()) {
+                pending = prefs.getString("pending_widget_select_date", "");
+            }
+            if (pending != null && !pending.isEmpty()) {
+                prefs.edit()
+                    .remove("pending_widget_date")
+                    .remove("pending_widget_select_date")
+                    .apply();
+                return pending;
+            }
+        } catch (Exception ignored) {}
+        return "";
+    }
 }
 
