@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.Settings;
 import android.util.Base64;
@@ -57,6 +58,30 @@ public class AndroidCalendarBridge {
     }
 
     /**
+     * Force SYNC_EVENTS = 1 and VISIBLE = 1 on subscribed/hidden calendars (e.g., BSKL Calendar)
+     * so Android's CalendarProvider writes their events into the shared database.
+     */
+    private void forceSyncAndVisibleCalendars(ContentResolver resolver) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(CalendarContract.Calendars.SYNC_EVENTS, 1);
+            cv.put(CalendarContract.Calendars.VISIBLE, 1);
+            int updated = resolver.update(
+                CalendarContract.Calendars.CONTENT_URI,
+                cv,
+                CalendarContract.Calendars.SYNC_EVENTS + " = 0 OR " + CalendarContract.Calendars.VISIBLE + " = 0",
+                null
+            );
+            if (updated > 0) {
+                ContentResolver.requestSync(null, CalendarContract.AUTHORITY, Bundle.EMPTY);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    /**
      * 1. Query all calendars on phone with NO filters and NO deduplication by name.
      * Returns all sub-calendars, including Google Calendar, Outlook, Family, Work, etc.
      */
@@ -68,6 +93,7 @@ public class AndroidCalendarBridge {
 
         JSONArray array = new JSONArray();
         ContentResolver resolver = context.getContentResolver();
+        forceSyncAndVisibleCalendars(resolver);
 
         String[] projection = new String[]{
             CalendarContract.Calendars._ID,
@@ -142,6 +168,7 @@ public class AndroidCalendarBridge {
 
         JSONArray array = new JSONArray();
         ContentResolver resolver = context.getContentResolver();
+        forceSyncAndVisibleCalendars(resolver);
 
         long bufferedStart = Math.max(0L, startMs - 86400000L);
         long bufferedEnd = endMs + 86400000L;
@@ -231,6 +258,8 @@ public class AndroidCalendarBridge {
                     obj.put("startMinute", startMinute);
                     obj.put("durationMinutes", durationMinutes);
                     obj.put("dateKey", dateKey);
+                    obj.put("beginMs", begin);
+                    obj.put("endMs", end);
                     obj.put("isAllDay", isAllDay);
                     obj.put("isFridayAfterFour", isFridayAfterFour);
                     obj.put("source", "synced");
@@ -432,6 +461,8 @@ public class AndroidCalendarBridge {
         obj.put("startMinute", startMinute);
         obj.put("durationMinutes", durationMinutes);
         obj.put("dateKey", dateKey);
+        obj.put("beginMs", begin);
+        obj.put("endMs", end);
         obj.put("isAllDay", isAllDay);
         obj.put("isFridayAfterFour", isFridayAfterFour);
         obj.put("source", "synced");

@@ -1402,9 +1402,10 @@ export async function fetchNativeDeviceCalendarEvents(
         endOfDay.getTime()
       );
       const rawEvents: any[] = JSON.parse(jsonStr || '[]');
-      const meetings: CalendarMeeting[] = (Array.isArray(rawEvents) ? rawEvents : [])
+      const meetings: CalendarMeeting[] = [];
+      (Array.isArray(rawEvents) ? rawEvents : [])
         .filter((e) => isEventEnabled(e.calendarId))
-        .map((e, idx) => {
+        .forEach((e, idx) => {
           const rawCalId = e.calendarId;
           const calIdStr = rawCalId !== undefined && rawCalId !== null && String(rawCalId).trim() !== ''
             ? String(rawCalId)
@@ -1427,7 +1428,7 @@ export async function fetchNativeDeviceCalendarEvents(
               ? accessLevel < 500
               : true;
 
-          return {
+          const baseMeeting: CalendarMeeting = {
             id: String(e.id || `native-inst-${idx + 1}`),
             title: e.title || '未命名行程',
             startHour: Number(e.startHour ?? 9),
@@ -1446,6 +1447,60 @@ export async function fetchNativeDeviceCalendarEvents(
             notes: e.notes || undefined,
             location: e.location || undefined,
           };
+
+          const beginMs = typeof e.beginMs === 'number' ? e.beginMs : Number(e.beginMs);
+          const endMs = typeof e.endMs === 'number' ? e.endMs : Number(e.endMs);
+          if (
+            Number.isFinite(beginMs) &&
+            Number.isFinite(endMs) &&
+            endMs - beginMs > 86400000
+          ) {
+            if (baseMeeting.isAllDay) {
+              // All-day DTEND in Android/iCal is exclusive UTC midnight of the day after the last day
+              const sDate = new Date(beginMs);
+              const eDate = new Date(endMs);
+              let currDay = Date.UTC(sDate.getUTCFullYear(), sDate.getUTCMonth(), sDate.getUTCDate());
+              const endDayUtc = Date.UTC(eDate.getUTCFullYear(), eDate.getUTCMonth(), eDate.getUTCDate());
+              let dayIdx = 0;
+              while (currDay < endDayUtc && dayIdx < 90) {
+                const dObj = new Date(currDay);
+                const y = dObj.getUTCFullYear();
+                const m = String(dObj.getUTCMonth() + 1).padStart(2, '0');
+                const d = String(dObj.getUTCDate()).padStart(2, '0');
+                const dk = `${y}-${m}-${d}`;
+                meetings.push({
+                  ...baseMeeting,
+                  id: dayIdx === 0 ? baseMeeting.id : `${baseMeeting.id}_d${dayIdx}`,
+                  dateKey: dk,
+                });
+                currDay += 86400000;
+                dayIdx++;
+              }
+              return;
+            } else {
+              const sLocal = new Date(beginMs);
+              const eLocal = new Date(endMs);
+              let curr = new Date(sLocal.getFullYear(), sLocal.getMonth(), sLocal.getDate());
+              const endMidnight = new Date(eLocal.getFullYear(), eLocal.getMonth(), eLocal.getDate());
+              const endHasTime = eLocal.getHours() > 0 || eLocal.getMinutes() > 0;
+              let dayIdx = 0;
+              while (
+                (endHasTime ? curr.getTime() <= endMidnight.getTime() : curr.getTime() < endMidnight.getTime()) &&
+                dayIdx < 90
+              ) {
+                meetings.push({
+                  ...baseMeeting,
+                  id: dayIdx === 0 ? baseMeeting.id : `${baseMeeting.id}_d${dayIdx}`,
+                  dateKey: toLocalDateKey(curr),
+                });
+                curr = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate() + 1);
+                dayIdx++;
+              }
+              return;
+            }
+          }
+
+          meetings.push(baseMeeting);
         });
 
       meetings.sort((a, b) => {
@@ -1656,6 +1711,8 @@ export function parseICSToMeetings(
     summary?: string;
     dtstart?: string;
     dtend?: string;
+    rrule?: string;
+    exdates?: string[];
     description?: string;
     location?: string;
   } = {};
@@ -1684,74 +1741,83 @@ export function parseICSToMeetings(
             .trim();
 
           const calName = detectedCalName || '🌐 外部訂閱日曆';
+          const notes = currentEvent.description
+            ? currentEvent.description.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+            : undefined;
+          const location = currentEvent.location
+            ? currentEvent.location.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
+            : undefined;
 
-          // If all-day event spanning multiple days (e.g. DTSTART:20261102 to DTEND:20261105)
-          if (isAllDay && endParsed && endParsed.isAllDay) {
-            const cur = new Date(startParsed.date);
-            const endLimit = new Date(endParsed.date);
-            // End date in iCal all-day events is exclusive; ensure at least 1 day
-            const maxDays = Math.max(1, Math.round((endLimit.getTime() - cur.getTime()) / (1000 * 60 * 60 * 24)));
-            for (let d = 0; d < Math.min(30, maxDays); d++) {
-              const dayDate = new Date(cur.getTime() + d * 86400000);
-              const dateKey = toLocalDateKey(dayDate);
+          const pushSingleOccurrence = (occStart: Date, occIdSuffix: string) => {
+            if (isAllDay && endParsed && endParsed.isAllDay) {
+              const spanDays = Math.max(
+                1,
+                Math.round((endParsed.date.getTime() - startParsed.date.getTime()) / 86400000)
+              );
+              for (let d = 0; d < Math.min(90, spanDays); d++) {
+                const dayDate = new Date(occStart.getTime() + d * 86400000);
+                const dateKey = toLocalDateKey(dayDate);
+                meetings.push({
+                  id: `ics-${currentEvent.uid || Date.now()}-${occIdSuffix}-d${d}`,
+                  title,
+                  startHour: 9,
+                  startMinute: 0,
+                  durationMinutes: 480,
+                  isAllDay: true,
+                  dateKey,
+                  isFridayAfterFour: false,
+                  source: 'synced',
+                  calendarName: calName,
+                  calendarColor: '#0F9D58',
+                  notes,
+                  location,
+                });
+              }
+            } else {
+              const dateKey = toLocalDateKey(occStart);
+              const startHour = isAllDay ? 9 : occStart.getHours();
+              const startMinute = isAllDay ? 0 : occStart.getMinutes();
+              let durationMinutes = isAllDay ? 480 : 60;
+
+              if (!isAllDay && endParsed && !isNaN(endParsed.date.getTime())) {
+                const diffMs = endParsed.date.getTime() - startParsed.date.getTime();
+                if (diffMs > 0) {
+                  durationMinutes = Math.max(15, Math.round(diffMs / 60000));
+                }
+              }
+
+              const isFridayAfterFour =
+                occStart.getDay() === 5 &&
+                (startHour >= 16 || (startHour === 15 && startMinute >= 45));
+
               meetings.push({
-                id: `ics-${currentEvent.uid || Date.now()}-${d}`,
+                id: `ics-${currentEvent.uid || `${dateKey}_${title.replace(/\s+/g, '_')}_${startHour}_${startMinute}`}-${occIdSuffix}`,
                 title,
-                startHour: 9,
-                startMinute: 0,
-                durationMinutes: 480,
-                isAllDay: true,
+                startHour,
+                startMinute,
+                durationMinutes,
+                isFridayAfterFour,
                 dateKey,
-                isFridayAfterFour: false,
+                isAllDay,
                 source: 'synced',
                 calendarName: calName,
                 calendarColor: '#0F9D58',
-                notes: currentEvent.description
-                  ? currentEvent.description.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
-                  : undefined,
-                location: currentEvent.location
-                  ? currentEvent.location.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
-                  : undefined,
+                notes,
+                location,
               });
             }
-          } else {
-            // Standard timed meeting or single-day all day event
-            const localDate = startParsed.date;
-            const dateKey = toLocalDateKey(localDate);
-            const startHour = isAllDay ? 9 : localDate.getHours();
-            const startMinute = isAllDay ? 0 : localDate.getMinutes();
-            let durationMinutes = isAllDay ? 480 : 60;
+          };
 
-            if (!isAllDay && endParsed && !isNaN(endParsed.date.getTime())) {
-              const diffMs = endParsed.date.getTime() - startParsed.date.getTime();
-              if (diffMs > 0) {
-                durationMinutes = Math.max(15, Math.round(diffMs / (1000 * 60)));
-              }
-            }
-
-            const isFridayAfterFour =
-              localDate.getDay() === 5 &&
-              (startHour >= 16 || (startHour === 15 && startMinute >= 45));
-
-            meetings.push({
-              id: `ics-${currentEvent.uid || `${dateKey}_${title.replace(/\s+/g, '_')}_${startHour}_${startMinute}`}`,
-              title,
-              startHour,
-              startMinute,
-              durationMinutes,
-              isFridayAfterFour,
-              dateKey,
-              isAllDay,
-              source: 'synced',
-              calendarName: calName,
-              calendarColor: '#0F9D58',
-              notes: currentEvent.description
-                ? currentEvent.description.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
-                : undefined,
-              location: currentEvent.location
-                ? currentEvent.location.replace(/\\,/g, ',').replace(/\\n/g, '\n').trim()
-                : undefined,
+          if (currentEvent.rrule) {
+            const now = new Date();
+            const winStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30, 0, 0, 0).getTime();
+            const winEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 60, 23, 59, 59).getTime();
+            const occDates = expandIcsRRule(startParsed.date, currentEvent.rrule, currentEvent.exdates || [], winStart, winEnd);
+            occDates.forEach((occ, oIdx) => {
+              pushSingleOccurrence(occ, `r${oIdx}`);
             });
+          } else {
+            pushSingleOccurrence(startParsed.date, '0');
           }
         }
       }
@@ -1770,6 +1836,11 @@ export function parseICSToMeetings(
       currentEvent.dtstart = line;
     } else if (line.startsWith('DTEND')) {
       currentEvent.dtend = line;
+    } else if (line.startsWith('RRULE:')) {
+      currentEvent.rrule = line.substring(6).trim();
+    } else if (line.startsWith('EXDATE')) {
+      const valPart = line.includes(':') ? line.substring(line.indexOf(':') + 1) : '';
+      currentEvent.exdates = [...(currentEvent.exdates || []), ...valPart.split(',').map((s) => s.trim())];
     } else if (line.startsWith('DESCRIPTION:')) {
       currentEvent.description = line.substring(12);
     } else if (line.startsWith('LOCATION:')) {
@@ -1785,6 +1856,99 @@ export function parseICSToMeetings(
   });
 
   return meetings;
+}
+
+function expandIcsRRule(
+  dtStart: Date,
+  rrule: string,
+  exdates: string[],
+  rangeStartMs: number,
+  rangeEndMs: number
+): Date[] {
+  const results: Date[] = [];
+  if (dtStart.getTime() > rangeEndMs) return results;
+
+  const parts = rrule.toUpperCase().split(';');
+  let freq = '';
+  let interval = 1;
+  let countLimit = Infinity;
+  let untilMs = Infinity;
+  const byDays: number[] = [];
+
+  const dayMap: Record<string, number> = {
+    SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6,
+  };
+
+  for (const part of parts) {
+    const eq = part.indexOf('=');
+    if (eq <= 0) continue;
+    const k = part.substring(0, eq).trim();
+    const v = part.substring(eq + 1).trim();
+    if (k === 'FREQ') freq = v;
+    else if (k === 'INTERVAL') interval = Math.max(1, parseInt(v, 10) || 1);
+    else if (k === 'COUNT') countLimit = Math.max(1, parseInt(v, 10) || Infinity);
+    else if (k === 'UNTIL') {
+      const parsedUntil = parseIcsTimestamp(`UNTIL:${v}`);
+      if (parsedUntil) untilMs = parsedUntil.date.getTime() + 86399999;
+    } else if (k === 'BYDAY') {
+      v.split(',').forEach((d) => {
+        const code = d.trim().slice(-2);
+        if (dayMap[code] !== undefined) byDays.push(dayMap[code]);
+      });
+    }
+  }
+
+  if (!freq) return [dtStart];
+
+  const excludedKeys = new Set<string>();
+  exdates.forEach((ex) => {
+    const clean = ex.replace(/[^0-9]/g, '');
+    if (clean.length >= 8) {
+      excludedKeys.add(`${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}`);
+    }
+  });
+
+  const effectiveEnd = Math.min(rangeEndMs, untilMs);
+  let generated = 0;
+
+  if (freq === 'WEEKLY' && byDays.length > 0) {
+    const weekStart = new Date(dtStart);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    for (let iter = 0; iter < 500; iter++) {
+      if (weekStart.getTime() > effectiveEnd + 7 * 86400000) break;
+      for (let d = 0; d < 7; d++) {
+        const occ = new Date(weekStart);
+        occ.setDate(weekStart.getDate() + d);
+        if (!byDays.includes(occ.getDay())) continue;
+        if (occ.getTime() < dtStart.getTime()) continue;
+        if (occ.getTime() > effectiveEnd) return results;
+        generated++;
+        if (generated > countLimit) return results;
+        if (occ.getTime() >= rangeStartMs && !excludedKeys.has(toLocalDateKey(occ))) {
+          results.push(occ);
+        }
+      }
+      weekStart.setDate(weekStart.getDate() + 7 * interval);
+    }
+  } else {
+    const cur = new Date(dtStart);
+    for (let iter = 0; iter < 1500; iter++) {
+      const ts = cur.getTime();
+      if (ts > effectiveEnd) break;
+      generated++;
+      if (generated > countLimit) break;
+      if (ts >= rangeStartMs && !excludedKeys.has(toLocalDateKey(cur))) {
+        results.push(new Date(cur));
+      }
+      if (freq === 'DAILY') cur.setDate(cur.getDate() + interval);
+      else if (freq === 'WEEKLY') cur.setDate(cur.getDate() + 7 * interval);
+      else if (freq === 'MONTHLY') cur.setMonth(cur.getMonth() + interval);
+      else if (freq === 'YEARLY') cur.setFullYear(cur.getFullYear() + interval);
+      else break;
+    }
+  }
+
+  return results;
 }
 
 /**
@@ -1863,18 +2027,18 @@ export async function fetchSingleCalendarUrl(
   let text = '';
   let fetchErrorMsg = '';
 
-  // 1. On Android: Use native AndroidCalendarBridge.fetchIcsUrl to bypass WebView CORS!
+  // 1. On Android: Always use native AndroidCalendarBridge.fetchIcsUrl to bypass WebView CORS (never browser fetch)!
   if (win.AndroidCalendarBridge?.fetchIcsUrl) {
+    let nativeText = '';
     try {
-      const nativeText = win.AndroidCalendarBridge.fetchIcsUrl(cleanUrl);
-      if (nativeText && !nativeText.startsWith('ERROR:') && (nativeText.includes('BEGIN:VCALENDAR') || nativeText.includes('BEGIN:VEVENT') || nativeText.trim().startsWith('['))) {
-        text = nativeText;
-      } else if (nativeText && nativeText.startsWith('ERROR:')) {
-        fetchErrorMsg = nativeText;
-      }
+      nativeText = win.AndroidCalendarBridge.fetchIcsUrl(cleanUrl);
     } catch (e: any) {
-      console.warn('Native fetchIcsUrl exception:', e);
-      fetchErrorMsg = e?.message || 'Native fetch error';
+      throw new Error(`Android 原生下載失敗：${e?.message || '網路異常'}`);
+    }
+    if (nativeText && !nativeText.startsWith('ERROR:') && (nativeText.includes('BEGIN:VCALENDAR') || nativeText.includes('BEGIN:VEVENT') || nativeText.trim().startsWith('['))) {
+      text = nativeText;
+    } else {
+      throw new Error(nativeText && nativeText.startsWith('ERROR:') ? nativeText : '無法讀取日曆內容，請確認網址是否公開可用');
     }
   }
 

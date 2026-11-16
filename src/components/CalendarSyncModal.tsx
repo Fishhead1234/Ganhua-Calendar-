@@ -245,12 +245,27 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
 
     try {
       localStorage.setItem('live_calendar_url', liveJsonUrl.trim());
-      const meetings = await fetchLiveCalendarFeed(liveJsonUrl.trim());
-      onUpdateMeetings(meetings, null);
+      const icsMeetings = await fetchLiveCalendarFeed(liveJsonUrl.trim());
+      // Merge with existing native device calendar events (avoid overwriting native sync)
+      const existingNative = activeMeetings.filter(
+        (m) => m.source === 'synced' && !String(m.id).startsWith('ics-')
+      );
+      const merged: CalendarMeeting[] = [...existingNative];
+      const seenKeys = new Set(
+        existingNative.map((ev) => `${ev.dateKey || ''}_${ev.title}_${ev.startHour}_${ev.startMinute}`)
+      );
+      icsMeetings.forEach((ev) => {
+        const key = `${ev.dateKey || ''}_${ev.title}_${ev.startHour}_${ev.startMinute}`;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          merged.push(ev);
+        }
+      });
+      onUpdateMeetings(merged, null);
       onToggleConnected(true);
-      syncAllCalendarRemindersViaBridge(meetings);
+      syncAllCalendarRemindersViaBridge(merged);
       const urlCount = liveJsonUrl.split(/[\r\n,;]+/).filter((u) => u.trim().length > 0).length;
-      setSuccessMsg(`🌐 日曆連線成功！已同步 ${urlCount} 個日曆網址來源，共抓取 ${meetings.length} 場行程，並已排定提醒通知。`);
+      setSuccessMsg(`🌐 日曆連線成功！已同步 ${urlCount} 個日曆網址來源（新增 ${icsMeetings.length} 場），共 ${merged.length} 場行程。`);
     } catch (err: any) {
       setErrorMsg(err.message || '連線失敗，請確認日曆網址是否正確且公開可用。');
     } finally {
