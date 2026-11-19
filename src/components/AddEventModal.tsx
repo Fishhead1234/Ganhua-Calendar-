@@ -355,13 +355,16 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   const isSyncedEvent = Boolean(editingEvent && editingEvent.source && editingEvent.source !== 'local');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-md bg-[#FAF7F0] rounded-[26px] border-2 border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.2),0_6px_0_#2D2D2D] overflow-hidden flex flex-col max-h-[92vh]"
+        className="w-full max-w-md bg-[#FAF7F0] rounded-[26px] border-2 border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.2),0_6px_0_#2D2D2D] overflow-hidden flex flex-col max-h-[82vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-3 flex items-center justify-between border-b-2 border-[#2D2D2D] select-none">
+        <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-2.5 flex items-center justify-between border-b-2 border-[#2D2D2D] select-none shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-[#F9F6F0]/40 shadow-inner" />
             <span className="font-serif font-black text-sm tracking-widest text-[#F9F6F0]">
@@ -372,9 +375,10 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-[#FAF7F0]/10 hover:bg-[#FAF7F0]/20 text-[#FAF7F0] flex items-center justify-center transition cursor-pointer"
+            className="w-10 h-10 rounded-full bg-[#FAF7F0]/10 hover:bg-[#FAF7F0]/20 text-[#FAF7F0] flex items-center justify-center transition cursor-pointer"
+            aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -396,9 +400,10 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           {/* Quick Voice / Natural Language Input Bar */}
           {!editingEvent && (
             <div className="p-3 rounded-2xl bg-[#F3EFE6] border border-[#2D2D2D]/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-[11px] font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
-                  <span>🎙️ 一句話快速輸入（可打字或語音）</span>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-[11px] font-serif font-black text-[#2D2D2D] flex items-center gap-1.5 pl-0.5 leading-normal">
+                  <span>🎙️</span>
+                  <span>一句話快速輸入（可打字或語音）</span>
                 </label>
                 {onStartVoiceAdd && (
                   <button
@@ -441,7 +446,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
             <div className="space-y-1.5">
               <label className="block text-xs font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
                 <FolderOpen className="w-3.5 h-3.5 text-[#C83E31]" />
-                <span>📂 儲存至行事曆</span>
+                <span>儲存至行事曆</span>
               </label>
               <select
                 value={targetCalendarId}

@@ -30,15 +30,15 @@ export const DeleteEventConfirmModal: React.FC<DeleteEventConfirmModalProps> = (
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[70] flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm bg-[#FAF7F0] rounded-[24px] border-2 border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.25),0_6px_0_#2D2D2D] overflow-hidden"
+        className="w-full max-w-sm max-h-[82vh] bg-[#FAF7F0] rounded-[24px] border-2 border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.25),0_6px_0_#2D2D2D] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-[#2D2D2D] text-[#FAF7F0] px-5 py-3.5 flex items-center justify-between">
+        <div className="bg-[#2D2D2D] text-[#FAF7F0] px-5 py-2.5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <Trash2 className="w-4 h-4 text-[#E58C8A]" />
             <h3 className="font-serif font-bold text-sm tracking-wide">
@@ -48,10 +48,10 @@ export const DeleteEventConfirmModal: React.FC<DeleteEventConfirmModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/10 transition cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition cursor-pointer"
             aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -145,3 +145,4 @@ export const DeleteEventConfirmModal: React.FC<DeleteEventConfirmModalProps> = (
     </div>
   );
 };
+

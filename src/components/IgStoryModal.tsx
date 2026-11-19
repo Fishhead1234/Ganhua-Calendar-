@@ -299,10 +299,16 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-md rounded-3xl bg-[#F9F6F0] border-2 border-[#2D2D2D] shadow-2xl overflow-hidden my-auto">
+    <div
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md max-h-[82vh] rounded-3xl bg-[#F9F6F0] border-2 border-[#2D2D2D] shadow-2xl overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="px-5 py-3.5 bg-[#2D2D2D] text-[#F9F6F0] flex items-center justify-between">
+        <div className="px-5 py-2.5 bg-[#2D2D2D] text-[#F9F6F0] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <Share2 className="w-4 h-4 text-[#D4B483]" />
             <span className="font-serif font-bold text-sm tracking-wider">
@@ -312,13 +318,14 @@ export const IgStoryModal: React.FC<IgStoryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-white/80 hover:text-white cursor-pointer"
+            aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-4 sm:p-5 space-y-4">
+        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto">
           {/* Pro Status Banner */}
           {!isPro ? (
             <div className="rounded-xl bg-amber-500/10 border border-amber-600/30 p-2.5 flex items-center justify-between text-xs font-sans">

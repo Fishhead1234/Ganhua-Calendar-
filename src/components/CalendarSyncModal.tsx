@@ -336,10 +336,16 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#2D2D2D]/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-[#FAF7F0] rounded-[28px] border-2 border-[#2D2D2D] shadow-[0_20px_50px_rgba(45,45,45,0.25)] overflow-hidden flex flex-col max-h-[92vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3 bg-[#2D2D2D]/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-lg bg-[#FAF7F0] rounded-[28px] border-2 border-[#2D2D2D] shadow-[0_20px_50px_rgba(45,45,45,0.25)] overflow-hidden flex flex-col max-h-[82vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="bg-[#FAF7F0] border-b-2 border-[#2D2D2D] p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-[#FAF7F0] border-b-2 border-[#2D2D2D] p-4 sm:p-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#C83E31] text-[#FAF7F0] flex items-center justify-center border border-[#2D2D2D] shadow-xs">
               <CalendarIcon className="w-5 h-5" />
@@ -361,7 +367,8 @@ export const CalendarSyncModal: React.FC<CalendarSyncModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-[#2D2D2D]/10 text-[#2D2D2D] transition cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2D2D2D]/10 text-[#2D2D2D] transition cursor-pointer shrink-0"
+            aria-label="關閉"
           >
             <X className="w-5 h-5" />
           </button>

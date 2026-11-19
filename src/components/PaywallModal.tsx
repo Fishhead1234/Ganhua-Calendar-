@@ -77,10 +77,16 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-md rounded-[32px] bg-[#F9F6F0] paper-texture border-[3px] border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.25)] overflow-hidden my-auto relative">
+    <div
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md max-h-[82vh] rounded-[32px] bg-[#F9F6F0] paper-texture border-[3px] border-[#2D2D2D] shadow-[0_20px_40px_rgba(45,45,45,0.25)] overflow-hidden flex flex-col relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Vintage Top Binding Bar */}
-        <div className="px-5 py-3 bg-[#2D2D2D] text-[#F9F6F0] flex items-center justify-between">
+        <div className="px-5 py-2.5 bg-[#2D2D2D] text-[#F9F6F0] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#D4B483] border border-white/30" />
             <span className="font-serif font-black text-xs sm:text-sm tracking-widest text-[#D4B483]">
@@ -90,13 +96,14 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-white/10 text-[#F9F6F0]/80 hover:text-white cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-[#F9F6F0]/80 hover:text-white cursor-pointer"
+            aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-5 sm:p-6 space-y-4">
+        <div className="p-5 sm:p-6 space-y-4 overflow-y-auto">
           {/* Header */}
           <div className="text-center space-y-1.5">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C83E31]/10 text-[#C83E31] border border-[#C83E31]/30 text-xs font-sans font-black">

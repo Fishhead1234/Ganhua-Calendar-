@@ -69,10 +69,16 @@ export const BirthdayModal: React.FC<BirthdayModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-sm rounded-[26px] paper-texture border-2 border-[#2D2D2D] bg-[#F9F6F0] p-6 shadow-[0_12px_0_#2D2D2D] flex flex-col gap-5 text-[#2D2D2D]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3 bg-black/60 backdrop-blur-sm animate-in fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-sm max-h-[82vh] overflow-hidden rounded-[26px] paper-texture border-2 border-[#2D2D2D] bg-[#F9F6F0] p-6 shadow-[0_12px_0_#2D2D2D] flex flex-col gap-5 text-[#2D2D2D]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#2D2D2D]/15 pb-3">
+        <div className="flex items-start justify-between border-b border-[#2D2D2D]/15 pb-3 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#C83E31] text-white flex items-center justify-center border-2 border-[#2D2D2D] shadow-md shrink-0">
               <Cake className="w-5 h-5" />
@@ -90,9 +96,10 @@ export const BirthdayModal: React.FC<BirthdayModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-full border border-[#2D2D2D]/20 hover:bg-[#2D2D2D]/10 transition text-[#2D2D2D] cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full border border-[#2D2D2D]/20 hover:bg-[#2D2D2D]/10 transition text-[#2D2D2D] cursor-pointer shrink-0"
+            aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 

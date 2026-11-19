@@ -590,10 +590,16 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-[420px] max-h-[92vh] flex flex-col rounded-3xl paper-texture border-2 border-[#2D2D2D] shadow-2xl bg-[#FAF7F0] overflow-hidden select-none">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(env(safe-area-inset-top,24px),48px)] pb-[max(env(safe-area-inset-bottom,16px),24px)] px-3 bg-black/60 backdrop-blur-sm animate-in fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-[420px] max-h-[82vh] flex flex-col rounded-3xl paper-texture border-2 border-[#2D2D2D] shadow-2xl bg-[#FAF7F0] overflow-hidden select-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Top Stand Header */}
-        <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-3 flex items-center justify-between shrink-0">
+        <div className="bg-[#2D2D2D] text-[#F9F6F0] px-5 py-2.5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#D4B483]" />
             <span className="font-serif font-black text-sm tracking-wider text-[#F9F6F0]">
@@ -603,9 +609,10 @@ export const MonthlyCalendarModal: React.FC<MonthlyCalendarModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-[#F9F6F0] transition cursor-pointer"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-[#F9F6F0] transition cursor-pointer"
+            aria-label="關閉"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
