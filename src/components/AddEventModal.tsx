@@ -14,6 +14,7 @@ import {
   Plus,
   MapPin,
   FolderOpen,
+  Mic,
 } from 'lucide-react';
 import {
   CalendarMeeting,
@@ -24,12 +25,16 @@ import {
 } from '../services/calendarService';
 import specialEventsData from '../data/special_events_quotes.json';
 import { SpecialEventQuote } from '../utils/eventRoastMatcher';
+import { ParsedVoiceSchedule, parseScheduleText } from '../utils/voiceScheduleParser';
 
 interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialDate?: string; // YYYY-MM-DD
   editingEvent?: (CustomCalendarEvent | CalendarMeeting) | null;
+  voiceDraft?: ParsedVoiceSchedule | null;
+  voiceRawText?: string;
+  onStartVoiceAdd?: () => void;
   onSave: (event: CustomCalendarEvent, targetCalendarId?: string) => void;
   onDelete?: (eventId: string, eventObj?: CustomCalendarEvent | CalendarMeeting) => void;
 }
@@ -57,6 +62,9 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   onClose,
   initialDate,
   editingEvent,
+  voiceDraft,
+  voiceRawText,
+  onStartVoiceAdd,
   onSave,
   onDelete,
 }) => {
@@ -92,6 +100,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
   ]);
   const [writableCalendars, setWritableCalendars] = useState<DeviceCalendarSource[]>([]);
   const [targetCalendarId, setTargetCalendarId] = useState<string>('local');
+  const [quickVoiceInput, setQuickVoiceInput] = useState<string>('');
 
   // Load writable Google / Android calendars when creating a new event
   useEffect(() => {
@@ -158,8 +167,20 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           // Default to 10 mins before (or 0 mins for all-day) matching native bridge behavior
           setReminders([{ id: 'rem_1', value: editingEvent.isAllDay ? 0 : 10, unit: 'minutes' }]);
         }
+      } else if (voiceDraft) {
+        setQuickVoiceInput(voiceRawText || voiceDraft.title);
+        setTitle(voiceDraft.title);
+        setDateKey(voiceDraft.dateKey || initialDate || getTodayStr());
+        setIsAllDay(voiceDraft.isAllDay);
+        setStartTime(voiceDraft.startTime || '09:00');
+        setEndTime(voiceDraft.endTime || '10:00');
+        setLocation('');
+        setNotes('');
+        setNotificationsDisabled(false);
+        setReminders([{ id: 'rem_voice_1h', value: 1, unit: 'hours' }]);
       } else {
         const defaults = getUpcomingDefaultTimes();
+        setQuickVoiceInput('');
         setTitle('');
         setDateKey(initialDate || getTodayStr());
         setIsAllDay(false);
@@ -171,7 +192,20 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
         setReminders([{ id: 'rem_1', value: 10, unit: 'minutes' }]);
       }
     }
-  }, [isOpen, editingEvent, initialDate]);
+  }, [isOpen, editingEvent, initialDate, voiceDraft, voiceRawText]);
+
+  const handleApplyQuickVoiceText = () => {
+    const trimmed = quickVoiceInput.trim();
+    if (!trimmed) return;
+    const parsed = parseScheduleText(trimmed, new Date());
+    setTitle(parsed.title);
+    setDateKey(parsed.dateKey);
+    setIsAllDay(parsed.isAllDay);
+    setStartTime(parsed.startTime);
+    setEndTime(parsed.endTime);
+    setNotificationsDisabled(false);
+    setReminders([{ id: `rem_voice_${Date.now()}`, value: 1, unit: 'hours' }]);
+  };
 
   const handleAddReminder = (
     val = 10,
@@ -356,6 +390,49 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           {isSyncedEvent && (
             <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-sans leading-relaxed">
               📡 <strong>同步連動行程：</strong>您可以自由修改下方的「通知時間」、行程時間與備忘，或點擊底部「刪除行程」將其從日曆中隱藏移除。
+            </div>
+          )}
+
+          {/* Quick Voice / Natural Language Input Bar */}
+          {!editingEvent && (
+            <div className="p-3 rounded-2xl bg-[#F3EFE6] border border-[#2D2D2D]/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-serif font-black text-[#2D2D2D] flex items-center gap-1.5">
+                  <span>🎙️ 一句話快速輸入（可打字或語音）</span>
+                </label>
+                {onStartVoiceAdd && (
+                  <button
+                    type="button"
+                    onClick={onStartVoiceAdd}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C83E31] hover:bg-[#b03428] text-white text-[10px] font-sans font-bold shadow-2xs cursor-pointer active:scale-95 transition"
+                  >
+                    <Mic className="w-3 h-3" />
+                    <span>語音輸入</span>
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="text"
+                  value={quickVoiceInput}
+                  onChange={(e) => setQuickVoiceInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleApplyQuickVoiceText();
+                    }
+                  }}
+                  placeholder="例如：明天下午三點部門週會"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-[#2D2D2D]/30 bg-white text-xs font-sans text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#D4B483]"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyQuickVoiceText}
+                  className="shrink-0 px-3 py-2 rounded-xl bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FAF7F0] text-xs font-sans font-bold cursor-pointer active:scale-95 transition"
+                >
+                  套用
+                </button>
+              </div>
             </div>
           )}
 

@@ -16,6 +16,7 @@ import {
   Trash2,
   Copy,
   Check,
+  Mic,
 } from 'lucide-react';
 import { CalendarMeeting, EventReminder } from '../services/calendarService';
 import { BirthdayWishGenerator } from './BirthdayWishGenerator';
@@ -28,6 +29,7 @@ interface DailyAgendaStripProps {
   isFuture?: boolean;
   onOpenSyncModal: () => void;
   onOpenAddEvent?: (targetDateKey?: string) => void;
+  onStartVoiceAdd?: () => void;
   onEditEvent?: (event: CalendarMeeting) => void;
   onDeleteEvent?: (event: CalendarMeeting) => void;
   onShowToast?: (msg: string) => void;
@@ -130,6 +132,7 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
   isFuture = false,
   onOpenSyncModal,
   onOpenAddEvent,
+  onStartVoiceAdd,
   onEditEvent,
   onDeleteEvent,
   onShowToast,
@@ -688,6 +691,18 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
               </span>
             )}
 
+            {onStartVoiceAdd && (
+              <button
+                type="button"
+                onClick={onStartVoiceAdd}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-[#2D2D2D] border border-[#2D2D2D]/30 text-[10px] font-sans font-bold transition shadow-xs cursor-pointer active:scale-95"
+                title="語音新增行程（例如：明天下午三點部門週會）"
+              >
+                <Mic className="w-3 h-3 text-[#C83E31]" />
+                <span className="hidden sm:inline">語音</span>
+              </button>
+            )}
+
             {onOpenAddEvent && (
               <button
                 type="button"
@@ -740,7 +755,19 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                   <div className="py-3 text-center text-xs font-sans text-[#6E6A63] space-y-1">
                     <p className="font-bold text-[#2D2D2D]">今日行事曆一片淨土 🏖️</p>
                     <p className="text-[11px]">薪水小偷模式全面啟動，零干擾專注當個空氣。</p>
-                    {onOpenAddEvent && (
+                    {onStartVoiceAdd && (
+              <button
+                type="button"
+                onClick={onStartVoiceAdd}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-[#2D2D2D] border border-[#2D2D2D]/30 text-[10px] font-sans font-bold transition shadow-xs cursor-pointer active:scale-95"
+                title="語音新增行程（例如：明天下午三點部門週會）"
+              >
+                <Mic className="w-3 h-3 text-[#C83E31]" />
+                <span className="hidden sm:inline">語音</span>
+              </button>
+            )}
+
+            {onOpenAddEvent && (
                       <button
                         type="button"
                         onClick={() => onOpenAddEvent()}
@@ -836,7 +863,19 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                   <span className="font-bold text-[#2D2D2D]">
                     🗓️ 未來一週行程排程 ({upcoming7DaysEvents.length} 場)
                   </span>
-                  {onOpenAddEvent && (
+                  {onStartVoiceAdd && (
+              <button
+                type="button"
+                onClick={onStartVoiceAdd}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-[#2D2D2D] border border-[#2D2D2D]/30 text-[10px] font-sans font-bold transition shadow-xs cursor-pointer active:scale-95"
+                title="語音新增行程（例如：明天下午三點部門週會）"
+              >
+                <Mic className="w-3 h-3 text-[#C83E31]" />
+                <span className="hidden sm:inline">語音</span>
+              </button>
+            )}
+
+            {onOpenAddEvent && (
                     <button
                       type="button"
                       onClick={() => onOpenAddEvent()}
@@ -877,7 +916,19 @@ export const DailyAgendaStrip: React.FC<DailyAgendaStripProps> = ({
                               </span>
                             </div>
 
-                            {onOpenAddEvent && (
+                            {onStartVoiceAdd && (
+              <button
+                type="button"
+                onClick={onStartVoiceAdd}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-[#2D2D2D] border border-[#2D2D2D]/30 text-[10px] font-sans font-bold transition shadow-xs cursor-pointer active:scale-95"
+                title="語音新增行程（例如：明天下午三點部門週會）"
+              >
+                <Mic className="w-3 h-3 text-[#C83E31]" />
+                <span className="hidden sm:inline">語音</span>
+              </button>
+            )}
+
+            {onOpenAddEvent && (
                               <button
                                 type="button"
                                 onClick={() => onOpenAddEvent(info.dateKey)}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Settings2, Lock, Sparkles, RotateCcw, Plus, Layers, RefreshCw, X } from 'lucide-react';
+import { Calendar, Settings2, Lock, Sparkles, RotateCcw, Plus, Layers, RefreshCw, X, Mic } from 'lucide-react';
 import { CalendarRoastResult, getEnabledCalendarIds } from '../services/calendarService';
 
 interface CalendarSyncBarProps {
@@ -13,6 +13,7 @@ interface CalendarSyncBarProps {
   onForceResync?: () => Promise<void> | void;
   onRemoveSync?: () => void;
   onOpenAddEvent?: () => void;
+  onStartVoiceAdd?: () => void;
 }
 
 export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
@@ -26,6 +27,7 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
   onForceResync,
   onRemoveSync,
   onOpenAddEvent,
+  onStartVoiceAdd,
 }) => {
   const enabledCount = getEnabledCalendarIds()?.length || 0;
 
@@ -136,7 +138,18 @@ export const CalendarSyncBar: React.FC<CalendarSyncBarProps> = ({
         )}
       </div>
 
-      {/* Quick Action Pill: + 新增行程 */}
+      {/* Quick Action Pills: 🎤 語音新增 & + 新增行程 */}
+      {onStartVoiceAdd && (
+        <button
+          type="button"
+          onClick={onStartVoiceAdd}
+          className="shrink-0 px-2 py-2 rounded-xl border border-[#2D2D2D] bg-[#FAF7F0] hover:bg-[#D4B483]/30 text-[#2D2D2D] text-xs font-sans font-bold flex items-center gap-1 transition shadow-xs cursor-pointer active:scale-95"
+          title="語音快速新增行程（例如：明天下午三點部門週會）"
+        >
+          <Mic className="w-3.5 h-3.5 text-[#C83E31]" />
+        </button>
+      )}
+
       {onOpenAddEvent && (
         <button
           type="button"

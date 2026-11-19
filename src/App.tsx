@@ -28,6 +28,7 @@ import { DeleteEventConfirmModal } from './components/DeleteEventConfirmModal';
 import { syncNativeWidgetData } from './services/widgetBridgeService';
 import { playPaperTearSound, playStampSound } from './utils/soundEffects';
 import { toLocalDateKey, getTodayLocalDateKey } from './utils/dateUtils';
+import { parseScheduleText, ParsedVoiceSchedule } from './utils/voiceScheduleParser';
 import { useSubscription } from './hooks/useSubscription';
 import { useTodayQuote } from './hooks/useTodayQuote';
 import { contentSyncService } from './services/contentSyncService';
@@ -288,6 +289,8 @@ const NativeCalendarApp: React.FC = () => {
   const [addEventInitialDate, setAddEventInitialDate] = useState<string>('');
   const [editingCustomEvent, setEditingCustomEvent] = useState<CustomCalendarEvent | null>(null);
   const [pendingDeleteEvent, setPendingDeleteEvent] = useState<CalendarMeeting | null>(null);
+  const [voiceScheduleDraft, setVoiceScheduleDraft] = useState<ParsedVoiceSchedule | null>(null);
+  const [voiceRawText, setVoiceRawText] = useState<string>('');
 
   // Merged meetings for currently viewed date
   const effectiveMeetings = useMemo(() => {
@@ -643,9 +646,25 @@ const NativeCalendarApp: React.FC = () => {
   };
 
   const handleOpenAddEvent = (dateStr?: string) => {
+    setVoiceScheduleDraft(null);
+    setVoiceRawText('');
     setAddEventInitialDate(dateStr || currentDateKey);
     setEditingCustomEvent(null);
     setIsAddEventModalOpen(true);
+  };
+
+  const handleStartVoiceSchedule = () => {
+    const bridge = (window as any).AndroidCalendarBridge;
+    if (bridge?.startVoiceScheduleInput) {
+      bridge.startVoiceScheduleInput();
+      return;
+    }
+    setVoiceScheduleDraft(null);
+    setVoiceRawText('');
+    setEditingCustomEvent(null);
+    setAddEventInitialDate(currentDateKey);
+    setIsAddEventModalOpen(true);
+    showToast('🎙️ 請於上方快速輸入框輸入行程語句，例如：明天下午三點部門週會');
   };
 
   const handleEditMeeting = (meeting: CalendarMeeting) => {
@@ -928,6 +947,25 @@ const NativeCalendarApp: React.FC = () => {
     };
     window.addEventListener('widgetSelectDate', handleWidgetDateEvent);
 
+    const handleVoiceScheduleResult = (e: any) => {
+      const spokenText = typeof e?.detail === 'string' ? e.detail.trim() : '';
+      if (!spokenText) return;
+      const parsed = parseScheduleText(spokenText, new Date());
+      setVoiceScheduleDraft(parsed);
+      setVoiceRawText(spokenText);
+      setEditingCustomEvent(null);
+      setAddEventInitialDate(parsed.dateKey);
+      setIsAddEventModalOpen(true);
+      showToast(`🎙️ 已辨識：「${spokenText}」`);
+    };
+    const handleVoiceScheduleError = (e: any) => {
+      if (typeof e?.detail === 'string' && e.detail.trim()) {
+        showToast(e.detail.trim());
+      }
+    };
+    window.addEventListener('voiceScheduleResult', handleVoiceScheduleResult);
+    window.addEventListener('voiceScheduleError', handleVoiceScheduleError);
+
     const handleWidgetSurvivedSync = (e: any) => {
       const detail = e.detail;
       if (!detail) return;
@@ -1030,6 +1068,8 @@ const NativeCalendarApp: React.FC = () => {
 
     return () => {
       window.removeEventListener('widgetSelectDate', handleWidgetDateEvent);
+      window.removeEventListener('voiceScheduleResult', handleVoiceScheduleResult);
+      window.removeEventListener('voiceScheduleError', handleVoiceScheduleError);
       window.removeEventListener('widgetSurvivedSync', handleWidgetSurvivedSync);
       window.removeEventListener('focus', handleVisibilityOrFocus);
       document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
@@ -1183,6 +1223,7 @@ const NativeCalendarApp: React.FC = () => {
           onForceResync={handleForceCalendarResync}
           onRemoveSync={handleRemoveCalendarSync}
           onOpenAddEvent={() => handleOpenAddEvent(currentQuote?.date)}
+          onStartVoiceAdd={handleStartVoiceSchedule}
         />
 
         {/* B. Center Stage: Desk Calendar Card */}
@@ -1265,6 +1306,7 @@ const NativeCalendarApp: React.FC = () => {
               isFuture={isFutureDate}
               onOpenSyncModal={() => setIsCalendarSyncModalOpen(true)}
               onOpenAddEvent={(targetDateKey) => handleOpenAddEvent(targetDateKey || currentQuote?.date)}
+              onStartVoiceAdd={handleStartVoiceSchedule}
               onEditEvent={handleEditMeeting}
               onDeleteEvent={(evt) => handleDeleteCustomEvent(evt.id, evt)}
               onShowToast={showToast}
@@ -1441,9 +1483,14 @@ const NativeCalendarApp: React.FC = () => {
         onClose={() => {
           setIsAddEventModalOpen(false);
           setEditingCustomEvent(null);
+          setVoiceScheduleDraft(null);
+          setVoiceRawText('');
         }}
         initialDate={addEventInitialDate || currentQuote?.date}
         editingEvent={editingCustomEvent}
+        voiceDraft={voiceScheduleDraft}
+        voiceRawText={voiceRawText}
+        onStartVoiceAdd={handleStartVoiceSchedule}
         onSave={handleSaveCustomEvent}
         onDelete={handleDeleteCustomEvent}
       />

@@ -1525,6 +1525,22 @@ public class AndroidCalendarBridge {
     }
 
     /**
+     * Launch native Android speech recognition dialog for 1-tap voice schedule entry.
+     */
+    @JavascriptInterface
+    public void startVoiceScheduleInput() {
+        if (context instanceof MainActivity) {
+            final MainActivity activity = (MainActivity) context;
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activity.launchVoiceScheduleRecognizer();
+                }
+            });
+        }
+    }
+
+    /**
      * Consume any pending widget deep-link date stored by MainActivity (for cold start).
      */
     @JavascriptInterface

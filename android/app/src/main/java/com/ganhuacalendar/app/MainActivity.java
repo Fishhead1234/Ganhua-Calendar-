@@ -3,6 +3,7 @@ package com.ganhuacalendar.app;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,10 +13,14 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import com.getcapacitor.BridgeActivity;
+import java.util.ArrayList;
+import org.json.JSONObject;
 
 public class MainActivity extends BridgeActivity {
     public static final String CHANNEL_ID_REMINDERS = "ganhua_calendar_reminders";
+    public static final int REQUEST_VOICE_SCHEDULE = 9102;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,6 +153,49 @@ public class MainActivity extends BridgeActivity {
             MonthlyLargeWidgetProvider.updateAllWidgets(this);
             SurvivalStampWidgetProvider.updateAllWidgets(this);
         } catch (Exception ignored) {
+        }
+    }
+
+    public void launchVoiceScheduleRecognizer() {
+        try {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-TW");
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請說出行程，例如：明天下午三點部門週會");
+            startActivityForResult(intent, REQUEST_VOICE_SCHEDULE);
+        } catch (ActivityNotFoundException e) {
+            dispatchVoiceEvent("voiceScheduleError", "此裝置尚未安裝語音辨識服務，請改用文字輸入");
+        } catch (Exception e) {
+            dispatchVoiceEvent("voiceScheduleError", "語音辨識啟動失敗，請改用文字輸入");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_VOICE_SCHEDULE && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (results != null && !results.isEmpty()) {
+                String spokenText = results.get(0);
+                if (spokenText != null && !spokenText.trim().isEmpty()) {
+                    dispatchVoiceEvent("voiceScheduleResult", spokenText.trim());
+                }
+            }
+        }
+    }
+
+    private void dispatchVoiceEvent(final String eventName, final String detailText) {
+        if (bridge != null && bridge.getWebView() != null) {
+            bridge.getWebView().post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String quoted = JSONObject.quote(detailText != null ? detailText : "");
+                        String js = "window.dispatchEvent(new CustomEvent('" + eventName + "', { detail: " + quoted + " }));";
+                        bridge.getWebView().evaluateJavascript(js, null);
+                    } catch (Exception ignored) {}
+                }
+            });
         }
     }
 }
