@@ -3,6 +3,9 @@ import { Purchases, LOG_LEVEL, PurchasesPackage } from '@revenuecat/purchases-ca
 import { Capacitor } from '@capacitor/core';
 import { REVENUECAT_GOOGLE_API_KEY, ENTITLEMENT_ID_PRO, PRODUCT_IDS } from '../constants/revenuecat';
 
+const RC_ANDROID_KEY = import.meta.env.VITE_REVENUECAT_ANDROID_KEY || REVENUECAT_GOOGLE_API_KEY || "goog_YOUR_ANDROID_KEY";
+const RC_IOS_KEY = import.meta.env.VITE_REVENUECAT_IOS_KEY || "appl_YOUR_IOS_KEY";
+
 export type SubscriptionPlan = 'annual' | 'lifetime';
 export type AppTier = 'free' | 'pro' | 'admin';
 
@@ -65,6 +68,7 @@ class PurchaseService {
   private isAdminAuthed: boolean = false;
   private listeners: Set<SubscriptionListener> = new Set();
   private isConfigured: boolean = false;
+  private isMockMode: boolean = false;
   private availablePackages: PurchasesPackage[] = [];
 
   constructor() {
@@ -105,9 +109,20 @@ class PurchaseService {
     if (typeof window === 'undefined') return;
 
     if (Capacitor.isNativePlatform()) {
+      const platform = Capacitor.getPlatform();
+      const apiKey = platform === 'ios' ? RC_IOS_KEY : RC_ANDROID_KEY;
+
+      // Skip RevenueCat SDK configuration on iOS until a real App Store Connect key is provided
+      if (platform === 'ios' && apiKey.startsWith('appl_YOUR')) {
+        console.warn('[PurchaseService] iOS RevenueCat key is placeholder; running in local/mock mode.');
+        this.isMockMode = true;
+        this.isConfigured = true;
+        return;
+      }
+
       try {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
-        await Purchases.configure({ apiKey: REVENUECAT_GOOGLE_API_KEY });
+        await Purchases.configure({ apiKey });
         this.isConfigured = true;
 
         // Check active subscriptions on startup
@@ -140,7 +155,7 @@ class PurchaseService {
    * Load offerings from RevenueCat & update local price display
    */
   public async loadOfferings(): Promise<PurchasesPackage[]> {
-    if (!Capacitor.isNativePlatform()) return [];
+    if (!Capacitor.isNativePlatform() || this.isMockMode) return [];
     try {
       const offerings = await Purchases.getOfferings();
       if (offerings.current?.availablePackages && offerings.current.availablePackages.length > 0) {
@@ -321,9 +336,9 @@ class PurchaseService {
    * Execute Google Play native purchase via RevenueCat, or web mock fallback
    */
   public async purchasePlan(planId: SubscriptionPlan): Promise<{ success: boolean; message: string }> {
-    if (Capacitor.isNativePlatform()) {
+    await this.initialize();
+    if (Capacitor.isNativePlatform() && !this.isMockMode) {
       try {
-        await this.initialize();
         if (this.availablePackages.length === 0) {
           await this.loadOfferings();
         }
@@ -398,9 +413,9 @@ class PurchaseService {
    * Restore purchases (Google Play / RevenueCat verification)
    */
   public async restorePurchases(): Promise<{ success: boolean; message: string }> {
-    if (Capacitor.isNativePlatform()) {
+    await this.initialize();
+    if (Capacitor.isNativePlatform() && !this.isMockMode) {
       try {
-        await this.initialize();
         const { customerInfo } = await Purchases.restorePurchases();
         const hasPro = Boolean(customerInfo?.entitlements?.active?.[ENTITLEMENT_ID_PRO]);
         if (hasPro) {
