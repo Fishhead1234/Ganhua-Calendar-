@@ -1,0 +1,47 @@
+require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+
+platform :ios, '15.0'
+use_frameworks!
+
+# workaround to avoid Xcode caching of Pods that requires
+# Product -> Clean Build Folder after new Cordova plugins installed
+# Requires CocoaPods 1.6 or newer
+install! 'cocoapods', :disable_input_output_paths => true
+
+def capacitor_pods
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
+end
+
+target 'App' do
+  capacitor_pods
+  # Add your Pods here
+end
+
+post_install do |installer|
+  assertDeploymentTarget(installer)
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+
+  # Fix Swift 6.3+ synthesized memberwise init collision in RevenueCat PaywallColor.swift
+  paywall_color_path = File.join(__dir__, 'Pods/RevenueCat/Sources/Paywalls/PaywallColor.swift')
+  if File.exist?(paywall_color_path)
+    content = File.read(paywall_color_path)
+    unless content.include?('fileprivate init(stringRepresentation: String, underlyingColor: (any Sendable)?)')
+      File.chmod(0644, paywall_color_path)
+      content.sub!(
+        "    fileprivate var _underlyingColor: (any Sendable)?\n\n}",
+        "    fileprivate var _underlyingColor: (any Sendable)?\n\n    fileprivate init(stringRepresentation: String, underlyingColor: (any Sendable)?) {\n        self.stringRepresentation = stringRepresentation\n        self._underlyingColor = underlyingColor\n    }\n\n}"
+      )
+      content.sub!(
+        "    /// \"Designated\" initializer\n    private init(stringRepresentation: String, underlyingColor: (any Sendable)?) {\n        self.stringRepresentation = stringRepresentation\n        self._underlyingColor = underlyingColor\n    }",
+        ""
+      )
+      File.write(paywall_color_path, content)
+    end
+  end
+end

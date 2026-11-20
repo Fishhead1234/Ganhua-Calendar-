@@ -12,6 +12,7 @@
     "@capacitor/android": "^7.0.0",
     "@capacitor/cli": "^7.0.0",
     "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.6.9",
     "@revenuecat/purchases-capacitor": "^11.3.3",
     "@vercel/analytics": "^2.0.1",
     "canvas-confetti": "^1.9.4",
